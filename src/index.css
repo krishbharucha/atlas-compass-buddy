@@ -116,13 +116,13 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Source Serif 4', Georgia, serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   }
 }
 
 @layer utilities {
   .font-heading {
-    font-family: 'Source Serif 4', Georgia, serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   }
 
   .font-body {

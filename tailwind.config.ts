@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ['"Source Serif 4"', 'Georgia', 'serif'],
+        heading: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
         body: ['"Inter"', 'system-ui', 'sans-serif'],
         mono: ['"IBM Plex Mono"', 'monospace'],
       },
