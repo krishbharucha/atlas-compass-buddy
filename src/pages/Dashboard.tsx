@@ -42,7 +42,7 @@ const Dashboard = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
       {/* Hero */}
-      <div className="gradient-hero rounded-3xl p-8 mb-8 animate-fade-in-up">
+      <div className="gradient-hero rounded-xl p-8 mb-8 animate-fade-in-up">
         <h1 className="text-3xl sm:text-4xl font-heading font-bold text-foreground">
           Good morning, Jordan
         </h1>

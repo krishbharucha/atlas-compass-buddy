@@ -97,7 +97,7 @@ const MyPlan = () => {
       </div>
 
       {/* Bottom banner */}
-      <div className="mt-8 bg-yellow-light rounded-2xl p-5 flex items-center gap-3 animate-fade-in-up" style={{ animationDelay: "600ms" }}>
+      <div className="mt-8 bg-yellow-light rounded-xl p-5 flex items-center gap-3 animate-fade-in-up" style={{ animationDelay: "600ms" }}>
         <Zap className="w-5 h-5 text-primary shrink-0" />
         <p className="text-sm text-foreground">
           Atlas checks your systems every morning and will alert you if anything needs attention.
