@@ -4,105 +4,95 @@
 
 @layer base {
   :root {
-    --background: 264 50% 98%;
-    --foreground: 252 25% 14%;
+    --background: 0 0% 99%;
+    --foreground: 220 20% 14%;
 
     --card: 0 0% 100%;
-    --card-foreground: 252 25% 14%;
+    --card-foreground: 220 20% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 252 25% 14%;
+    --popover-foreground: 220 20% 14%;
 
-    --primary: 263 83% 58%;
+    --primary: 220 25% 18%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 263 100% 96%;
-    --secondary-foreground: 252 25% 14%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 20% 14%;
 
-    --muted: 263 30% 94%;
+    --muted: 220 14% 95%;
     --muted-foreground: 220 9% 46%;
 
-    --accent: 38 92% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 220 14% 92%;
+    --accent-foreground: 220 20% 14%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 65% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 160 84% 39%;
+    --success: 152 60% 36%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
-    --warning-foreground: 252 25% 14%;
+    --warning: 38 75% 50%;
+    --warning-foreground: 220 20% 14%;
 
-    --purple-light: 263 100% 96%;
-    --purple-medium: 258 89% 76%;
-    --yellow-light: 55 97% 88%;
-    --yellow-warm: 48 96% 77%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 220 25% 18%;
 
-    --border: 263 40% 92%;
-    --input: 263 40% 92%;
-    --ring: 263 83% 58%;
-
-    --radius: 0.625rem;
+    --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-foreground: 220 10% 26%;
+    --sidebar-primary: 220 25% 18%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 220 10% 26%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 220 25% 18%;
   }
 
   .dark {
-    --background: 260 30% 8%;
-    --foreground: 260 20% 90%;
+    --background: 220 20% 7%;
+    --foreground: 220 14% 90%;
 
-    --card: 260 25% 12%;
-    --card-foreground: 260 20% 90%;
+    --card: 220 18% 10%;
+    --card-foreground: 220 14% 90%;
 
-    --popover: 260 25% 12%;
-    --popover-foreground: 260 20% 90%;
+    --popover: 220 18% 10%;
+    --popover-foreground: 220 14% 90%;
 
-    --primary: 263 83% 65%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 220 20% 75%;
+    --primary-foreground: 220 20% 7%;
 
-    --secondary: 260 25% 16%;
-    --secondary-foreground: 260 20% 85%;
+    --secondary: 220 14% 14%;
+    --secondary-foreground: 220 14% 85%;
 
-    --muted: 260 20% 18%;
-    --muted-foreground: 260 10% 55%;
+    --muted: 220 12% 16%;
+    --muted-foreground: 220 8% 55%;
 
-    --accent: 38 85% 55%;
-    --accent-foreground: 260 30% 8%;
+    --accent: 220 12% 18%;
+    --accent-foreground: 220 14% 85%;
 
-    --destructive: 0 65% 55%;
+    --destructive: 0 55% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 160 70% 45%;
+    --success: 152 50% 42%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 85% 55%;
-    --warning-foreground: 260 30% 8%;
+    --warning: 38 65% 55%;
+    --warning-foreground: 220 20% 7%;
 
-    --purple-light: 260 30% 18%;
-    --purple-medium: 258 60% 55%;
-    --yellow-light: 48 50% 15%;
-    --yellow-warm: 48 60% 30%;
+    --border: 220 12% 18%;
+    --input: 220 12% 18%;
+    --ring: 220 20% 75%;
 
-    --border: 260 20% 18%;
-    --input: 260 20% 18%;
-    --ring: 263 83% 65%;
-
-    --sidebar-background: 260 25% 10%;
-    --sidebar-foreground: 260 20% 85%;
-    --sidebar-primary: 263 83% 65%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 260 25% 16%;
-    --sidebar-accent-foreground: 260 20% 85%;
-    --sidebar-border: 260 20% 18%;
-    --sidebar-ring: 263 83% 65%;
+    --sidebar-background: 220 18% 8%;
+    --sidebar-foreground: 220 14% 85%;
+    --sidebar-primary: 220 20% 75%;
+    --sidebar-primary-foreground: 220 20% 7%;
+    --sidebar-accent: 220 14% 14%;
+    --sidebar-accent-foreground: 220 14% 85%;
+    --sidebar-border: 220 12% 18%;
+    --sidebar-ring: 220 20% 75%;
   }
 }
 
@@ -134,98 +124,37 @@
   }
 
   .glass-card {
-    @apply bg-card border border-border rounded-xl;
-    box-shadow: 0 1px 3px 0 hsl(263 83% 58% / 0.04), 0 1px 2px -1px hsl(263 83% 58% / 0.04);
+    @apply bg-card border border-border rounded-lg;
+    box-shadow: 0 1px 3px 0 hsl(220 20% 14% / 0.04);
   }
 
   .gradient-header {
-    background: linear-gradient(135deg, hsl(263 83% 58%), hsl(263 70% 34%));
-  }
-
-  .gradient-hero {
-    background: linear-gradient(180deg, hsl(var(--purple-light)), hsl(var(--background)));
-  }
-
-  .noise-bg {
-    position: relative;
-  }
-
-  .noise-bg::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    opacity: 0.03;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
+    background: hsl(220 25% 18%);
   }
 
   .pill-success {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium font-mono-accent;
-    background: hsl(160 84% 39% / 0.1);
-    color: hsl(160 84% 39%);
+    background: hsl(152 60% 36% / 0.1);
+    color: hsl(152 60% 36%);
   }
 
   .pill-warning {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium font-mono-accent;
-    background: hsl(38 92% 50% / 0.15);
-    color: hsl(38 80% 50%);
+    background: hsl(38 75% 50% / 0.12);
+    color: hsl(38 65% 42%);
   }
 
   .pill-danger {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium font-mono-accent;
-    background: hsl(0 72% 51% / 0.1);
-    color: hsl(0 72% 51%);
+    background: hsl(0 65% 51% / 0.1);
+    color: hsl(0 65% 51%);
   }
 
-  .pill-purple {
+  .pill-neutral {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium font-mono-accent;
-    background: hsl(263 83% 58% / 0.1);
-    color: hsl(263 83% 58%);
+    background: hsl(220 14% 92%);
+    color: hsl(220 9% 46%);
   }
-
-  .pill-blue {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium font-mono-accent;
-    background: hsl(217 91% 60% / 0.1);
-    color: hsl(217 91% 60%);
-  }
-}
-
-/* Floating orbs */
-@keyframes float-orb {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -20px) scale(1.05); }
-  66% { transform: translate(-20px, 15px) scale(0.95); }
-}
-
-.orb {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.12;
-  pointer-events: none;
-  z-index: 0;
-  animation: float-orb 20s ease-in-out infinite;
-}
-
-.orb-purple {
-  width: 400px; height: 400px;
-  background: hsl(263 83% 58%);
-  top: 10%; left: 10%;
-}
-
-.orb-yellow {
-  width: 350px; height: 350px;
-  background: hsl(38 92% 50%);
-  top: 50%; right: 5%;
-  animation-delay: -7s;
-}
-
-.orb-light-purple {
-  width: 300px; height: 300px;
-  background: hsl(258 89% 76%);
-  bottom: 10%; left: 40%;
-  animation-delay: -13s;
 }
 
 /* Animations */
@@ -234,48 +163,15 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes slide-in-left {
-  from { opacity: 0; transform: translateX(-20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes slide-in-right {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes gentle-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
-@keyframes pulse-subtle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .animate-fade-in-up {
   animation: fade-in-up 0.5s ease-out both;
 }
 
-.animate-slide-left {
-  animation: slide-in-left 0.4s ease-out both;
-}
-
-.animate-slide-right {
-  animation: slide-in-right 0.4s ease-out both;
-}
-
-.animate-bounce-gentle {
-  animation: gentle-bounce 1.5s ease-in-out infinite;
-}
-
-.animate-pulse-subtle {
-  animation: pulse-subtle 2s ease-in-out infinite;
-}
-
-/* Nav active underline */
-@keyframes slide-underline {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out both;
 }
