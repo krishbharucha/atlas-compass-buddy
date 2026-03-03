@@ -1,5 +1,7 @@
+import { type ReactNode } from "react";
+
 interface StatCardProps {
-  icon: string;
+  icon: ReactNode;
   iconBg: string;
   label: string;
   value: string;
@@ -14,7 +16,7 @@ const StatCard = ({ icon, iconBg, label, value, subLabel, pill, delay }: StatCar
     style={{ animationDelay: `${delay}ms` }}
   >
     <div className="flex items-center justify-between">
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${iconBg}`}>
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconBg}`}>
         {icon}
       </div>
       <span className={pill.className}>{pill.text}</span>

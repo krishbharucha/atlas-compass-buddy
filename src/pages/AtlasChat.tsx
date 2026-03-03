@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Send } from "lucide-react";
+import { Send, Heart, DollarSign, BookOpen, Briefcase, Landmark, AlertTriangle, Zap } from "lucide-react";
 
 interface ActionItem {
   num: number;
-  pillar: string;
+  pillarIcon: React.ReactNode;
   borderColor: string;
   title: string;
   description: string;
@@ -13,22 +13,22 @@ interface ActionItem {
 }
 
 const baseActions: ActionItem[] = [
-  { num: 1, pillar: "🧠", borderColor: "border-l-primary", title: "Counseling Appointment Booked", description: "Same-day slot secured: Tomorrow, Thursday 10:00am", status: "✅ Complete", statusClass: "pill-success" },
-  { num: 2, pillar: "🧠", borderColor: "border-l-primary", title: "Wellness Toolkit Sent", description: "3 sleep + stress resources sent to your phone via SMS", status: "✅ Complete", statusClass: "pill-success" },
-  { num: 3, pillar: "💰", borderColor: "border-l-accent", title: "Aid Issue Identified", description: "Root cause: Missing income verification document", status: "✅ Complete", statusClass: "pill-success" },
-  { num: 4, pillar: "💰", borderColor: "border-l-accent", title: "Appeal Filed & Routed", description: "Pre-filled appeal sent to Financial Aid with urgency flag", status: "🔄 In Progress", statusClass: "pill-warning animate-pulse-subtle" },
-  { num: 5, pillar: "💰", borderColor: "border-l-accent", title: "Hold Prevention Flag Placed", description: "Account protected — registration safe during appeal", status: "✅ Complete", statusClass: "pill-success" },
-  { num: 6, pillar: "📚", borderColor: "border-l-purple-medium", title: "Withdrawal Impact Calculated", description: "W keeps GPA at 3.41. Fail drops to 3.18. Recommendation: Stay + tutoring.", status: "✅ Complete", statusClass: "pill-success" },
-  { num: 7, pillar: "📚", borderColor: "border-l-purple-medium", title: "Emergency Advising Booked", description: "Wed 2pm — Decision brief pre-sent to your advisor", status: "✅ Complete", statusClass: "pill-success" },
-  { num: 8, pillar: "📚", borderColor: "border-l-purple-medium", title: "Tutoring Sessions Scheduled", description: "Mon/Wed/Fri 4pm — pending your confirmation", status: "⏳ Awaiting Confirmation", statusClass: "pill-purple animate-pulse-subtle" },
-  { num: 9, pillar: "💼", borderColor: "border-l-yellow-warm", title: "Internship Applications Pre-Filled", description: "Amazon SDE + Microsoft PM — ready for your review", status: "✅ Ready", statusClass: "pill-success" },
-  { num: 10, pillar: "🏛️", borderColor: "border-l-muted-foreground", title: "Library Hold Resolved", description: "Resolution request sent directly to Registrar — ETA 24hrs", status: "🔄 In Progress", statusClass: "pill-warning animate-pulse-subtle" },
+  { num: 1, pillarIcon: <Heart className="w-4 h-4 text-primary" />, borderColor: "border-l-primary", title: "Counseling Appointment Booked", description: "Same-day slot secured: Tomorrow, Thursday 10:00am", status: "Complete", statusClass: "pill-success" },
+  { num: 2, pillarIcon: <Heart className="w-4 h-4 text-primary" />, borderColor: "border-l-primary", title: "Wellness Toolkit Sent", description: "3 sleep + stress resources sent to your phone via SMS", status: "Complete", statusClass: "pill-success" },
+  { num: 3, pillarIcon: <DollarSign className="w-4 h-4 text-accent" />, borderColor: "border-l-accent", title: "Aid Issue Identified", description: "Root cause: Missing income verification document", status: "Complete", statusClass: "pill-success" },
+  { num: 4, pillarIcon: <DollarSign className="w-4 h-4 text-accent" />, borderColor: "border-l-accent", title: "Appeal Filed & Routed", description: "Pre-filled appeal sent to Financial Aid with urgency flag", status: "In Progress", statusClass: "pill-warning animate-pulse-subtle" },
+  { num: 5, pillarIcon: <DollarSign className="w-4 h-4 text-accent" />, borderColor: "border-l-accent", title: "Hold Prevention Flag Placed", description: "Account protected — registration safe during appeal", status: "Complete", statusClass: "pill-success" },
+  { num: 6, pillarIcon: <BookOpen className="w-4 h-4 text-purple-medium" />, borderColor: "border-l-purple-medium", title: "Withdrawal Impact Calculated", description: "W keeps GPA at 3.41. Fail drops to 3.18. Recommendation: Stay + tutoring.", status: "Complete", statusClass: "pill-success" },
+  { num: 7, pillarIcon: <BookOpen className="w-4 h-4 text-purple-medium" />, borderColor: "border-l-purple-medium", title: "Emergency Advising Booked", description: "Wed 2pm — Decision brief pre-sent to your advisor", status: "Complete", statusClass: "pill-success" },
+  { num: 8, pillarIcon: <BookOpen className="w-4 h-4 text-purple-medium" />, borderColor: "border-l-purple-medium", title: "Tutoring Sessions Scheduled", description: "Mon/Wed/Fri 4pm — pending your confirmation", status: "Awaiting Confirmation", statusClass: "pill-purple animate-pulse-subtle" },
+  { num: 9, pillarIcon: <Briefcase className="w-4 h-4 text-accent" />, borderColor: "border-l-yellow-warm", title: "Internship Applications Pre-Filled", description: "Amazon SDE + Microsoft PM — ready for your review", status: "Ready", statusClass: "pill-success" },
+  { num: 10, pillarIcon: <Landmark className="w-4 h-4 text-muted-foreground" />, borderColor: "border-l-muted-foreground", title: "Library Hold Resolved", description: "Resolution request sent directly to Registrar — ETA 24hrs", status: "In Progress", statusClass: "pill-warning animate-pulse-subtle" },
 ];
 
 const crisisAction: ActionItem = {
-  num: 0, pillar: "🚨", borderColor: "border-l-destructive", title: "Crisis Support Activated",
+  num: 0, pillarIcon: <AlertTriangle className="w-4 h-4 text-destructive" />, borderColor: "border-l-destructive", title: "Crisis Support Activated",
   description: "On-call counselor paged. Direct callback number sent to your phone. This conversation is being held safely.",
-  status: "🔴 Human Taking Over", statusClass: "pill-danger", isCrisis: true,
+  status: "Human Taking Over", statusClass: "pill-danger", isCrisis: true,
 };
 
 const AtlasChat = () => {
@@ -43,7 +43,9 @@ const AtlasChat = () => {
         <div className="lg:w-[45%] flex flex-col glass-card overflow-hidden">
           {/* Chat header */}
           <div className="p-4 border-b border-border flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full gradient-header flex items-center justify-center text-lg">⚡</div>
+            <div className="w-10 h-10 rounded-full gradient-header flex items-center justify-center">
+              <Zap className="w-5 h-5 text-primary-foreground" />
+            </div>
             <div>
               <h2 className="font-heading font-semibold text-foreground">Atlas</h2>
               <p className="text-xs text-muted-foreground flex items-center gap-1">
@@ -64,7 +66,7 @@ const AtlasChat = () => {
             {/* Atlas 1 */}
             <div className="flex justify-start animate-slide-left" style={{ animationDelay: "400ms" }}>
               <div className="max-w-[85%] bg-secondary text-foreground rounded-2xl rounded-bl-md p-4 text-sm leading-relaxed">
-                Jordan, that's a lot to carry at once — and it's completely understandable to feel overwhelmed. The good news is I can see everything going on and I know exactly what needs to happen. Let's handle the urgent stuff first, then build you a plan for the rest. I'm starting now. ✨
+                Jordan, that's a lot to carry at once — and it's completely understandable to feel overwhelmed. The good news is I can see everything going on and I know exactly what needs to happen. Let's handle the urgent stuff first, then build you a plan for the rest. I'm starting now.
               </div>
             </div>
 
@@ -89,7 +91,7 @@ const AtlasChat = () => {
                 <p className="text-sm text-muted-foreground mb-4">Mon / Wed / Fri at 4:00pm — MATH 208 Tutoring Center</p>
                 <div className="flex gap-3">
                   <button className="px-5 py-2 bg-accent text-accent-foreground rounded-xl text-sm font-semibold hover:opacity-90 transition-opacity animate-bounce-gentle" style={{ animationDelay: "3s" }}>
-                    ✓ Confirm
+                    Confirm
                   </button>
                   <button className="px-5 py-2 border-2 border-primary text-primary rounded-xl text-sm font-semibold hover:bg-secondary transition-colors">
                     Reschedule
@@ -101,7 +103,7 @@ const AtlasChat = () => {
             {/* Final Atlas message */}
             <div className="flex justify-start animate-slide-left" style={{ animationDelay: "1200ms" }}>
               <div className="max-w-[85%] rounded-2xl rounded-bl-md p-4 text-sm leading-relaxed" style={{ background: "hsl(160 84% 39% / 0.08)" }}>
-                ✅ Done. You're all set, Jordan. Go get some rest — I've handled everything else.
+                Done. You're all set, Jordan. Go get some rest — I've handled everything else.
               </div>
             </div>
 
@@ -115,7 +117,7 @@ const AtlasChat = () => {
                 </div>
                 <div className="flex justify-start animate-slide-left">
                   <div className="max-w-[85%] rounded-2xl rounded-bl-md p-4 text-sm leading-relaxed" style={{ background: "hsl(350 80% 60% / 0.08)" }}>
-                    I hear you. What you're feeling matters, and I'm glad you told me. I want to make sure you have real support right now — not a ticket number. I'm connecting you with someone directly. Can you stay here with me for just a moment? 💙
+                    I hear you. What you're feeling matters, and I'm glad you told me. I want to make sure you have real support right now — not a ticket number. I'm connecting you with someone directly. Can you stay here with me for just a moment?
                   </div>
                 </div>
               </>
@@ -154,9 +156,9 @@ const AtlasChat = () => {
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <span className="font-mono-accent text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-md">
-                      {a.isCrisis ? "🚨" : `#${a.num}`}
+                      {a.isCrisis ? "!" : `#${a.num}`}
                     </span>
-                    <span className="text-lg">{a.pillar}</span>
+                    {a.pillarIcon}
                     <h3 className="font-semibold text-sm text-foreground">{a.title}</h3>
                   </div>
                   <span className={`${a.statusClass} shrink-0 text-[11px]`}>{a.status}</span>
