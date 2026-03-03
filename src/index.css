@@ -54,6 +54,56 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  .dark {
+    --background: 260 30% 8%;
+    --foreground: 260 20% 90%;
+
+    --card: 260 25% 12%;
+    --card-foreground: 260 20% 90%;
+
+    --popover: 260 25% 12%;
+    --popover-foreground: 260 20% 90%;
+
+    --primary: 263 83% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 260 25% 16%;
+    --secondary-foreground: 260 20% 85%;
+
+    --muted: 260 20% 18%;
+    --muted-foreground: 260 10% 55%;
+
+    --accent: 38 85% 55%;
+    --accent-foreground: 260 30% 8%;
+
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 160 70% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 85% 55%;
+    --warning-foreground: 260 30% 8%;
+
+    --purple-light: 260 30% 18%;
+    --purple-medium: 258 60% 55%;
+    --yellow-light: 48 50% 15%;
+    --yellow-warm: 48 60% 30%;
+
+    --border: 260 20% 18%;
+    --input: 260 20% 18%;
+    --ring: 263 83% 65%;
+
+    --sidebar-background: 260 25% 10%;
+    --sidebar-foreground: 260 20% 85%;
+    --sidebar-primary: 263 83% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 260 25% 16%;
+    --sidebar-accent-foreground: 260 20% 85%;
+    --sidebar-border: 260 20% 18%;
+    --sidebar-ring: 263 83% 65%;
+  }
 }
 
 @layer base {
@@ -93,7 +143,7 @@
   }
 
   .gradient-hero {
-    background: linear-gradient(180deg, hsl(263 100% 96%), hsl(264 50% 98%));
+    background: linear-gradient(180deg, hsl(var(--purple-light)), hsl(var(--background)));
   }
 
   .noise-bg {
@@ -118,8 +168,8 @@
 
   .pill-warning {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium font-mono-accent;
-    background: hsl(38 92% 50% / 0.1);
-    color: hsl(38 72% 40%);
+    background: hsl(38 92% 50% / 0.15);
+    color: hsl(38 80% 50%);
   }
 
   .pill-danger {
