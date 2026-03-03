@@ -1,12 +1,16 @@
 import { NavLink as RouterNavLink, useLocation } from "react-router-dom";
-import { Bell, GraduationCap, LayoutDashboard, MessageSquare, ClipboardList, User } from "lucide-react";
+import { Bell, GraduationCap, LayoutDashboard, MessageSquare, ClipboardList, User, BookOpen, DollarSign, Briefcase, Heart, Settings } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
 const navItems = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/academic", label: "Academic", icon: BookOpen },
+  { to: "/financial", label: "Financial", icon: DollarSign },
+  { to: "/jobs", label: "Jobs", icon: Briefcase },
+  { to: "/wellness", label: "Wellness", icon: Heart },
+  { to: "/admin", label: "Admin", icon: Settings },
   { to: "/chat", label: "Atlas Chat", icon: MessageSquare },
   { to: "/plan", label: "My Plan", icon: ClipboardList },
-  { to: "/profile", label: "Profile", icon: User },
 ];
 
 const Navigation = () => {
@@ -14,7 +18,7 @@ const Navigation = () => {
 
   return (
     <nav className="sticky top-0 z-50 bg-card border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top bar */}
         <div className="flex items-center justify-between h-14">
           <div className="flex items-center gap-2.5">
@@ -46,7 +50,7 @@ const Navigation = () => {
         </div>
 
         {/* Navigation tabs */}
-        <div className="flex items-center gap-0.5 -mb-px">
+        <div className="flex items-center gap-0.5 -mb-px overflow-x-auto">
           {navItems.map((item) => {
             const isActive = location.pathname === item.to;
             const Icon = item.icon;
@@ -54,9 +58,9 @@ const Navigation = () => {
               <RouterNavLink
                 key={item.to}
                 to={item.to}
-                className={`flex items-center gap-1.5 px-3 py-2.5 text-[13px] font-medium border-b-2 transition-colors ${
+                className={`flex items-center gap-1.5 px-3 py-2.5 text-[13px] font-medium border-b-2 transition-colors whitespace-nowrap ${
                   isActive
-                    ? "border-primary text-primary"
+                    ? "border-foreground text-foreground"
                     : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
                 }`}
               >
