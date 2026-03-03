@@ -1,23 +1,24 @@
 import StatCard from "../components/StatCard";
+import { DollarSign, BookOpen, Briefcase, Heart, Zap } from "lucide-react";
 
 const stats = [
   {
-    icon: "💰", iconBg: "bg-yellow-light", label: "Financial Aid",
+    icon: <DollarSign className="w-5 h-5 text-accent" />, iconBg: "bg-yellow-light", label: "Financial Aid",
     value: "$3,200", subLabel: "Balance outstanding",
     pill: { text: "Action Needed", className: "pill-warning" }, delay: 0,
   },
   {
-    icon: "📚", iconBg: "bg-purple-light", label: "GPA",
+    icon: <BookOpen className="w-5 h-5 text-primary" />, iconBg: "bg-purple-light", label: "GPA",
     value: "3.41", subLabel: "87 of 180 credits complete",
     pill: { text: "On Track", className: "pill-success" }, delay: 150,
   },
   {
-    icon: "💼", iconBg: "bg-yellow-light", label: "Applications",
+    icon: <Briefcase className="w-5 h-5 text-accent" />, iconBg: "bg-yellow-light", label: "Applications",
     value: "2 Due", subLabel: "This week",
     pill: { text: "Urgent", className: "pill-danger" }, delay: 300,
   },
   {
-    icon: "🧠", iconBg: "bg-purple-light", label: "Wellness",
+    icon: <Heart className="w-5 h-5 text-primary" />, iconBg: "bg-purple-light", label: "Wellness",
     value: "Check-in Due", subLabel: "Last check-in: 7 days ago",
     pill: { text: "Pending", className: "pill-purple" }, delay: 450,
   },
@@ -43,7 +44,7 @@ const Dashboard = () => {
       {/* Hero */}
       <div className="gradient-hero rounded-3xl p-8 mb-8 animate-fade-in-up">
         <h1 className="text-3xl sm:text-4xl font-heading font-bold text-foreground">
-          Good morning, Jordan 👋
+          Good morning, Jordan
         </h1>
         <p className="text-muted-foreground mt-2 text-lg">
           Week 8 of Fall Quarter — here's what needs your attention today
@@ -63,7 +64,7 @@ const Dashboard = () => {
           {/* Activity Feed */}
           <div className="glass-card p-6 animate-fade-in-up" style={{ animationDelay: "600ms" }}>
             <h2 className="font-heading text-lg font-semibold flex items-center gap-2 mb-4">
-              <span className="text-primary">⚡</span> Recent Atlas Activity
+              <Zap className="w-4 h-4 text-primary" /> Recent Atlas Activity
             </h2>
             <div className="space-y-3">
               {activities.map((a, i) => (

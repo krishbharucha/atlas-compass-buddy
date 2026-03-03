@@ -1,5 +1,5 @@
 import { NavLink as RouterNavLink, useLocation } from "react-router-dom";
-import { Bell } from "lucide-react";
+import { Bell, GraduationCap } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
 const navItems = [
@@ -16,7 +16,9 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <span className="text-2xl">🎓</span>
+          <div className="w-8 h-8 rounded-lg gradient-header flex items-center justify-center">
+            <GraduationCap className="w-5 h-5 text-primary-foreground" />
+          </div>
           <span className="font-heading font-bold text-xl text-primary">Atlas</span>
         </div>
 

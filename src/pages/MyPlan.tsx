@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { ChevronDown, ChevronRight, Zap } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { ChevronDown, ChevronRight, Zap, DollarSign, Heart, BookOpen, Briefcase, Landmark } from "lucide-react";
 
 interface PlanSection {
-  emoji: string;
+  icon: ReactNode;
   name: string;
   summary: string;
   summaryClass: string;
@@ -11,21 +11,21 @@ interface PlanSection {
 
 const sections: PlanSection[] = [
   {
-    emoji: "💰", name: "Financial Aid", summary: "1 action in progress", summaryClass: "pill-warning",
+    icon: <DollarSign className="w-5 h-5 text-accent" />, name: "Financial Aid", summary: "1 action in progress", summaryClass: "pill-warning",
     items: [
       { text: "Appeal filed and routed to Financial Aid office", status: "In Progress", statusClass: "pill-warning" },
       { text: "Hold prevention flag active on your account", status: "Complete", statusClass: "pill-success" },
     ],
   },
   {
-    emoji: "🧠", name: "Mental Health & Wellbeing", summary: "All clear", summaryClass: "pill-success",
+    icon: <Heart className="w-5 h-5 text-primary" />, name: "Mental Health & Wellbeing", summary: "All clear", summaryClass: "pill-success",
     items: [
       { text: "Counseling appointment: Thursday 10:00am", status: "Confirmed", statusClass: "pill-blue" },
       { text: "Wellness toolkit sent to your phone", status: "Delivered", statusClass: "pill-success" },
     ],
   },
   {
-    emoji: "📚", name: "Academic Support", summary: "Awaiting your confirmation", summaryClass: "pill-purple",
+    icon: <BookOpen className="w-5 h-5 text-purple-medium" />, name: "Academic Support", summary: "Awaiting your confirmation", summaryClass: "pill-purple",
     items: [
       { text: "Tutoring schedule: Mon/Wed/Fri 4pm — MATH 208", status: "Needs Confirmation", statusClass: "pill-purple" },
       { text: "Emergency advising booked: Wed 2pm", status: "Confirmed", statusClass: "pill-blue" },
@@ -33,14 +33,14 @@ const sections: PlanSection[] = [
     ],
   },
   {
-    emoji: "💼", name: "Career & Internships", summary: "2 items ready for review", summaryClass: "pill-warning",
+    icon: <Briefcase className="w-5 h-5 text-accent" />, name: "Career & Internships", summary: "2 items ready for review", summaryClass: "pill-warning",
     items: [
       { text: "Amazon SDE application pre-filled", status: "Ready to Review", statusClass: "pill-warning" },
       { text: "Microsoft PM application pre-filled", status: "Ready to Review", statusClass: "pill-warning" },
     ],
   },
   {
-    emoji: "🏛️", name: "Campus & Admin", summary: "1 item in progress", summaryClass: "pill-warning",
+    icon: <Landmark className="w-5 h-5 text-muted-foreground" />, name: "Campus & Admin", summary: "1 item in progress", summaryClass: "pill-warning",
     items: [
       { text: "Library fine hold resolution sent to Registrar", status: "In Progress", statusClass: "pill-warning" },
     ],
@@ -48,7 +48,7 @@ const sections: PlanSection[] = [
 ];
 
 const MyPlan = () => {
-  const [openIndex, setOpenIndex] = useState(2); // Academic expanded by default
+  const [openIndex, setOpenIndex] = useState(2);
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
@@ -71,7 +71,7 @@ const MyPlan = () => {
                 className="w-full flex items-center justify-between p-5 text-left hover:bg-secondary/30 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-xl">{section.emoji}</span>
+                  {section.icon}
                   <span className="font-heading font-semibold text-foreground">{section.name}</span>
                   <span className={section.summaryClass}>{section.summary}</span>
                 </div>
