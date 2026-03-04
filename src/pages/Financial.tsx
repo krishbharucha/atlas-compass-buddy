@@ -146,53 +146,7 @@ const Financial = () => {
           <AlertsSection />
         </div>
 
-        {/* Atlas AI Capabilities */}
-        <Card className="mb-8 border-primary/10">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-foreground" />
-              <CardTitle className="text-lg">Atlas AI — Financial Support</CardTitle>
-            </div>
-            <Button size="sm" onClick={() => navigate("/chat")} className="gap-1">
-              Open Atlas Chat <ExternalLink className="w-3.5 h-3.5" />
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              Atlas detects financial stress signals and takes immediate, multi-step action — not just answers, but filed appeals, pre-filled forms, and account protection.
-            </p>
-            <div className="space-y-4">
-              {atlasCapabilities.map((cap) => (
-                <div key={cap.trigger} className="border border-border rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-foreground">{cap.trigger}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground font-mono-accent">{cap.example}</span>
-                      {cap.demoFlow && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-xs h-7 gap-1"
-                          onClick={() => setDemoDrawerOpen(true)}
-                        >
-                          See How It Works <ChevronRight className="w-3 h-3" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                  <div className="grid sm:grid-cols-2 gap-2">
-                    {cap.actions.map((action, i) => (
-                      <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                        <CheckCircle2 className="w-3 h-3 mt-0.5 shrink-0 text-foreground/40" />
-                        <span>{action}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+
 
         {/* Aid breakdown */}
         <div className="grid lg:grid-cols-3 gap-4 mb-8">
@@ -296,6 +250,37 @@ const Financial = () => {
                     </span>
                     <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Atlas Help */}
+        <Card className="mt-8 border-primary/10 bg-secondary/30">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-primary" />
+                <CardTitle className="text-base">Need Help With Your Finances?</CardTitle>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => navigate("/chat")} className="gap-1 text-xs">
+                Open Atlas Chat <ExternalLink className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">Atlas can help you understand charges, resolve issues, and manage your financial aid — just ask.</p>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="grid sm:grid-cols-3 gap-3">
+              {atlasCapabilities.map((cap) => (
+                <div
+                  key={cap.trigger}
+                  className="border border-border rounded-lg p-3 hover:bg-secondary/50 transition-colors cursor-pointer"
+                  onClick={() => cap.demoFlow ? setDemoDrawerOpen(true) : navigate("/chat")}
+                >
+                  <p className="text-sm font-medium text-foreground mb-1">{cap.trigger}</p>
+                  <p className="text-xs text-muted-foreground italic mb-2">{cap.example}</p>
+                  <p className="text-[11px] text-muted-foreground">{cap.actions[0]}</p>
                 </div>
               ))}
             </div>
