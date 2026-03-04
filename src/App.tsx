@@ -16,6 +16,7 @@ import Jobs from "./pages/Jobs";
 import Wellness from "./pages/Wellness";
 import Administration from "./pages/Administration";
 import NotFound from "./pages/NotFound";
+import AtlasDrawer from "./components/AtlasDrawer";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const AppLayout = () => {
         <Route path="/admin" element={<Administration />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      {showNav && <AtlasDrawer />}
     </div>
   );
 };

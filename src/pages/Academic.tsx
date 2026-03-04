@@ -1,9 +1,15 @@
-import { BookOpen, TrendingUp, Calendar, FileText, CheckCircle, Clock, ChevronRight, Zap, CheckCircle2, AlertTriangle } from "lucide-react";
+import { useState } from "react";
+import { BookOpen, TrendingUp, Calendar, FileText, CheckCircle, Clock, ChevronRight, AlertTriangle, GraduationCap, ArrowLeft, Check } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
 
+// ── Data ──
 const courses = [
   { code: "CS 301", name: "Data Structures & Algorithms", grade: "A-", credits: 4, status: "In Progress", professor: "Dr. Sarah Chen" },
   { code: "MATH 208", name: "Linear Algebra", grade: "D+", credits: 3, status: "At Risk", professor: "Dr. James Liu" },
@@ -19,151 +25,403 @@ const milestones = [
   { label: "Gen-Ed Requirements", value: 10, total: 10, status: "complete" },
 ];
 
-const atlasCapabilities = [
-  {
-    trigger: "Adding a minor",
-    example: "\"Can I add Data Science and still graduate on time?\"",
-    actions: ["Pulls complete degree audit & maps minor requirements", "Generates 2 graduation pathway options (standard + accelerated)", "Identifies course conflicts and bottlenecks", "Pre-fills minor declaration form for advisor signature"],
-  },
-  {
-    trigger: "Failing a course",
-    example: "\"I'm failing MATH 208 — withdrawal deadline is in 5 days\"",
-    actions: ["Calculates GPA impact: withdraw (W) vs. fail (F)", "Checks financial aid & eligibility implications", "Books emergency advising with pre-built decision brief", "Schedules tutoring + drafts professor email in parallel"],
-  },
-  {
-    trigger: "Course planning",
-    example: "\"Which electives should I take for a career in ML?\"",
-    actions: ["Analyzes degree requirements vs. career goal alignment", "Recommends courses based on alumni career paths", "Checks prerequisite chains and section availability", "Generates optimized semester-by-semester plan"],
-  },
-];
+const timelineCourses = {
+  "Fall 2026": ["INFO 340 — Client-Side Dev", "STAT 311 — Intro to Statistics", "DATA 100 — Intro to Data Science"],
+  "Winter 2027": ["DATA 301 — ML Fundamentals", "MATH 307 — Discrete Math", "INFO 370 — Data Ethics"],
+  "Spring 2027": ["DATA 401 — Capstone", "CS 401 — Senior Project", "INFO 380 — Data Visualization"],
+};
+
+const atRiskCourses = courses.filter((c) => c.status === "At Risk");
+
+type FlowState = "landing" | "minor-select" | "minor-audit" | "minor-confirm" | "minor-done" | "course-select" | "course-impact" | "course-actions" | "course-done";
 
 const Academic = () => {
-  const navigate = useNavigate();
+  const [flow, setFlow] = useState<FlowState>("landing");
+  const [selectedMinor, setSelectedMinor] = useState("");
+  const [selectedPath, setSelectedPath] = useState<"standard" | "accelerated" | null>(null);
+  const [prepareForm, setPrepareForm] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [emailReviewed, setEmailReviewed] = useState(false);
+  const { toast } = useToast();
 
-  return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="font-heading text-2xl font-bold text-foreground mb-1">Academic Overview</h1>
-        <p className="text-sm text-muted-foreground">Track your progress, courses, and degree requirements.</p>
-      </div>
+  // ── Landing ──
+  if (flow === "landing") {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mb-10">
+          <h1 className="font-heading text-2xl font-bold text-foreground mb-1">Academic Support</h1>
+          <p className="text-sm text-muted-foreground">Make informed decisions before deadlines hit.</p>
+        </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {[
-          { icon: TrendingUp, label: "Cumulative GPA", value: "3.52", sub: "Dean's List" },
-          { icon: BookOpen, label: "Current Credits", value: "17", sub: "Spring 2026" },
-          { icon: Calendar, label: "Expected Graduation", value: "May 2027", sub: "On track" },
-          { icon: FileText, label: "Advisor", value: "Dr. Patel", sub: "CS Department" },
-        ].map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={stat.label}>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Icon className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</span>
-                </div>
-                <p className="text-xl font-bold font-heading text-foreground">{stat.value}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{stat.sub}</p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Atlas AI */}
-      <Card className="mb-8 border-primary/10">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-foreground" />
-            <CardTitle className="text-lg">Atlas AI — Academic Advising</CardTitle>
-          </div>
-          <Button size="sm" onClick={() => navigate("/chat")} className="gap-1">
-            Try Demo <ChevronRight className="w-3.5 h-3.5" />
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">
-            Atlas performs real-time degree audits, calculates GPA impact scenarios, and takes action — booking advising, scheduling tutoring, and filing forms simultaneously.
-          </p>
-          <div className="space-y-4">
-            {atlasCapabilities.map((cap) => (
-              <div key={cap.trigger} className="border border-border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-semibold text-foreground">{cap.trigger}</span>
-                  <span className="text-xs text-muted-foreground font-mono-accent">{cap.example}</span>
-                </div>
-                <div className="grid sm:grid-cols-2 gap-2">
-                  {cap.actions.map((action, i) => (
-                    <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                      <CheckCircle2 className="w-3 h-3 mt-0.5 shrink-0 text-foreground/40" />
-                      <span>{action}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Degree Progress */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-lg">Degree Progress</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          {milestones.map((m) => (
-            <div key={m.label}>
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-sm font-medium text-foreground">{m.label}</span>
-                <span className="text-xs font-mono-accent text-muted-foreground">{m.value}/{m.total}</span>
-              </div>
-              <Progress value={(m.value / m.total) * 100} className="h-2" />
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Courses */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">Current Courses</CardTitle>
-          <Button variant="outline" size="sm">View All Semesters</Button>
-        </CardHeader>
-        <CardContent>
-          <div className="divide-y divide-border">
-            {courses.map((course) => (
-              <div key={course.code} className="py-3 flex items-center justify-between group cursor-pointer hover:bg-secondary/50 -mx-6 px-6 transition-colors">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono-accent text-xs text-muted-foreground">{course.code}</span>
-                    <span className="text-sm font-medium text-foreground">{course.name}</span>
-                    {course.status === "At Risk" && (
-                      <span className="pill-danger text-[10px] flex items-center gap-1">
-                        <AlertTriangle className="w-3 h-3" />
-                        At Risk
-                      </span>
-                    )}
+        {/* Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          {[
+            { icon: TrendingUp, label: "Cumulative GPA", value: "3.52", sub: "Dean's List" },
+            { icon: BookOpen, label: "Current Credits", value: "17", sub: "Spring 2026" },
+            { icon: Calendar, label: "Expected Graduation", value: "May 2027", sub: "On track" },
+            { icon: FileText, label: "Advisor", value: "Dr. Patel", sub: "CS Department" },
+          ].map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <Card key={stat.label}>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{course.professor} · {course.credits} credits</p>
+                  <p className="text-xl font-bold font-heading text-foreground">{stat.value}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{stat.sub}</p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Action Cards */}
+        <div className="grid sm:grid-cols-2 gap-6 mb-10">
+          <Card className="cursor-pointer hover:border-primary/30 transition-colors group" onClick={() => setFlow("minor-select")}>
+            <CardContent className="p-6">
+              <GraduationCap className="w-8 h-8 text-muted-foreground mb-4 group-hover:text-foreground transition-colors" />
+              <h3 className="font-heading font-semibold text-foreground mb-1">Degree & Minor Planning</h3>
+              <p className="text-sm text-muted-foreground mb-4">Planning a major or minor? See your options instantly.</p>
+              <Button size="sm" className="gap-1">
+                Plan my degree <ChevronRight className="w-3.5 h-3.5" />
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:border-primary/30 transition-colors group" onClick={() => setFlow("course-select")}>
+            <CardContent className="p-6">
+              <AlertTriangle className="w-8 h-8 text-muted-foreground mb-4 group-hover:text-foreground transition-colors" />
+              <h3 className="font-heading font-semibold text-foreground mb-1">Course Trouble</h3>
+              <p className="text-sm text-muted-foreground mb-4">Worried about a class or deadline?</p>
+              <Button size="sm" variant="outline" className="gap-1">
+                See my options <ChevronRight className="w-3.5 h-3.5" />
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Degree Progress */}
+        <Card className="mb-8">
+          <CardHeader><CardTitle className="text-lg">Degree Progress</CardTitle></CardHeader>
+          <CardContent className="space-y-5">
+            {milestones.map((m) => (
+              <div key={m.label}>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-sm font-medium text-foreground">{m.label}</span>
+                  <span className="text-xs font-mono-accent text-muted-foreground">{m.value}/{m.total}</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="font-heading font-semibold text-foreground">{course.grade}</span>
-                  {course.status === "Completed" ? (
-                    <CheckCircle className="w-4 h-4 text-muted-foreground" />
-                  ) : (
-                    <Clock className="w-4 h-4 text-muted-foreground" />
-                  )}
-                  <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
+                <Progress value={(m.value / m.total) * 100} className="h-2" />
               </div>
             ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          </CardContent>
+        </Card>
+
+        {/* Courses */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg">Current Courses</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="divide-y divide-border">
+              {courses.map((course) => (
+                <div key={course.code} className="py-3 flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono-accent text-xs text-muted-foreground">{course.code}</span>
+                      <span className="text-sm font-medium text-foreground">{course.name}</span>
+                      {course.status === "At Risk" && <span className="pill-danger text-[10px] flex items-center gap-1"><AlertTriangle className="w-3 h-3" />At Risk</span>}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">{course.professor} · {course.credits} credits</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="font-heading font-semibold text-foreground">{course.grade}</span>
+                    {course.status === "Completed" ? <CheckCircle className="w-4 h-4 text-muted-foreground" /> : <Clock className="w-4 h-4 text-muted-foreground" />}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // ── Back button helper ──
+  const BackButton = ({ to }: { to: FlowState }) => (
+    <button onClick={() => setFlow(to)} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
+      <ArrowLeft className="w-4 h-4" /> Back
+    </button>
   );
+
+  // ── Flow 1: Minor Planning ──
+  if (flow === "minor-select") {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-12 animate-fade-in-up">
+        <BackButton to="landing" />
+        <h2 className="font-heading text-xl font-bold text-foreground mb-2">What are you thinking about adding?</h2>
+        <p className="text-sm text-muted-foreground mb-6">Select a minor and Atlas will check feasibility against your degree audit.</p>
+        <Select onValueChange={setSelectedMinor}>
+          <SelectTrigger className="w-full mb-4">
+            <SelectValue placeholder="Select a minor" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="data-science">Data Science</SelectItem>
+            <SelectItem value="informatics">Informatics</SelectItem>
+            <SelectItem value="math">Mathematics</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button disabled={!selectedMinor} onClick={() => setFlow("minor-audit")} className="w-full">
+          Check feasibility
+        </Button>
+      </div>
+    );
+  }
+
+  if (flow === "minor-audit") {
+    return (
+      <div className="max-w-5xl mx-auto px-4 py-12 animate-fade-in-up">
+        <BackButton to="minor-select" />
+        <h2 className="font-heading text-xl font-bold text-foreground mb-6">Degree Audit — Data Science Minor</h2>
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Timeline */}
+          <Card>
+            <CardHeader><CardTitle className="text-base">Course Timeline</CardTitle></CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {Object.entries(timelineCourses).map(([term, crs]) => (
+                  <div key={term}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+                      <span className="text-sm font-semibold text-foreground">{term}</span>
+                    </div>
+                    <div className="ml-5 border-l border-border pl-4 space-y-1.5">
+                      {crs.map((c) => (
+                        <p key={c} className="text-sm text-muted-foreground">{c}</p>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Pathway Comparison */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-semibold text-foreground">Pathway Comparison</h3>
+            {[
+              { id: "standard" as const, title: "Option A: Standard Path", grad: "Spring 2027", load: "Normal (15 cr/qtr)", risk: "Low", riskClass: "pill-success" },
+              { id: "accelerated" as const, title: "Option B: Accelerated Path", grad: "Spring 2027", load: "Heavy (19 cr/qtr)", risk: "Medium", riskClass: "pill-warning" },
+            ].map((opt) => (
+              <Card
+                key={opt.id}
+                className={`cursor-pointer transition-all ${selectedPath === opt.id ? "border-primary ring-1 ring-primary/20" : "hover:border-primary/30"}`}
+                onClick={() => setSelectedPath(opt.id)}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-semibold text-foreground">{opt.title}</span>
+                    {selectedPath === opt.id && <Check className="w-4 h-4 text-primary" />}
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-xs">
+                    <div>
+                      <p className="text-muted-foreground uppercase tracking-wider mb-0.5">Graduation</p>
+                      <p className="font-medium text-foreground">{opt.grad}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground uppercase tracking-wider mb-0.5">Credit Load</p>
+                      <p className="font-medium text-foreground">{opt.load}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground uppercase tracking-wider mb-0.5">Risk</p>
+                      <span className={opt.riskClass}>{opt.risk}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+            <Button disabled={!selectedPath} onClick={() => {
+              toast({ title: "Minor pathway selected", description: "Preparing declaration…" });
+              setTimeout(() => setFlow("minor-confirm"), 800);
+            }} className="w-full">
+              Select this path
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (flow === "minor-confirm") {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-12 animate-fade-in-up">
+        <BackButton to="minor-audit" />
+        <Card>
+          <CardContent className="p-6 space-y-4">
+            <h3 className="font-heading font-semibold text-foreground">Confirmation</h3>
+            <div className="text-sm space-y-2 text-muted-foreground">
+              <p><span className="text-foreground font-medium">Minor:</span> Data Science</p>
+              <p><span className="text-foreground font-medium">Path:</span> {selectedPath === "standard" ? "Standard" : "Accelerated"}</p>
+              <p><span className="text-foreground font-medium">Graduation:</span> Spring 2027</p>
+            </div>
+            <div className="flex items-start gap-2 pt-2">
+              <Checkbox id="prepare" checked={prepareForm} onCheckedChange={(v) => setPrepareForm(v === true)} />
+              <label htmlFor="prepare" className="text-sm text-foreground cursor-pointer">
+                I want Atlas to prepare the minor declaration form
+              </label>
+            </div>
+            <Button disabled={!prepareForm} onClick={() => {
+              toast({ title: "🎉 Minor declaration prepared", description: "Routed to your advisor for review." });
+              setFlow("minor-done");
+            }} className="w-full">
+              Prepare & Send to Advisor
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (flow === "minor-done") {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-12 animate-fade-in-up">
+        <Card>
+          <CardContent className="p-6 space-y-5">
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center mx-auto mb-3">
+                <Check className="w-6 h-6 text-foreground" />
+              </div>
+              <h3 className="font-heading font-semibold text-foreground mb-1">Declaration Sent</h3>
+              <p className="text-sm text-muted-foreground">Minor declaration prepared and routed to your advisor.</p>
+            </div>
+            <div className="space-y-3">
+              {[
+                { label: "Pathway analyzed", status: "done" },
+                { label: "Declaration form prepared", status: "done" },
+                { label: "Advisor review pending", status: "pending" },
+              ].map((step) => (
+                <div key={step.label} className="flex items-center gap-3">
+                  <div className={`w-2.5 h-2.5 rounded-full ${step.status === "done" ? "bg-success" : "bg-warning"}`} />
+                  <span className="text-sm text-foreground">{step.label}</span>
+                </div>
+              ))}
+            </div>
+            <Button variant="outline" onClick={() => { setFlow("landing"); setSelectedMinor(""); setSelectedPath(null); setPrepareForm(false); }} className="w-full">
+              Back to Academic
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // ── Flow 2: Course Trouble ──
+  if (flow === "course-select") {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-12 animate-fade-in-up">
+        <BackButton to="landing" />
+        <h2 className="font-heading text-xl font-bold text-foreground mb-2">Which course are you concerned about?</h2>
+        <p className="text-sm text-muted-foreground mb-6">Atlas will analyze your options and take parallel actions.</p>
+        <Select onValueChange={setSelectedCourse}>
+          <SelectTrigger className="w-full mb-4">
+            <SelectValue placeholder="Select a course" />
+          </SelectTrigger>
+          <SelectContent>
+            {courses.map((c) => (
+              <SelectItem key={c.code} value={c.code}>
+                <span className="flex items-center gap-2">
+                  {c.code} — {c.name}
+                  {c.status === "At Risk" && <Badge variant="destructive" className="text-[10px] ml-1">Deadline in 5 days</Badge>}
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button disabled={!selectedCourse} onClick={() => setFlow("course-impact")} className="w-full">
+          Analyze my options
+        </Button>
+      </div>
+    );
+  }
+
+  if (flow === "course-impact") {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-12 animate-fade-in-up">
+        <BackButton to="course-select" />
+        <h2 className="font-heading text-xl font-bold text-foreground mb-6">Impact Comparison — {selectedCourse}</h2>
+        <div className="grid sm:grid-cols-2 gap-6 mb-6">
+          <Card className="border-warning/30">
+            <CardContent className="p-5 space-y-3">
+              <h3 className="font-heading font-semibold text-foreground">Withdraw (W)</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between"><span className="text-muted-foreground">GPA impact</span><span className="text-foreground font-medium">No change</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Aid impact</span><span className="pill-warning text-[11px]">⚠ May affect SAP</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Stress level</span><span className="text-foreground font-medium">Lower</span></div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-destructive/30">
+            <CardContent className="p-5 space-y-3">
+              <h3 className="font-heading font-semibold text-foreground">Fail (F)</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between"><span className="text-muted-foreground">GPA impact</span><span className="text-foreground font-medium">−0.4</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Aid impact</span><span className="pill-danger text-[11px]">⚠ High risk</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Stress level</span><span className="text-foreground font-medium">Higher</span></div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <Button onClick={() => {
+          toast({ title: "Emergency advising booked", description: "Wed 2:30pm with Dr. Patel" });
+          setTimeout(() => toast({ title: "Tutoring sessions scheduled", description: "3 sessions this week" }), 600);
+          setTimeout(() => toast({ title: "Draft email to professor prepared", description: "Ready for your review" }), 1200);
+          setTimeout(() => setFlow("course-actions"), 1800);
+        }} className="w-full">
+          Discuss with advisor
+        </Button>
+      </div>
+    );
+  }
+
+  if (flow === "course-actions") {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-12 animate-fade-in-up">
+        <BackButton to="course-impact" />
+        <Card>
+          <CardContent className="p-6 space-y-4">
+            <h3 className="font-heading font-semibold text-foreground">Actions Taken</h3>
+            <div className="space-y-3">
+              {[
+                { label: "Advising appointment booked — Wed 2:30pm", done: true },
+                { label: "Tutoring sessions scheduled (3 this week)", done: true },
+                { label: "Email to professor", done: emailReviewed, action: true },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded flex items-center justify-center ${item.done ? "bg-success text-success-foreground" : "border border-border"}`}>
+                      {item.done && <Check className="w-3 h-3" />}
+                    </div>
+                    <span className="text-sm text-foreground">{item.label}</span>
+                  </div>
+                  {item.action && !emailReviewed && (
+                    <Button size="sm" variant="outline" onClick={() => setEmailReviewed(true)}>
+                      Review & Send
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+            <Button variant="outline" onClick={() => { setFlow("landing"); setSelectedCourse(""); setEmailReviewed(false); }} className="w-full mt-4">
+              Back to Academic
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return null;
 };
 
 export default Academic;
