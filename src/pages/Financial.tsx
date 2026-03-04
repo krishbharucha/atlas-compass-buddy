@@ -154,7 +154,7 @@ const Financial = () => {
               <CardTitle className="text-lg">Atlas AI — Financial Support</CardTitle>
             </div>
             <Button size="sm" onClick={() => navigate("/chat")} className="gap-1">
-              Try Demo <ChevronRight className="w-3.5 h-3.5" />
+              Open Atlas Chat <ExternalLink className="w-3.5 h-3.5" />
             </Button>
           </CardHeader>
           <CardContent>
@@ -175,7 +175,7 @@ const Financial = () => {
                           className="text-xs h-7 gap-1"
                           onClick={() => setDemoDrawerOpen(true)}
                         >
-                          Try Demo <ChevronRight className="w-3 h-3" />
+                          See How It Works <ChevronRight className="w-3 h-3" />
                         </Button>
                       )}
                     </div>
