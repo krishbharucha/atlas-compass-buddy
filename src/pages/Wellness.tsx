@@ -367,20 +367,104 @@ const Wellness = () => {
 
       {/* Atlas AI — Wellness */}
       <Card className="mb-8 border-primary/10">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-foreground" />
             <CardTitle className="text-lg">Atlas AI — Mental Health Support</CardTitle>
           </div>
-          <Button size="sm" onClick={runDemo} disabled={demoRunning} className="gap-1">
-            {demoRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ChevronRight className="w-3.5 h-3.5" />}
-            {demoRunning ? "Running..." : "Try Demo"}
-          </Button>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
             Atlas monitors wellness trends, detects stress signals, recommends resources, schedules counseling support, and ensures students receive help before challenges escalate.
           </p>
+
+          {/* Student input flow */}
+          {!demoRunning && !demoCompleted && (
+            <div className="mb-4 p-4 rounded-lg bg-muted/30 border border-border space-y-3">
+              <p className="text-sm font-medium text-foreground">How are you feeling today?</p>
+              <textarea
+                value={studentMessage}
+                onChange={(e) => setStudentMessage(e.target.value)}
+                placeholder="I haven't slept well and I feel overwhelmed about exams…"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+                rows={3}
+              />
+              <Button
+                size="sm"
+                onClick={() => { if (studentMessage.trim()) runWorkflow(studentMessage.trim()); }}
+                disabled={!studentMessage.trim()}
+                className="gap-1.5"
+              >
+                <Send className="w-3.5 h-3.5" />
+                Check In With Atlas
+              </Button>
+            </div>
+          )}
+
+          {/* Analyzing message */}
+          {analysisMessage && (
+            <div className="mb-4 p-3 rounded-lg bg-muted/50 border border-border animate-fade-in flex items-center gap-2">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">{analysisMessage}</p>
+            </div>
+          )}
+
+          {/* Atlas response after submission */}
+          {submittedMessage && !analysisMessage && (
+            <div className="mb-4 space-y-3">
+              <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                <p className="text-xs text-muted-foreground mb-1">You shared:</p>
+                <p className="text-sm text-foreground italic">"{submittedMessage}"</p>
+              </div>
+              {distressSignals.length > 0 && (
+                <div className="p-3 rounded-lg bg-muted/50 border border-border animate-fade-in">
+                  <p className="text-xs font-medium text-foreground mb-1.5">Thanks for sharing that. Here's what I noticed:</p>
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {distressSignals.map((signal) => (
+                      <span key={signal} className="pill-warning text-[10px]">{signal}</span>
+                    ))}
+                  </div>
+                  {severityLabel && (
+                    <p className="text-xs text-muted-foreground">
+                      Distress level: <span className={`font-medium ${severityLabel === "High" ? "text-destructive" : severityLabel === "Moderate" ? "text-warning" : "text-foreground"}`}>{severityLabel}</span>
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Reset button when done */}
+          {demoCompleted && (
+            <div className="mb-4">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs gap-1"
+                onClick={() => {
+                  setDemoCompleted(false);
+                  setSubmittedMessage("");
+                  setStudentMessage("");
+                  setDistressSignals([]);
+                  setSeverityLabel(null);
+                  setSteps(initialSteps.map((s) => ({ ...s, status: "queued", completedAt: undefined })));
+                  setDistressLevel("normal");
+                  setWellnessInsight(null);
+                  setPulseInsight(null);
+                  setPulseAlerts(new Set());
+                  setAppointmentBooked(false);
+                  setRecommendedGroup(null);
+                  setRecommendedWorkshop(null);
+                  setRecommendedEvents(new Set());
+                  setAdvisorFlagged(false);
+                  setToolkitItems([]);
+                  setCrisisDetected(false);
+                }}
+              >
+                Check in again
+              </Button>
+            </div>
+          )}
 
           {/* Workflow status chips */}
           {(demoRunning || demoCompleted) && (
