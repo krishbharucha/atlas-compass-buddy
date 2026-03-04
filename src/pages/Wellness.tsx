@@ -344,21 +344,23 @@ const Wellness = () => {
       </div>
 
       {/* Emergency banner */}
-      <Card className={`mb-8 transition-all duration-500 ${distressLevel === "high" ? "border-destructive/40 bg-destructive/10" : "border-destructive/20 bg-destructive/5"}`}>
+      <Card className={`mb-8 transition-all duration-500 ${crisisDetected || distressLevel === "high" ? "border-destructive/40 bg-destructive/10" : "border-destructive/20 bg-destructive/5"}`}>
         <CardContent className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Phone className={`w-5 h-5 text-destructive ${distressLevel === "high" ? "animate-pulse" : ""}`} />
+            <Phone className={`w-5 h-5 text-destructive ${crisisDetected ? "animate-pulse" : ""}`} />
             <div>
               <p className="text-sm font-medium text-foreground">
-                {distressLevel === "high"
+                {crisisDetected
+                  ? "We're here to help. Immediate support is available."
+                  : distressLevel === "high"
                   ? "We noticed you may be under significant stress. Immediate help is available."
                   : "In crisis? Reach out now."}
               </p>
               <p className="text-xs text-muted-foreground">988 Suicide & Crisis Lifeline · Campus Emergency: (555) 123-4567</p>
             </div>
           </div>
-          <Button variant={distressLevel === "high" ? "default" : "outline"} size="sm">
-            Get Help Now
+          <Button variant={crisisDetected || distressLevel === "high" ? "default" : "outline"} size="sm">
+            {crisisDetected ? "Connect to Counselor Now" : "Get Help Now"}
           </Button>
         </CardContent>
       </Card>
