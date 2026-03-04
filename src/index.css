@@ -155,6 +155,18 @@
     background: hsl(220 14% 92%);
     color: hsl(220 9% 46%);
   }
+
+  .pill-blue {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium font-mono-accent;
+    background: hsl(210 70% 50% / 0.1);
+    color: hsl(210 70% 45%);
+  }
+
+  .pill-purple {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium font-mono-accent;
+    background: hsl(270 60% 50% / 0.1);
+    color: hsl(270 50% 45%);
+  }
 }
 
 /* Animations */

@@ -1,7 +1,8 @@
-import { Settings, FileText, User, Mail, Building, Clock, ChevronRight, Download, Upload, Shield, CheckCircle } from "lucide-react";
+import { Settings, FileText, User, Mail, Building, Clock, ChevronRight, Download, Upload, Shield, CheckCircle, Zap, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 
 const personalInfo = [
   { label: "Full Name", value: "Jordan Mitchell" },
@@ -36,127 +37,185 @@ const statusStyle = (status: string) => {
   }
 };
 
-const Administration = () => (
-  <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div className="flex items-start justify-between mb-8">
-      <div>
-        <h1 className="font-heading text-2xl font-bold text-foreground mb-1">Administration</h1>
-        <p className="text-sm text-muted-foreground">Manage records, documents, and administrative requests.</p>
+const atlasCapabilities = [
+  {
+    trigger: "Account hold resolution",
+    example: "\"Hold on my account for 3 weeks — nobody responds\"",
+    actions: ["Identifies exact hold type, responsible office, and required action", "Routes resolution request directly to specific staff (bypasses general inbox)", "Escalates to Dean of Students if registration deadline is at risk", "Documents full attempt history for escalation trail"],
+  },
+  {
+    trigger: "Campus services navigation",
+    example: "\"I need a notary for my lease — where on campus?\"",
+    actions: ["Surfaces all campus locations offering the service", "Checks real-time availability and hours", "Books appointment in a single response", "Provides all requirements (student ID, documents needed)"],
+  },
+  {
+    trigger: "Registration problems",
+    example: "\"I can't register — the system says I have a prerequisite issue\"",
+    actions: ["Identifies exact prerequisite conflict or system error", "Checks if equivalent courses satisfy the requirement", "Files override request with supporting documentation", "Protects course selections during resolution"],
+  },
+];
+
+const Administration = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex items-start justify-between mb-8">
+        <div>
+          <h1 className="font-heading text-2xl font-bold text-foreground mb-1">Administration</h1>
+          <p className="text-sm text-muted-foreground">Manage records, documents, and administrative requests.</p>
+        </div>
+        <Button variant="outline" size="sm" className="gap-1">
+          <Mail className="w-3.5 h-3.5" />
+          Contact Registrar
+        </Button>
       </div>
-      <Button variant="outline" size="sm" className="gap-1">
-        <Mail className="w-3.5 h-3.5" />
-        Contact Registrar
-      </Button>
-    </div>
 
-    {/* Student Info Card */}
-    <Card className="mb-8">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div className="flex items-center gap-2">
-          <CardTitle className="text-lg">Student Information</CardTitle>
-          <Badge variant="secondary" className="gap-1 text-xs">
-            <CheckCircle className="w-3 h-3" />
-            Verified
-          </Badge>
-        </div>
-        <Button variant="outline" size="sm">Edit Profile</Button>
-      </CardHeader>
-      <CardContent>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {personalInfo.map((info) => (
-            <div key={info.label}>
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-0.5">{info.label}</p>
-              <p className="text-sm font-medium text-foreground">{info.value}</p>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-
-    <div className="grid lg:grid-cols-2 gap-4 mb-8">
-      {/* Requests */}
-      <Card>
+      {/* Atlas AI */}
+      <Card className="mb-8 border-primary/10">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">Recent Requests</CardTitle>
-          <Button variant="outline" size="sm">New Request</Button>
-        </CardHeader>
-        <CardContent>
-          <div className="divide-y divide-border">
-            {requests.map((req) => (
-              <div key={req.title} className="py-3 flex items-center justify-between hover:bg-secondary/50 -mx-6 px-6 transition-colors cursor-pointer group">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-foreground">{req.title}</p>
-                    <Badge variant="secondary" className="text-[10px] font-mono-accent">{req.type}</Badge>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{req.date}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={statusStyle(req.status)}>{req.status}</span>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-              </div>
-            ))}
+          <div className="flex items-center gap-2">
+            <Zap className="w-4 h-4 text-foreground" />
+            <CardTitle className="text-lg">Atlas AI — Campus Navigation</CardTitle>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Documents */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-lg">Documents</CardTitle>
-          <Button variant="outline" size="sm" className="gap-1">
-            <Upload className="w-3.5 h-3.5" />
-            Upload
+          <Button size="sm" onClick={() => navigate("/chat")} className="gap-1">
+            Try Demo <ChevronRight className="w-3.5 h-3.5" />
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="divide-y divide-border">
-            {documents.map((doc) => (
-              <div key={doc.name} className="py-3 flex items-center justify-between hover:bg-secondary/50 -mx-6 px-6 transition-colors cursor-pointer group">
-                <div className="flex items-center gap-3">
-                  <FileText className="w-4 h-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{doc.name}</p>
-                    <p className="text-xs text-muted-foreground">{doc.updated} · {doc.size}</p>
-                  </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Atlas solves the most universally hated student experience — getting bounced between offices. It identifies the right person, routes requests directly, and escalates when deadlines are at risk.
+          </p>
+          <div className="space-y-4">
+            {atlasCapabilities.map((cap) => (
+              <div key={cap.trigger} className="border border-border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold text-foreground">{cap.trigger}</span>
+                  <span className="text-xs text-muted-foreground font-mono-accent">{cap.example}</span>
                 </div>
-                <Download className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="grid sm:grid-cols-2 gap-2">
+                  {cap.actions.map((action, i) => (
+                    <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                      <CheckCircle2 className="w-3 h-3 mt-0.5 shrink-0 text-foreground/40" />
+                      <span>{action}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
-    </div>
 
-    {/* Quick Actions */}
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Quick Actions</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {[
-            { icon: FileText, label: "Request Transcript" },
-            { icon: Shield, label: "Update Emergency Contact" },
-            { icon: Building, label: "Change Housing" },
-            { icon: User, label: "Update Personal Info" },
-          ].map((action) => {
-            const Icon = action.icon;
-            return (
-              <button
-                key={action.label}
-                className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left"
-              >
-                <Icon className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-foreground">{action.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </CardContent>
-    </Card>
-  </div>
-);
+      {/* Student Info Card */}
+      <Card className="mb-8">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-lg">Student Information</CardTitle>
+            <Badge variant="secondary" className="gap-1 text-xs">
+              <CheckCircle className="w-3 h-3" />
+              Verified
+            </Badge>
+          </div>
+          <Button variant="outline" size="sm">Edit Profile</Button>
+        </CardHeader>
+        <CardContent>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {personalInfo.map((info) => (
+              <div key={info.label}>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-0.5">{info.label}</p>
+                <p className="text-sm font-medium text-foreground">{info.value}</p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid lg:grid-cols-2 gap-4 mb-8">
+        {/* Requests */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg">Recent Requests</CardTitle>
+            <Button variant="outline" size="sm">New Request</Button>
+          </CardHeader>
+          <CardContent>
+            <div className="divide-y divide-border">
+              {requests.map((req) => (
+                <div key={req.title} className="py-3 flex items-center justify-between hover:bg-secondary/50 -mx-6 px-6 transition-colors cursor-pointer group">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-foreground">{req.title}</p>
+                      <Badge variant="secondary" className="text-[10px] font-mono-accent">{req.type}</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">{req.date}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={statusStyle(req.status)}>{req.status}</span>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Documents */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg">Documents</CardTitle>
+            <Button variant="outline" size="sm" className="gap-1">
+              <Upload className="w-3.5 h-3.5" />
+              Upload
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="divide-y divide-border">
+              {documents.map((doc) => (
+                <div key={doc.name} className="py-3 flex items-center justify-between hover:bg-secondary/50 -mx-6 px-6 transition-colors cursor-pointer group">
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-4 h-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{doc.name}</p>
+                      <p className="text-xs text-muted-foreground">{doc.updated} · {doc.size}</p>
+                    </div>
+                  </div>
+                  <Download className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {[
+              { icon: FileText, label: "Request Transcript" },
+              { icon: Shield, label: "Update Emergency Contact" },
+              { icon: Building, label: "Change Housing" },
+              { icon: User, label: "Update Personal Info" },
+            ].map((action) => {
+              const Icon = action.icon;
+              return (
+                <button
+                  key={action.label}
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors text-left"
+                >
+                  <Icon className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">{action.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
 export default Administration;
