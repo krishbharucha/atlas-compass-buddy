@@ -7,6 +7,11 @@ export function useTypewriter(text: string, speed = 80, startImmediately = true)
   const words = text.split(" ");
   const idx = useRef(0);
 
+  // Sync started state with startImmediately prop changes
+  useEffect(() => {
+    if (startImmediately) setStarted(true);
+  }, [startImmediately]);
+
   useEffect(() => {
     if (!started) return;
     idx.current = 0;
