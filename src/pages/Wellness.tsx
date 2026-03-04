@@ -91,6 +91,13 @@ const Wellness = () => {
   const [, setTick] = useState(0);
   const runningRef = useRef(false);
 
+  // Student input
+  const [studentMessage, setStudentMessage] = useState("");
+  const [submittedMessage, setSubmittedMessage] = useState("");
+  const [analysisMessage, setAnalysisMessage] = useState<string | null>(null);
+  const [distressSignals, setDistressSignals] = useState<string[]>([]);
+  const [severityLabel, setSeverityLabel] = useState<string | null>(null);
+
   // Dynamic state
   const [distressLevel, setDistressLevel] = useState<"normal" | "elevated" | "high">("normal");
   const [wellnessInsight, setWellnessInsight] = useState<string | null>(null);
@@ -102,6 +109,7 @@ const Wellness = () => {
   const [recommendedEvents, setRecommendedEvents] = useState<Set<number>>(new Set());
   const [advisorFlagged, setAdvisorFlagged] = useState(false);
   const [toolkitItems, setToolkitItems] = useState<string[]>([]);
+  const [crisisDetected, setCrisisDetected] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => setTick((t) => t + 1), 5000);
@@ -116,11 +124,63 @@ const Wellness = () => {
     setSteps((prev) => prev.map((s, i) => i === idx ? { ...s, status: "processing" } : s));
   }, []);
 
-  const runDemo = useCallback(async () => {
+  // Analyze message for distress signals
+  const analyzeMessage = (msg: string) => {
+    const lower = msg.toLowerCase();
+    const signals: string[] = [];
+    const severeKeywords = ["hopeless", "give up", "end it", "can't go on", "no point", "don't want to be here", "hurt myself"];
+    const stressKeywords: [string, string][] = [
+      ["sleep", "Sleep deprivation"],
+      ["insomnia", "Sleep deprivation"],
+      ["haven't slept", "Sleep deprivation"],
+      ["exam", "Exam stress"],
+      ["finals", "Exam stress"],
+      ["test", "Exam stress"],
+      ["overwhelm", "Feeling overwhelmed"],
+      ["stress", "Academic stress"],
+      ["anxious", "Anxiety"],
+      ["anxiety", "Anxiety"],
+      ["panic", "Panic symptoms"],
+      ["lonely", "Social isolation"],
+      ["alone", "Social isolation"],
+      ["sad", "Low mood"],
+      ["depressed", "Low mood"],
+      ["burnout", "Burnout"],
+      ["exhausted", "Exhaustion"],
+      ["tired", "Fatigue"],
+    ];
+
+    const isCrisis = severeKeywords.some((k) => lower.includes(k));
+
+    const seen = new Set<string>();
+    for (const [keyword, label] of stressKeywords) {
+      if (lower.includes(keyword) && !seen.has(label)) {
+        signals.push(label);
+        seen.add(label);
+      }
+    }
+    if (signals.length === 0) signals.push("General stress");
+
+    let level: "normal" | "elevated" | "high" = "normal";
+    let severity = "Low";
+    if (isCrisis) { level = "high"; severity = "High"; }
+    else if (signals.length >= 2) { level = "elevated"; severity = "Moderate"; }
+    else { level = "normal"; severity = "Low"; }
+
+    // Upgrade to at least moderate for any real content
+    if (level === "normal" && msg.trim().length > 15) { level = "elevated"; severity = "Moderate"; }
+
+    return { signals, level, severity, isCrisis };
+  };
+
+  const runWorkflow = useCallback(async (message: string) => {
     if (runningRef.current) return;
     runningRef.current = true;
     setDemoRunning(true);
     setDemoCompleted(false);
+    setSubmittedMessage(message);
+    setAnalysisMessage("Analyzing your message...");
+
     // Reset
     setSteps(initialSteps.map((s) => ({ ...s, status: "queued", completedAt: undefined })));
     setDistressLevel("normal");
@@ -133,57 +193,78 @@ const Wellness = () => {
     setRecommendedEvents(new Set());
     setAdvisorFlagged(false);
     setToolkitItems([]);
+    setCrisisDetected(false);
+    setDistressSignals([]);
+    setSeverityLabel(null);
 
     const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    const { signals, level, severity, isCrisis } = analyzeMessage(message);
 
-    // Step 1: Trend Analysis
+    await delay(800);
+    setAnalysisMessage(null);
+
+    // Step 1: Distress Detection
     startStep(0);
     await delay(1500);
     completeStep(0);
-    setWellnessInsight("Detected 2-week stress increase during exam period. Sleep pattern decline detected across last 2 pulse checks.");
-    setPulseInsight("Detected decline across last two weeks.");
-    setPulseAlerts(new Set([0, 1])); // Week 8 & 7
+    setDistressSignals(signals);
+    setSeverityLabel(severity);
 
-    // Step 2: Pattern Detection
+    // Step 2: Severity Classification + Pulse Comparison
     startStep(1);
     await delay(1500);
     completeStep(1);
-    setDistressLevel("elevated");
-    toast({ title: "🔍 Pattern detected", description: "Stress indicators elevated over 2-week period" });
+    setDistressLevel(level);
+    setWellnessInsight("Your wellness score has declined for two consecutive weeks.");
+    setPulseInsight("Detected decline across last two weeks.");
+    setPulseAlerts(new Set([0, 1]));
+    toast({ title: "Concerns identified", description: `${signals.join(", ")} · ${severity} distress` });
 
     // Step 3: Resource Recommendation
     startStep(2);
     await delay(2000);
     completeStep(2);
-    setRecommendedGroup("Peer Support: Anxiety");
-    setRecommendedWorkshop("Sleep Hygiene Seminar");
-    setRecommendedEvents(new Set([1, 2])); // Meditation Circle + Sleep Hygiene
-    toast({ title: "📚 Resources matched", description: "Personalized support resources identified" });
+    const groupPick = signals.some((s) => s.includes("Anxiety") || s.includes("Panic")) ? "Peer Support: Anxiety" : "Peer Support: Stress Management";
+    const workshopPick = signals.some((s) => s.includes("Sleep")) ? "Sleep Hygiene Seminar" : "Stress Management Workshop";
+    setRecommendedGroup(groupPick);
+    setRecommendedWorkshop(workshopPick);
+    setRecommendedEvents(new Set([1, 2]));
+    toast({ title: "Resources matched", description: "Personalized support resources identified" });
 
-    // Step 4: Appointment Creation
-    startStep(3);
-    await delay(2000);
-    completeStep(3);
-    setAppointmentBooked(true);
-    toast({ title: "📅 Counselor appointment reserved", description: "Tomorrow at 3:00 PM with Dr. Maya Chen" });
+    // Step 4: Counseling Appointment
+    if (level !== "normal") {
+      startStep(3);
+      await delay(2000);
+      completeStep(3);
+      setAppointmentBooked(true);
+      toast({ title: "Counselor appointment suggested", description: "Tomorrow at 3:00 PM with Dr. Maya Chen" });
+    } else {
+      completeStep(3);
+    }
 
     // Step 5: Advisor Welfare Flag
     startStep(4);
     await delay(1500);
     completeStep(4);
-    setAdvisorFlagged(true);
-    setDistressLevel("high");
+    if (level === "elevated" || level === "high") setAdvisorFlagged(true);
 
-    // Step 6: Toolkit Sent
+    // Step 6: Crisis Detection (if severe)
+    if (isCrisis) {
+      setCrisisDetected(true);
+      setDistressLevel("high");
+    }
+
+    // Step 7: Toolkit Sent
     startStep(5);
     await delay(1000);
     completeStep(5);
-    setToolkitItems([
-      "Sleep reset guide sent via SMS",
-      "Stress relief exercises added to your dashboard",
-      "Counselor appointment reminder scheduled",
-    ]);
-    toast({ title: "📦 Support toolkit delivered", description: "Personalized resources sent to your phone and dashboard" });
+    const toolkit: string[] = [];
+    if (signals.some((s) => s.includes("Sleep"))) toolkit.push("Sleep reset guide sent via SMS");
+    toolkit.push("Stress relief exercises added to your dashboard");
+    if (level !== "normal") toolkit.push("Counselor appointment reminder scheduled");
+    if (signals.some((s) => s.includes("Exam"))) toolkit.push("Exam planning template added to your dashboard");
+    setToolkitItems(toolkit);
+    toast({ title: "Support toolkit delivered", description: "Personalized resources sent to your phone and dashboard" });
 
     setDemoRunning(false);
     setDemoCompleted(true);
