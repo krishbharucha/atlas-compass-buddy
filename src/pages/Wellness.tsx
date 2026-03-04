@@ -91,6 +91,13 @@ const Wellness = () => {
   const [, setTick] = useState(0);
   const runningRef = useRef(false);
 
+  // Student input
+  const [studentMessage, setStudentMessage] = useState("");
+  const [submittedMessage, setSubmittedMessage] = useState("");
+  const [analysisMessage, setAnalysisMessage] = useState<string | null>(null);
+  const [distressSignals, setDistressSignals] = useState<string[]>([]);
+  const [severityLabel, setSeverityLabel] = useState<string | null>(null);
+
   // Dynamic state
   const [distressLevel, setDistressLevel] = useState<"normal" | "elevated" | "high">("normal");
   const [wellnessInsight, setWellnessInsight] = useState<string | null>(null);
@@ -102,6 +109,7 @@ const Wellness = () => {
   const [recommendedEvents, setRecommendedEvents] = useState<Set<number>>(new Set());
   const [advisorFlagged, setAdvisorFlagged] = useState(false);
   const [toolkitItems, setToolkitItems] = useState<string[]>([]);
+  const [crisisDetected, setCrisisDetected] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => setTick((t) => t + 1), 5000);
@@ -116,11 +124,63 @@ const Wellness = () => {
     setSteps((prev) => prev.map((s, i) => i === idx ? { ...s, status: "processing" } : s));
   }, []);
 
-  const runDemo = useCallback(async () => {
+  // Analyze message for distress signals
+  const analyzeMessage = (msg: string) => {
+    const lower = msg.toLowerCase();
+    const signals: string[] = [];
+    const severeKeywords = ["hopeless", "give up", "end it", "can't go on", "no point", "don't want to be here", "hurt myself"];
+    const stressKeywords: [string, string][] = [
+      ["sleep", "Sleep deprivation"],
+      ["insomnia", "Sleep deprivation"],
+      ["haven't slept", "Sleep deprivation"],
+      ["exam", "Exam stress"],
+      ["finals", "Exam stress"],
+      ["test", "Exam stress"],
+      ["overwhelm", "Feeling overwhelmed"],
+      ["stress", "Academic stress"],
+      ["anxious", "Anxiety"],
+      ["anxiety", "Anxiety"],
+      ["panic", "Panic symptoms"],
+      ["lonely", "Social isolation"],
+      ["alone", "Social isolation"],
+      ["sad", "Low mood"],
+      ["depressed", "Low mood"],
+      ["burnout", "Burnout"],
+      ["exhausted", "Exhaustion"],
+      ["tired", "Fatigue"],
+    ];
+
+    const isCrisis = severeKeywords.some((k) => lower.includes(k));
+
+    const seen = new Set<string>();
+    for (const [keyword, label] of stressKeywords) {
+      if (lower.includes(keyword) && !seen.has(label)) {
+        signals.push(label);
+        seen.add(label);
+      }
+    }
+    if (signals.length === 0) signals.push("General stress");
+
+    let level: "normal" | "elevated" | "high" = "normal";
+    let severity = "Low";
+    if (isCrisis) { level = "high"; severity = "High"; }
+    else if (signals.length >= 2) { level = "elevated"; severity = "Moderate"; }
+    else { level = "normal"; severity = "Low"; }
+
+    // Upgrade to at least moderate for any real content
+    if (level === "normal" && msg.trim().length > 15) { level = "elevated"; severity = "Moderate"; }
+
+    return { signals, level, severity, isCrisis };
+  };
+
+  const runWorkflow = useCallback(async (message: string) => {
     if (runningRef.current) return;
     runningRef.current = true;
     setDemoRunning(true);
     setDemoCompleted(false);
+    setSubmittedMessage(message);
+    setAnalysisMessage("Analyzing your message...");
+
     // Reset
     setSteps(initialSteps.map((s) => ({ ...s, status: "queued", completedAt: undefined })));
     setDistressLevel("normal");
@@ -133,57 +193,78 @@ const Wellness = () => {
     setRecommendedEvents(new Set());
     setAdvisorFlagged(false);
     setToolkitItems([]);
+    setCrisisDetected(false);
+    setDistressSignals([]);
+    setSeverityLabel(null);
 
     const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    const { signals, level, severity, isCrisis } = analyzeMessage(message);
 
-    // Step 1: Trend Analysis
+    await delay(800);
+    setAnalysisMessage(null);
+
+    // Step 1: Distress Detection
     startStep(0);
     await delay(1500);
     completeStep(0);
-    setWellnessInsight("Detected 2-week stress increase during exam period. Sleep pattern decline detected across last 2 pulse checks.");
-    setPulseInsight("Detected decline across last two weeks.");
-    setPulseAlerts(new Set([0, 1])); // Week 8 & 7
+    setDistressSignals(signals);
+    setSeverityLabel(severity);
 
-    // Step 2: Pattern Detection
+    // Step 2: Severity Classification + Pulse Comparison
     startStep(1);
     await delay(1500);
     completeStep(1);
-    setDistressLevel("elevated");
-    toast({ title: "🔍 Pattern detected", description: "Stress indicators elevated over 2-week period" });
+    setDistressLevel(level);
+    setWellnessInsight("Your wellness score has declined for two consecutive weeks.");
+    setPulseInsight("Detected decline across last two weeks.");
+    setPulseAlerts(new Set([0, 1]));
+    toast({ title: "Concerns identified", description: `${signals.join(", ")} · ${severity} distress` });
 
     // Step 3: Resource Recommendation
     startStep(2);
     await delay(2000);
     completeStep(2);
-    setRecommendedGroup("Peer Support: Anxiety");
-    setRecommendedWorkshop("Sleep Hygiene Seminar");
-    setRecommendedEvents(new Set([1, 2])); // Meditation Circle + Sleep Hygiene
-    toast({ title: "📚 Resources matched", description: "Personalized support resources identified" });
+    const groupPick = signals.some((s) => s.includes("Anxiety") || s.includes("Panic")) ? "Peer Support: Anxiety" : "Peer Support: Stress Management";
+    const workshopPick = signals.some((s) => s.includes("Sleep")) ? "Sleep Hygiene Seminar" : "Stress Management Workshop";
+    setRecommendedGroup(groupPick);
+    setRecommendedWorkshop(workshopPick);
+    setRecommendedEvents(new Set([1, 2]));
+    toast({ title: "Resources matched", description: "Personalized support resources identified" });
 
-    // Step 4: Appointment Creation
-    startStep(3);
-    await delay(2000);
-    completeStep(3);
-    setAppointmentBooked(true);
-    toast({ title: "📅 Counselor appointment reserved", description: "Tomorrow at 3:00 PM with Dr. Maya Chen" });
+    // Step 4: Counseling Appointment
+    if (level !== "normal") {
+      startStep(3);
+      await delay(2000);
+      completeStep(3);
+      setAppointmentBooked(true);
+      toast({ title: "Counselor appointment suggested", description: "Tomorrow at 3:00 PM with Dr. Maya Chen" });
+    } else {
+      completeStep(3);
+    }
 
     // Step 5: Advisor Welfare Flag
     startStep(4);
     await delay(1500);
     completeStep(4);
-    setAdvisorFlagged(true);
-    setDistressLevel("high");
+    if (level === "elevated" || level === "high") setAdvisorFlagged(true);
 
-    // Step 6: Toolkit Sent
+    // Step 6: Crisis Detection (if severe)
+    if (isCrisis) {
+      setCrisisDetected(true);
+      setDistressLevel("high");
+    }
+
+    // Step 7: Toolkit Sent
     startStep(5);
     await delay(1000);
     completeStep(5);
-    setToolkitItems([
-      "Sleep reset guide sent via SMS",
-      "Stress relief exercises added to your dashboard",
-      "Counselor appointment reminder scheduled",
-    ]);
-    toast({ title: "📦 Support toolkit delivered", description: "Personalized resources sent to your phone and dashboard" });
+    const toolkit: string[] = [];
+    if (signals.some((s) => s.includes("Sleep"))) toolkit.push("Sleep reset guide sent via SMS");
+    toolkit.push("Stress relief exercises added to your dashboard");
+    if (level !== "normal") toolkit.push("Counselor appointment reminder scheduled");
+    if (signals.some((s) => s.includes("Exam"))) toolkit.push("Exam planning template added to your dashboard");
+    setToolkitItems(toolkit);
+    toast({ title: "Support toolkit delivered", description: "Personalized resources sent to your phone and dashboard" });
 
     setDemoRunning(false);
     setDemoCompleted(true);
@@ -263,41 +344,127 @@ const Wellness = () => {
       </div>
 
       {/* Emergency banner */}
-      <Card className={`mb-8 transition-all duration-500 ${distressLevel === "high" ? "border-destructive/40 bg-destructive/10" : "border-destructive/20 bg-destructive/5"}`}>
+      <Card className={`mb-8 transition-all duration-500 ${crisisDetected || distressLevel === "high" ? "border-destructive/40 bg-destructive/10" : "border-destructive/20 bg-destructive/5"}`}>
         <CardContent className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Phone className={`w-5 h-5 text-destructive ${distressLevel === "high" ? "animate-pulse" : ""}`} />
+            <Phone className={`w-5 h-5 text-destructive ${crisisDetected ? "animate-pulse" : ""}`} />
             <div>
               <p className="text-sm font-medium text-foreground">
-                {distressLevel === "high"
+                {crisisDetected
+                  ? "We're here to help. Immediate support is available."
+                  : distressLevel === "high"
                   ? "We noticed you may be under significant stress. Immediate help is available."
                   : "In crisis? Reach out now."}
               </p>
               <p className="text-xs text-muted-foreground">988 Suicide & Crisis Lifeline · Campus Emergency: (555) 123-4567</p>
             </div>
           </div>
-          <Button variant={distressLevel === "high" ? "default" : "outline"} size="sm">
-            Get Help Now
+          <Button variant={crisisDetected || distressLevel === "high" ? "default" : "outline"} size="sm">
+            {crisisDetected ? "Connect to Counselor Now" : "Get Help Now"}
           </Button>
         </CardContent>
       </Card>
 
       {/* Atlas AI — Wellness */}
       <Card className="mb-8 border-primary/10">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-foreground" />
             <CardTitle className="text-lg">Atlas AI — Mental Health Support</CardTitle>
           </div>
-          <Button size="sm" onClick={runDemo} disabled={demoRunning} className="gap-1">
-            {demoRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ChevronRight className="w-3.5 h-3.5" />}
-            {demoRunning ? "Running..." : "Try Demo"}
-          </Button>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
             Atlas monitors wellness trends, detects stress signals, recommends resources, schedules counseling support, and ensures students receive help before challenges escalate.
           </p>
+
+          {/* Student input flow */}
+          {!demoRunning && !demoCompleted && (
+            <div className="mb-4 p-4 rounded-lg bg-muted/30 border border-border space-y-3">
+              <p className="text-sm font-medium text-foreground">How are you feeling today?</p>
+              <textarea
+                value={studentMessage}
+                onChange={(e) => setStudentMessage(e.target.value)}
+                placeholder="I haven't slept well and I feel overwhelmed about exams…"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+                rows={3}
+              />
+              <Button
+                size="sm"
+                onClick={() => { if (studentMessage.trim()) runWorkflow(studentMessage.trim()); }}
+                disabled={!studentMessage.trim()}
+                className="gap-1.5"
+              >
+                <Send className="w-3.5 h-3.5" />
+                Check In With Atlas
+              </Button>
+            </div>
+          )}
+
+          {/* Analyzing message */}
+          {analysisMessage && (
+            <div className="mb-4 p-3 rounded-lg bg-muted/50 border border-border animate-fade-in flex items-center gap-2">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">{analysisMessage}</p>
+            </div>
+          )}
+
+          {/* Atlas response after submission */}
+          {submittedMessage && !analysisMessage && (
+            <div className="mb-4 space-y-3">
+              <div className="p-3 rounded-lg bg-muted/30 border border-border">
+                <p className="text-xs text-muted-foreground mb-1">You shared:</p>
+                <p className="text-sm text-foreground italic">"{submittedMessage}"</p>
+              </div>
+              {distressSignals.length > 0 && (
+                <div className="p-3 rounded-lg bg-muted/50 border border-border animate-fade-in">
+                  <p className="text-xs font-medium text-foreground mb-1.5">Thanks for sharing that. Here's what I noticed:</p>
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {distressSignals.map((signal) => (
+                      <span key={signal} className="pill-warning text-[10px]">{signal}</span>
+                    ))}
+                  </div>
+                  {severityLabel && (
+                    <p className="text-xs text-muted-foreground">
+                      Distress level: <span className={`font-medium ${severityLabel === "High" ? "text-destructive" : severityLabel === "Moderate" ? "text-warning" : "text-foreground"}`}>{severityLabel}</span>
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Reset button when done */}
+          {demoCompleted && (
+            <div className="mb-4">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs gap-1"
+                onClick={() => {
+                  setDemoCompleted(false);
+                  setSubmittedMessage("");
+                  setStudentMessage("");
+                  setDistressSignals([]);
+                  setSeverityLabel(null);
+                  setSteps(initialSteps.map((s) => ({ ...s, status: "queued", completedAt: undefined })));
+                  setDistressLevel("normal");
+                  setWellnessInsight(null);
+                  setPulseInsight(null);
+                  setPulseAlerts(new Set());
+                  setAppointmentBooked(false);
+                  setRecommendedGroup(null);
+                  setRecommendedWorkshop(null);
+                  setRecommendedEvents(new Set());
+                  setAdvisorFlagged(false);
+                  setToolkitItems([]);
+                  setCrisisDetected(false);
+                }}
+              >
+                Check in again
+              </Button>
+            </div>
+          )}
 
           {/* Workflow status chips */}
           {(demoRunning || demoCompleted) && (
