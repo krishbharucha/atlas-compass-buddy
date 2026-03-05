@@ -46,6 +46,7 @@ const Academic = () => {
   const [emailRecipient, setEmailRecipient] = useState("");
   const [showCourseEmailDialog, setShowCourseEmailDialog] = useState(false);
   const [courseEmailTarget, setCourseEmailTarget] = useState<typeof courses[0] | null>(null);
+  const [courseEmailRecipient, setCourseEmailRecipient] = useState("");
   const { toast } = useToast();
 
   const selectedCourseData = useMemo(() => courses.find(c => c.code === selectedCourse), [selectedCourse]);
@@ -172,7 +173,7 @@ Student ID: [Your ID]`,
                   <div className="flex items-center gap-3">
                     <span className="font-heading font-semibold text-foreground">{course.grade}</span>
                     {course.status === "At Risk" ? (
-                      <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => { setCourseEmailTarget(course); setShowCourseEmailDialog(true); }}>
+                      <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => { setCourseEmailTarget(course); setCourseEmailRecipient(course.professor); setShowCourseEmailDialog(true); }}>
                         <FileText className="w-3 h-3" /> Reach Out
                       </Button>
                     ) : course.status === "Completed" ? (
@@ -186,6 +187,76 @@ Student ID: [Your ID]`,
             </div>
           </CardContent>
         </Card>
+
+        {/* At-risk course reach-out dialog */}
+        <Dialog open={showCourseEmailDialog} onOpenChange={setShowCourseEmailDialog}>
+          <DialogContent className="w-[95vw] max-w-lg sm:max-w-xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-base">Reach Out — {courseEmailTarget?.code} {courseEmailTarget?.name}</DialogTitle>
+            </DialogHeader>
+            {courseEmailTarget && (() => {
+              const courseRecipients = [
+                { id: "prof", label: courseEmailTarget.professor, role: "Course Professor" },
+                { id: "advisor", label: "Dr. Patel", role: "Academic Advisor" },
+                { id: "department", label: "CS Department Office", role: "Department Contact" },
+              ];
+              const draft = getEmailDraft(courseEmailRecipient, courseEmailTarget.code, courseEmailTarget.name);
+              return (
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-2">Who would you like to reach out to?</p>
+                    <div className="space-y-2">
+                      {courseRecipients.map((r) => (
+                        <div
+                          key={r.id}
+                          className={`flex items-center justify-between p-3 rounded-md border cursor-pointer transition-colors ${
+                            courseEmailRecipient === r.label ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"
+                          }`}
+                          onClick={() => setCourseEmailRecipient(r.label)}
+                        >
+                          <div>
+                            <p className="text-sm font-medium text-foreground">{r.label}</p>
+                            <p className="text-xs text-muted-foreground">{r.role}</p>
+                          </div>
+                          {courseEmailRecipient === r.label && <Check className="w-4 h-4 text-primary" />}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 text-sm">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-muted-foreground w-16 shrink-0">To:</span>
+                      <span className="text-foreground font-medium">{draft.to}</span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-muted-foreground w-16 shrink-0">Subject:</span>
+                      <span className="text-foreground font-medium break-all">{draft.subject}</span>
+                    </div>
+                  </div>
+
+                  <div className="border border-border rounded-md p-3 sm:p-4 bg-muted/30">
+                    <pre className="text-xs sm:text-sm text-foreground whitespace-pre-wrap font-sans leading-relaxed">{draft.body}</pre>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground">Atlas drafted this email based on your situation. Review the content and send when ready.</p>
+
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button variant="outline" className="flex-1" onClick={() => setShowCourseEmailDialog(false)}>
+                      Cancel
+                    </Button>
+                    <Button className="flex-1" onClick={() => {
+                      setShowCourseEmailDialog(false);
+                      toast({ title: "Email sent", description: `Your message has been sent to ${draft.to}.` });
+                    }}>
+                      Send Email
+                    </Button>
+                  </div>
+                </div>
+              );
+            })()}
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -524,57 +595,8 @@ Student ID: [Your ID]`,
     );
   }
 
-  // At-risk course email dialog (from landing page)
-  return (
-    <>
-      <Dialog open={showCourseEmailDialog} onOpenChange={setShowCourseEmailDialog}>
-        <DialogContent className="w-[95vw] max-w-lg sm:max-w-xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-base">Reach Out — {courseEmailTarget?.code}</DialogTitle>
-          </DialogHeader>
-          {courseEmailTarget && (() => {
-            const draft = getEmailDraft(courseEmailTarget.professor, courseEmailTarget.code, courseEmailTarget.name);
-            const courseRecipients = [
-              { id: "prof", label: courseEmailTarget.professor, role: "Course Professor" },
-              { id: "advisor", label: "Dr. Patel", role: "Academic Advisor" },
-            ];
-            return (
-              <div className="space-y-4">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-2">Select who to contact:</p>
-                  <div className="space-y-2">
-                    {courseRecipients.map((r) => (
-                      <div
-                        key={r.id}
-                        className="flex items-center justify-between p-3 rounded-md border border-border hover:border-primary/30 cursor-pointer transition-colors"
-                        onClick={() => {
-                          setShowCourseEmailDialog(false);
-                          toast({ title: "Email sent", description: `Message sent to ${r.label}.` });
-                        }}
-                      >
-                        <div>
-                          <p className="text-sm font-medium text-foreground">{r.label}</p>
-                          <p className="text-xs text-muted-foreground">{r.role}</p>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="border border-border rounded-md p-3 bg-muted/30">
-                  <p className="text-xs text-muted-foreground mb-1">Preview:</p>
-                  <pre className="text-xs text-foreground whitespace-pre-wrap font-sans leading-relaxed">{draft.body}</pre>
-                </div>
-                <Button variant="outline" className="w-full" onClick={() => setShowCourseEmailDialog(false)}>
-                  Cancel
-                </Button>
-              </div>
-            );
-          })()}
-        </DialogContent>
-      </Dialog>
-    </>
-  );
+  // Fallback
+  return null;
 };
 
 export default Academic;
