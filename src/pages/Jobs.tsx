@@ -106,8 +106,8 @@ const getStepDetails = (role: string): Record<string, StepDetail> => {
         "Generated resume v1 from projects + coursework",
         `Created 4 ${isPM ? "PM" : isData ? "data" : "engineering"}-ready bullet points`,
         "Highlighted measurable outcomes and tools used",
-        "Marked 2 bullets as "needs review"",
-        "Draft saved as "Resume Draft v1"",
+        "Marked 2 bullets as 'needs review'",
+        "Draft saved as 'Resume Draft v1'",
       ],
       sampleBullets: isPM
         ? [
