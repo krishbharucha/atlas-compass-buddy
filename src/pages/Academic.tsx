@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { BookOpen, TrendingUp, Calendar, FileText, CheckCircle, Clock, ChevronRight, AlertTriangle, GraduationCap, ArrowLeft, Check } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,7 +42,10 @@ const Academic = () => {
   const [prepareForm, setPrepareForm] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [emailReviewed, setEmailReviewed] = useState(false);
+  const [showEmailPreview, setShowEmailPreview] = useState(false);
   const { toast } = useToast();
+
+  const selectedCourseData = useMemo(() => courses.find(c => c.code === selectedCourse), [selectedCourse]);
 
   // ── Landing ──
   if (flow === "landing") {
@@ -385,6 +388,24 @@ const Academic = () => {
   }
 
   if (flow === "course-actions") {
+    const emailDraft = {
+      to: selectedCourseData?.professor ?? "Professor",
+      subject: `Request for Support — ${selectedCourse} ${selectedCourseData?.name ?? ""}`,
+      body: `Dear ${selectedCourseData?.professor ?? "Professor"},
+
+I hope this message finds you well. I am writing to discuss my current standing in ${selectedCourse} — ${selectedCourseData?.name ?? "your course"}.
+
+I have been facing some challenges this quarter that have affected my performance, and I would like to explore any options available to help me improve. I have also scheduled tutoring sessions and an advising appointment to develop a stronger study plan.
+
+Would it be possible to meet during your office hours this week to discuss strategies for the remaining assignments and exams? I am committed to putting in the effort needed to finish the course on the best possible terms.
+
+Thank you for your time and understanding.
+
+Best regards,
+[Your Name]
+Student ID: [Your ID]`,
+    };
+
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 animate-fade-in-up">
         <BackButton to="course-impact" />
@@ -405,7 +426,7 @@ const Academic = () => {
                     <span className="text-sm text-foreground">{item.label}</span>
                   </div>
                   {item.action && !emailReviewed && (
-                    <Button size="sm" variant="outline" onClick={() => setEmailReviewed(true)}>
+                    <Button size="sm" variant="outline" onClick={() => setShowEmailPreview(true)}>
                       Review & Send
                     </Button>
                   )}
@@ -417,6 +438,42 @@ const Academic = () => {
             </Button>
           </CardContent>
         </Card>
+
+        <Dialog open={showEmailPreview} onOpenChange={setShowEmailPreview}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle className="text-base">Review Email to Professor</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground w-16 shrink-0">To:</span>
+                  <span className="text-foreground font-medium">{emailDraft.to}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-muted-foreground w-16 shrink-0">Subject:</span>
+                  <span className="text-foreground font-medium">{emailDraft.subject}</span>
+                </div>
+              </div>
+              <div className="border border-border rounded-md p-4 bg-muted/30">
+                <pre className="text-sm text-foreground whitespace-pre-wrap font-sans leading-relaxed">{emailDraft.body}</pre>
+              </div>
+              <p className="text-xs text-muted-foreground">Atlas drafted this email based on your situation. Review the content and send when ready.</p>
+              <div className="flex gap-3">
+                <Button variant="outline" className="flex-1" onClick={() => setShowEmailPreview(false)}>
+                  Cancel
+                </Button>
+                <Button className="flex-1" onClick={() => {
+                  setShowEmailPreview(false);
+                  setEmailReviewed(true);
+                  toast({ title: "Email sent", description: `Your message has been sent to ${emailDraft.to}.` });
+                }}>
+                  Send Email
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
