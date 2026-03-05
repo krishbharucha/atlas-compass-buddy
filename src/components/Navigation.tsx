@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { NavLink as RouterNavLink, useLocation, useNavigate } from "react-router-dom";
-import { Bell, GraduationCap, LayoutDashboard, MessageSquare, User, BookOpen, DollarSign, Briefcase, Heart, Settings, ClipboardList, ChevronDown } from "lucide-react";
+import { Bell, GraduationCap, LayoutDashboard, MessageSquare, User, BookOpen, DollarSign, Briefcase, Heart, ClipboardList, ChevronDown } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
 const navItems = [
@@ -9,7 +9,6 @@ const navItems = [
   { to: "/financial", label: "Financial", icon: DollarSign },
   { to: "/jobs", label: "Jobs", icon: Briefcase },
   { to: "/wellness", label: "Wellness", icon: Heart },
-  { to: "/admin", label: "Admin", icon: Settings },
   { to: "/chat", label: "Atlas Chat", icon: MessageSquare },
 ];
 

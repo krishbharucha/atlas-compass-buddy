@@ -1,5 +1,5 @@
 import StatCard from "../components/StatCard";
-import { DollarSign, BookOpen, Briefcase, Heart, Activity, Calendar, ArrowRight } from "lucide-react";
+import { DollarSign, BookOpen, Briefcase, Heart, Activity, Calendar, ArrowRight, MessageSquare, Users } from "lucide-react";
 
 const stats = [
   {
@@ -14,28 +14,32 @@ const stats = [
   },
   {
     icon: <Briefcase className="w-4 h-4 text-accent" />, iconBg: "bg-yellow-light", label: "Applications",
-    value: "2 Due", subLabel: "This week",
+    value: "5 Matched", subLabel: "2 due this week",
     pill: { text: "Urgent", className: "pill-danger" }, delay: 160,
   },
   {
     icon: <Heart className="w-4 h-4 text-primary" />, iconBg: "bg-purple-light", label: "Wellness",
-    value: "Check-in Due", subLabel: "Last check-in: 7 days ago",
-    pill: { text: "Pending", className: "pill-purple" }, delay: 240,
+    value: "60%", subLabel: "Composite score · Sleep low",
+    pill: { text: "Check In", className: "pill-purple" }, delay: 240,
   },
 ];
 
 const activities = [
   { color: "bg-primary", text: "Financial aid verification document identified", time: "2 days ago", pill: { text: "Resolved", className: "pill-success" } },
-  { color: "bg-accent", text: "Counseling appointment booked — Thurs 10am", time: "1 day ago", pill: { text: "Confirmed", className: "pill-blue" } },
-  { color: "bg-primary", text: "MATH 208 tutoring sessions scheduled", time: "1 day ago", pill: { text: "Active", className: "pill-success" } },
-  { color: "bg-destructive", text: "Library fine hold — resolution pending", time: "Today", pill: { text: "In Progress", className: "pill-warning" } },
+  { color: "bg-accent", text: "Counseling appointment booked — Tomorrow 3:00 PM", time: "1 day ago", pill: { text: "Confirmed", className: "pill-blue" } },
+  { color: "bg-primary", text: "MATH 208 — Professor emailed for tutoring support", time: "1 day ago", pill: { text: "Sent", className: "pill-success" } },
+  { color: "bg-destructive", text: "Career check completed — 5 matches, 2 resume drafts", time: "Today", pill: { text: "Review", className: "pill-warning" } },
+  { color: "bg-primary", text: "Peer Support: Anxiety group — spot reserved", time: "Today", pill: { text: "Joined", className: "pill-blue" } },
+  { color: "bg-accent", text: "Sleep Hygiene Seminar — registered for Mar 14", time: "Today", pill: { text: "Registered", className: "pill-success" } },
 ];
 
 const deadlines = [
-  { border: "border-l-destructive", text: "Amazon SDE Application", time: "Friday", urgent: true },
-  { border: "border-l-destructive", text: "Microsoft PM Application", time: "Monday", urgent: true },
+  { border: "border-l-destructive", text: "Microsoft PM Application", time: "Friday", urgent: true },
+  { border: "border-l-destructive", text: "Amazon PM Application", time: "Monday", urgent: true },
   { border: "border-l-accent", text: "MATH 208 Tutoring", time: "Today 4pm", urgent: false },
-  { border: "border-l-primary", text: "Advising Appointment", time: "Wednesday 2pm", urgent: false },
+  { border: "border-l-primary", text: "Counseling — Dr. Maya Chen", time: "Tomorrow 3pm", urgent: false },
+  { border: "border-l-primary", text: "Peer Support Group", time: "Tuesday 5pm", urgent: false },
+  { border: "border-l-accent", text: "Sleep Hygiene Seminar", time: "Mar 14 4pm", urgent: false },
 ];
 
 const Dashboard = () => {
@@ -47,7 +51,7 @@ const Dashboard = () => {
           <div>
             <h1 className="text-2xl font-heading font-bold text-foreground">Good morning, Jordan</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Week 8 of Fall Quarter · 4 items need your attention
+              Week 8 of Fall Quarter · 6 items need your attention
             </p>
           </div>
           <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground font-mono-accent bg-secondary px-3 py-1.5 rounded-lg">
