@@ -171,12 +171,14 @@ Student ID: [Your ID]`,
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="font-heading font-semibold text-foreground">{course.grade}</span>
-                    {course.status === "Completed" ? (
-                      <CheckCircle className="w-4 h-4 text-muted-foreground" />
-                    ) : (
+                    {course.status === "At Risk" ? (
                       <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => { setCourseEmailTarget(course); setShowCourseEmailDialog(true); }}>
                         <FileText className="w-3 h-3" /> Reach Out
                       </Button>
+                    ) : course.status === "Completed" ? (
+                      <CheckCircle className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <Clock className="w-4 h-4 text-muted-foreground" />
                     )}
                   </div>
                 </div>
