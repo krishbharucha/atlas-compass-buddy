@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { BentoGrid, BentoCard } from "@/components/ui/bento-grid";
+import StatCard from "../components/StatCard";
 import { DollarSign, BookOpen, Briefcase, Heart, Activity, Calendar, ArrowRight, MessageSquare, Users, ClipboardList, TrendingUp, CheckCircle2 } from "lucide-react";
 
 const getGreeting = () => {
@@ -9,51 +9,30 @@ const getGreeting = () => {
   return "Good evening";
 };
 
-/* ─── Bento feature data for the 4 stat pillars ─── */
-const pillarCards = [
+const stats = [
   {
-    Icon: DollarSign,
-    name: "Financial Aid",
-    description: "$3,200 outstanding · Action needed on verification document",
-    href: "/financial",
-    cta: "View Details",
-    background: (
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-50/80 via-transparent to-transparent dark:from-amber-900/20 dark:via-transparent" />
-    ),
-    className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
+    icon: <DollarSign className="w-4 h-4 text-accent" />, iconBg: "bg-yellow-light", label: "Financial Aid",
+    value: "$3,200", subLabel: "Balance outstanding",
+    pill: { text: "Action Needed", className: "pill-warning" }, delay: 0,
+    path: "/financial",
   },
   {
-    Icon: Heart,
-    name: "Wellness",
-    description: "60% composite score · Sleep metrics declining for 3 weeks · Counseling tomorrow 3 PM",
-    href: "/wellness",
-    cta: "Check In",
-    background: (
-      <div className="absolute inset-0 bg-gradient-to-br from-pink-50/80 via-transparent to-transparent dark:from-pink-900/20 dark:via-transparent" />
-    ),
-    className: "lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-4",
+    icon: <BookOpen className="w-4 h-4 text-primary" />, iconBg: "bg-purple-light", label: "GPA",
+    value: "3.41", subLabel: "87 of 180 credits complete",
+    pill: { text: "On Track", className: "pill-success" }, delay: 80,
+    path: "/academic",
   },
   {
-    Icon: Briefcase,
-    name: "Career",
-    description: "4 active applications · 2 due this week · 1 interview scheduled",
-    href: "/jobs",
-    cta: "View Pipeline",
-    background: (
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-transparent to-transparent dark:from-blue-900/20 dark:via-transparent" />
-    ),
-    className: "lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
+    icon: <Briefcase className="w-4 h-4 text-accent" />, iconBg: "bg-yellow-light", label: "Applications",
+    value: "4 Active", subLabel: "2 due this week",
+    pill: { text: "Urgent", className: "pill-danger" }, delay: 160,
+    path: "/jobs",
   },
   {
-    Icon: BookOpen,
-    name: "Academic",
-    description: "GPA 3.41 · 87 of 120 credits · On track for May 2027 graduation",
-    href: "/academic",
-    cta: "View Audit",
-    background: (
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/80 via-transparent to-transparent dark:from-emerald-900/20 dark:via-transparent" />
-    ),
-    className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
+    icon: <Heart className="w-4 h-4 text-primary" />, iconBg: "bg-purple-light", label: "Wellness",
+    value: "60%", subLabel: "Composite score · Sleep low",
+    pill: { text: "Check In", className: "pill-purple" }, delay: 240,
+    path: "/wellness",
   },
 ];
 
@@ -96,6 +75,15 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Stats — clickable */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        {stats.map((s) => (
+          <div key={s.label} onClick={() => navigate(s.path)} className="cursor-pointer hover:ring-1 hover:ring-foreground/10 rounded-xl transition-all">
+            <StatCard {...s} />
+          </div>
+        ))}
+      </div>
+
       {/* Quick Actions */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {[
@@ -121,34 +109,13 @@ const Dashboard = () => {
         })}
       </div>
 
-      {/* Bento Pillar Cards */}
-      <div className="mb-6 animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-        <BentoGrid className="lg:grid-rows-3 auto-rows-[14rem]">
-          {pillarCards.map((card) => (
-            <BentoCard key={card.name} {...card} />
-          ))}
-          {/* Activity Panel — fills remaining spot */}
-          <BentoCard
-            Icon={Activity}
-            name="Recent Activity"
-            description={`${activities.length} actions taken by Atlas this week`}
-            href="/plan"
-            cta="View All"
-            background={
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-50/80 via-transparent to-transparent dark:from-slate-900/20 dark:via-transparent" />
-            }
-            className="lg:col-start-3 lg:col-end-3 lg:row-start-2 lg:row-end-4"
-          />
-        </BentoGrid>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Activity Feed — 2 cols */}
         <div className="lg:col-span-2 glass-card animate-fade-in-up" style={{ animationDelay: "300ms" }}>
           <div className="flex items-center justify-between p-4 border-b border-border">
             <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <Activity className="w-4 h-4 text-primary" />
-              Activity Feed
+              Recent Activity
             </h2>
             <button onClick={() => navigate("/plan")} className="text-xs text-primary font-medium hover:underline flex items-center gap-1">
               View all <ArrowRight className="w-3 h-3" />

@@ -11,11 +11,15 @@ const features = [
   {
     Icon: DollarSign,
     name: "Financial Aid & Money Stress",
-    description: "Atlas pulls your aid history, files appeals, finds emergency funding, and protects your registration — all in one conversation.",
+    description: "Atlas pulls your aid history, files appeals, finds emergency funding, and protects your registration.",
     href: "/financial",
     cta: "Explore",
     background: (
-      <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/80 via-transparent to-transparent dark:from-yellow-900/20 dark:via-transparent" />
+      <img
+        src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&auto=format&fit=crop&q=60"
+        alt="Financial documents"
+        className="absolute inset-0 w-full h-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-95"
+      />
     ),
     className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
   },
@@ -26,7 +30,11 @@ const features = [
     href: "/wellness",
     cta: "Explore",
     background: (
-      <div className="absolute inset-0 bg-gradient-to-br from-pink-50/80 via-transparent to-transparent dark:from-pink-900/20 dark:via-transparent" />
+      <img
+        src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=60"
+        alt="Meditation and wellness"
+        className="absolute inset-0 w-full h-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-95"
+      />
     ),
     className: "lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-4",
   },
@@ -37,7 +45,11 @@ const features = [
     href: "/jobs",
     cta: "Explore",
     background: (
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-transparent to-transparent dark:from-blue-900/20 dark:via-transparent" />
+      <img
+        src="https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=800&auto=format&fit=crop&q=60"
+        alt="Team collaboration"
+        className="absolute inset-0 w-full h-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-95"
+      />
     ),
     className: "lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
   },
@@ -48,7 +60,11 @@ const features = [
     href: "/academic",
     cta: "Explore",
     background: (
-      <div className="absolute inset-0 bg-gradient-to-br from-green-50/80 via-transparent to-transparent dark:from-green-900/20 dark:via-transparent" />
+      <img
+        src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&auto=format&fit=crop&q=60"
+        alt="Library and books"
+        className="absolute inset-0 w-full h-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-95"
+      />
     ),
     className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
   },
@@ -59,7 +75,11 @@ const features = [
     href: "/chat",
     cta: "Explore",
     background: (
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/80 via-transparent to-transparent dark:from-purple-900/20 dark:via-transparent" />
+      <img
+        src="https://images.unsplash.com/photo-1562774053-701939374585?w=800&auto=format&fit=crop&q=60"
+        alt="University campus"
+        className="absolute inset-0 w-full h-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-95"
+      />
     ),
     className: "lg:col-start-3 lg:col-end-3 lg:row-start-2 lg:row-end-4",
   },
