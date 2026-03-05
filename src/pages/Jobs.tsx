@@ -28,6 +28,14 @@ interface WorkflowStep {
   statusText: string;
 }
 
+interface StepDetail {
+  bullets: string[];
+  source?: string;
+  extras?: { label: string; items: string[] };
+  sampleBullets?: string[];
+  guardrail?: string;
+}
+
 interface Application {
   company: string;
   role: string;
@@ -60,6 +68,107 @@ interface Filters {
   matchScore: number | null;
 }
 
+/* ─── STEP DETAILS BY ROLE ─── */
+const getStepDetails = (role: string): Record<string, StepDetail> => {
+  const isPM = role.toLowerCase().includes("pm") || role.toLowerCase().includes("product");
+  const isData = role.toLowerCase().includes("data") || role.toLowerCase().includes("analyst");
+
+  return {
+    profile: {
+      bullets: [
+        "Loaded student profile: Jordan Rivera, Junior, Information Science",
+        `Extracted skills from coursework: ${isPM ? "SQL, Python, Product Analytics" : isData ? "SQL, R, Python, Statistics, Tableau" : "Python, Java, System Design, Algorithms"}`,
+        "Pulled projects: 2 major projects detected",
+        `Target role inferred: ${role || "PM"} internships`,
+        "Location preference: Seattle + Remote",
+      ],
+      source: "Based on your student profile and academic record",
+    },
+    matches: {
+      bullets: [
+        "Found 5 matching opportunities",
+        "Top 2 matches flagged as urgent deadlines",
+        "Calculated match score using skills + coursework fit",
+        "Auto-saved 3 best-fit roles",
+        "Ranked opportunities by deadline + relevance",
+      ],
+      extras: {
+        label: "Top matches",
+        items: isPM
+          ? ["Microsoft PM Intern — 92% — Due Mar 12", "Amazon PM Intern — 89% — Due Mar 15", "Adobe Product Intern — 84% — Due Mar 20"]
+          : isData
+          ? ["Meta Data Science Intern — 94% — Due Mar 14", "Goldman Sachs Data Analyst — 88% — Due Mar 18", "Pfizer Data Analyst Intern — 82% — Due Mar 22"]
+          : ["Amazon SDE Intern — 94% — Due Mar 12", "Microsoft SWE Intern — 91% — Due Mar 15", "Apple ML Intern — 87% — Due Mar 20"],
+      },
+    },
+    resume: {
+      bullets: [
+        "Generated resume v1 from projects + coursework",
+        `Created 4 ${isPM ? "PM" : isData ? "data" : "engineering"}-ready bullet points`,
+        "Highlighted measurable outcomes and tools used",
+        "Marked 2 bullets as 'needs review'",
+        "Draft saved as 'Resume Draft v1'",
+      ],
+      sampleBullets: isPM
+        ? [
+            "Built a data pipeline in Python to analyze trends and present insights.",
+            "Designed a product-style feature brief based on user needs and constraints.",
+          ]
+        : isData
+        ? [
+            "Developed a Tableau dashboard to visualize enrollment trends across 3 semesters.",
+            "Performed regression analysis in R to identify key drivers of student retention.",
+          ]
+        : [
+            "Implemented a REST API in Java handling 1K+ requests/day with 99.9% uptime.",
+            "Optimized database queries reducing average response time by 40%.",
+          ],
+      guardrail: "Nothing is submitted without your approval.",
+    },
+    tasks: {
+      bullets: [
+        "Created 6 recruiting tasks with deadlines",
+        "Added 2 application drafts to My Applications",
+        "Set next deadline alert for Mar 12",
+        "Created task checklist per job (resume tailor, submit, follow-up)",
+        "Updated dashboard metrics",
+      ],
+      extras: {
+        label: "Next tasks",
+        items: isPM
+          ? ["Tailor resume for Microsoft PM — Due in 2 days", "Submit Microsoft application — Due Mar 12", "Draft STAR stories — Due in 4 days"]
+          : isData
+          ? ["Tailor resume for Meta Data Science — Due in 2 days", "Submit Goldman Sachs application — Due Mar 18", "Prepare SQL case study — Due in 4 days"]
+          : ["Tailor resume for Amazon SDE — Due in 2 days", "Submit Amazon application — Due Mar 12", "Practice system design — Due in 4 days"],
+      },
+    },
+    outreach: {
+      bullets: [
+        `Matched 2 alumni in ${isPM ? "Product" : isData ? "Data" : "Engineering"} roles at target companies`,
+        "Drafted personalized outreach messages using shared context",
+        "Saved drafts for student review",
+        "Sending disabled until confirmation",
+      ],
+      sampleBullets: [
+        isPM
+          ? "\"Hi Sarah, I'm Jordan — a junior studying IS. I'd love to hear about your PM path at Microsoft…\""
+          : isData
+          ? "\"Hi Alex, I'm Jordan — a junior studying IS. Your data science work at Meta really resonated with me…\""
+          : "\"Hi Marcus, I'm Jordan — a CS junior. I'd love to learn about your engineering journey at Google…\"",
+      ],
+    },
+    coaching: {
+      bullets: [
+        "Booked career coaching session: Tomorrow 2:00 PM",
+        `Added mock interview set: 12 ${isPM ? "behavioral" : isData ? "analytical" : "technical"} questions`,
+        `Flagged weak areas: ${isPM ? "metrics storytelling + leadership examples" : isData ? "SQL optimization + visualization narration" : "system design + complexity analysis"}`,
+        "Added prep tasks to your checklist",
+        "Calendar invite prepared (not sent)",
+      ],
+    },
+  };
+};
+
 /* ─── INITIAL DATA ─── */
 const initialApps: Application[] = [
   { company: "Google", role: "Software Engineering Intern", status: "Interview", date: "Applied Feb 20", location: "Mountain View, CA", tasks: ["Prep system design"] },
@@ -85,7 +194,7 @@ const initialWorkflowSteps: WorkflowStep[] = [
   { id: "resume", label: "Resume", icon: FileText, status: "queued", duration: 1500, statusText: "Drafting resume bullets" },
   { id: "tasks", label: "Tasks", icon: ListTodo, status: "queued", duration: 1200, statusText: "Creating application tasks" },
   { id: "outreach", label: "Outreach", icon: Mail, status: "queued", duration: 1500, statusText: "Preparing alumni outreach drafts" },
-  { id: "coaching", label: "Coaching", icon: GraduationCap, status: "queued", duration: 1000, statusText: "Career preparation completed" },
+  { id: "coaching", label: "Coaching", icon: GraduationCap, status: "queued", duration: 1000, statusText: "Scheduling career coaching" },
 ];
 
 const alumniDrafts = [
@@ -119,6 +228,14 @@ const statusStyle = (status: string) => {
   }
 };
 
+const timeAgo = (ts?: number) => {
+  if (!ts) return "";
+  const diff = Math.floor((Date.now() - ts) / 1000);
+  if (diff < 5) return "Just now";
+  if (diff < 60) return `${diff}s ago`;
+  return `${Math.floor(diff / 60)}m ago`;
+};
+
 const FILTER_OPTIONS = {
   jobType: ["Internship", "Part-time", "Full-time", "Research"],
   industry: ["Technology", "Finance", "Consulting", "Healthcare", "Data Science", "Product Management"],
@@ -137,6 +254,8 @@ const Jobs = () => {
   const [steps, setSteps] = useState<WorkflowStep[]>(initialWorkflowSteps);
   const [activeStatusText, setActiveStatusText] = useState("");
   const [summaryPills, setSummaryPills] = useState<{ label: string; value: string }[]>([]);
+  const [selectedStepId, setSelectedStepId] = useState<string | null>(null);
+  const [targetRole, setTargetRole] = useState("PM internship");
 
   // Dynamic data
   const [metrics, setMetrics] = useState({ applications: 12, interviews: 3, companies: 8, saved: 15 });
@@ -156,7 +275,16 @@ const Jobs = () => {
   const [sentDrafts, setSentDrafts] = useState<Set<number>>(new Set());
   const [outreachReady, setOutreachReady] = useState(false);
 
+  // Tick for timeAgo
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => setTick(t => t + 1), 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   const runningRef = useRef(false);
+
+  const stepDetails = useMemo(() => getStepDetails(targetRole), [targetRole]);
 
   const flashMetric = useCallback((key: string) => {
     setMetricFlash((p) => ({ ...p, [key]: true }));
@@ -172,13 +300,13 @@ const Jobs = () => {
   }, []);
 
   const startStep = useCallback((idx: number) => {
-    setSteps((prev) => {
-      const updated = prev.map((s, i) =>
+    setSteps((prev) =>
+      prev.map((s, i) =>
         i === idx ? { ...s, status: "processing" as StepStatus } : s
-      );
-      return updated;
-    });
+      )
+    );
     setActiveStatusText(initialWorkflowSteps[idx].statusText);
+    setSelectedStepId(initialWorkflowSteps[idx].id);
   }, []);
 
   /* ─── WORKFLOW RUNNER ─── */
@@ -190,8 +318,8 @@ const Jobs = () => {
     setSummaryPills([]);
     setActiveStatusText("");
     setOutreachReady(false);
+    setSelectedStepId(null);
 
-    // Reset
     setSteps(initialWorkflowSteps.map((s) => ({ ...s, status: "queued" as StepStatus, completedAt: undefined })));
     setApplications(initialApps);
     setListings(initialListings);
@@ -271,6 +399,7 @@ const Jobs = () => {
     setSummaryPills([]);
     setActiveStatusText("");
     setOutreachReady(false);
+    setSelectedStepId(null);
     setApplications(initialApps);
     setListings(initialListings);
     setMetrics({ applications: 12, interviews: 3, companies: 8, saved: 15 });
@@ -357,6 +486,11 @@ const Jobs = () => {
 
   const showWorkflow = demoRunning || demoCompleted;
 
+  // Selected step detail
+  const selectedStep = steps.find(s => s.id === selectedStepId);
+  const selectedDetail = selectedStepId ? stepDetails[selectedStepId] : null;
+  const canShowDetail = selectedStep && (selectedStep.status === "processing" || selectedStep.status === "completed");
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
@@ -400,12 +534,12 @@ const Jobs = () => {
 
       {/* Atlas Career Card */}
       <Card className="mb-8 border-primary/10">
-        <CardHeader className="flex flex-row items-center justify-between pb-3">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-foreground" />
             <CardTitle className="text-lg">Atlas — Career Services</CardTitle>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {outreachReady && (
               <Button size="sm" variant="outline" className="gap-1" onClick={() => setOutreachModal(true)}>
                 <Users className="w-3.5 h-3.5" />
@@ -430,10 +564,22 @@ const Jobs = () => {
           </div>
         </CardHeader>
         <CardContent>
+          {/* Role input */}
           {!showWorkflow && (
-            <p className="text-sm text-muted-foreground">
-              Run a career check to match opportunities, draft resumes, create tasks, and prepare alumni outreach — all in one step.
-            </p>
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                Run a career check to match opportunities, draft resumes, create tasks, and prepare alumni outreach.
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground whitespace-nowrap">Target role:</span>
+                <Input
+                  value={targetRole}
+                  onChange={(e) => setTargetRole(e.target.value)}
+                  placeholder="e.g. Data Analyst, SWE internship"
+                  className="h-8 text-sm max-w-xs"
+                />
+              </div>
+            </div>
           )}
 
           {showWorkflow && (
@@ -441,14 +587,20 @@ const Jobs = () => {
               {/* Horizontal Stepper */}
               <div className="flex items-center justify-between gap-1 overflow-x-auto pb-1">
                 {steps.map((step, i) => {
-                  const StepIcon = step.icon;
                   const isActive = step.status === "processing";
                   const isCompleted = step.status === "completed";
+                  const isSelected = step.id === selectedStepId;
+                  const isClickable = isCompleted || isActive;
                   return (
                     <div key={step.id} className="flex items-center gap-1 flex-1 min-w-0">
-                      <div className={`flex flex-col items-center gap-1.5 flex-shrink-0 px-2 py-1.5 rounded-lg transition-all duration-300 ${
-                        isActive ? "bg-primary/8" : ""
-                      }`}>
+                      <button
+                        type="button"
+                        disabled={!isClickable}
+                        onClick={() => isClickable && setSelectedStepId(step.id === selectedStepId ? null : step.id)}
+                        className={`flex flex-col items-center gap-1.5 flex-shrink-0 px-2 py-1.5 rounded-lg transition-all duration-200 ${
+                          isSelected ? "bg-primary/10 ring-1 ring-primary/20" : isActive ? "bg-primary/5" : ""
+                        } ${isClickable ? "cursor-pointer hover:bg-primary/8" : "cursor-default"}`}
+                      >
                         <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 ${
                           isCompleted
                             ? "bg-success/15 text-success"
@@ -465,11 +617,11 @@ const Jobs = () => {
                           )}
                         </div>
                         <span className={`text-[10px] font-medium leading-none transition-colors ${
-                          isCompleted ? "text-success" : isActive ? "text-foreground" : "text-muted-foreground"
+                          isSelected ? "text-foreground" : isCompleted ? "text-success" : isActive ? "text-foreground" : "text-muted-foreground"
                         }`}>
                           {step.label}
                         </span>
-                      </div>
+                      </button>
                       {i < steps.length - 1 && (
                         <div className={`h-px flex-1 min-w-[12px] transition-colors duration-300 ${
                           isCompleted ? "bg-success/30" : "bg-border"
@@ -496,6 +648,77 @@ const Jobs = () => {
                       {pill.value}
                     </span>
                   ))}
+                </div>
+              )}
+
+              {/* Step Details Area */}
+              {canShowDetail && selectedDetail && (
+                <div className="border border-border rounded-lg p-4 animate-fade-in bg-muted/30">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-semibold text-foreground uppercase tracking-wider">What Atlas did</p>
+                    {selectedStep.completedAt && (
+                      <span className="text-[10px] text-muted-foreground font-mono-accent">
+                        Completed {timeAgo(selectedStep.completedAt)}
+                      </span>
+                    )}
+                    {selectedStep.status === "processing" && (
+                      <span className="text-[10px] text-primary font-medium flex items-center gap-1">
+                        <Loader2 className="w-2.5 h-2.5 animate-spin" /> In progress
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5 mb-3">
+                    {selectedDetail.bullets.map((bullet, i) => (
+                      <div key={i} className="flex items-start gap-2 text-xs text-foreground/80 animate-fade-in" style={{ animationDelay: `${i * 60}ms` }}>
+                        <CheckCircle2 className="w-3 h-3 mt-0.5 shrink-0 text-foreground/30" />
+                        <span>{bullet}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Extras list */}
+                  {selectedDetail.extras && (
+                    <div className="mt-3 pt-3 border-t border-border/60">
+                      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                        {selectedDetail.extras.label}
+                      </p>
+                      <div className="space-y-1">
+                        {selectedDetail.extras.items.map((item, i) => (
+                          <p key={i} className="text-xs text-foreground/70 font-mono-accent pl-1">{item}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Sample bullets */}
+                  {selectedDetail.sampleBullets && (
+                    <div className="mt-3 pt-3 border-t border-border/60">
+                      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                        {selectedStepId === "outreach" ? "Draft preview" : "Sample bullets"}
+                      </p>
+                      <div className="space-y-1.5">
+                        {selectedDetail.sampleBullets.map((b, i) => (
+                          <p key={i} className="text-xs text-foreground/70 italic pl-1">"{b.replace(/^"|"$/g, '')}"</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Source */}
+                  {selectedDetail.source && (
+                    <p className="text-[10px] text-muted-foreground mt-3 pt-2 border-t border-border/60 italic">
+                      {selectedDetail.source}
+                    </p>
+                  )}
+
+                  {/* Guardrail */}
+                  {selectedDetail.guardrail && (
+                    <div className="flex items-center gap-1.5 mt-3 pt-2 border-t border-border/60 text-[10px] text-muted-foreground">
+                      <AlertCircle className="w-3 h-3 shrink-0" />
+                      <span>{selectedDetail.guardrail}</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -585,79 +808,54 @@ const Jobs = () => {
                     </Button>
                   </div>
 
-                  {/* Job Type */}
                   <div>
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Job Type</p>
                     <div className="space-y-1.5">
                       {FILTER_OPTIONS.jobType.map(opt => (
                         <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm text-foreground hover:bg-secondary/50 rounded px-2 py-1 -mx-2">
-                          <Checkbox
-                            checked={filters.jobType.includes(opt)}
-                            onCheckedChange={() => toggleFilterValue("jobType", opt)}
-                          />
+                          <Checkbox checked={filters.jobType.includes(opt)} onCheckedChange={() => toggleFilterValue("jobType", opt)} />
                           {opt}
                         </label>
                       ))}
                     </div>
                   </div>
-
                   <Separator />
-
-                  {/* Industry */}
                   <div>
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Industry</p>
                     <div className="space-y-1.5">
                       {FILTER_OPTIONS.industry.map(opt => (
                         <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm text-foreground hover:bg-secondary/50 rounded px-2 py-1 -mx-2">
-                          <Checkbox
-                            checked={filters.industry.includes(opt)}
-                            onCheckedChange={() => toggleFilterValue("industry", opt)}
-                          />
+                          <Checkbox checked={filters.industry.includes(opt)} onCheckedChange={() => toggleFilterValue("industry", opt)} />
                           {opt}
                         </label>
                       ))}
                     </div>
                   </div>
-
                   <Separator />
-
-                  {/* Location */}
                   <div>
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Location</p>
                     <div className="space-y-1.5">
                       {FILTER_OPTIONS.location.map(opt => (
                         <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm text-foreground hover:bg-secondary/50 rounded px-2 py-1 -mx-2">
-                          <Checkbox
-                            checked={filters.location.includes(opt)}
-                            onCheckedChange={() => toggleFilterValue("location", opt)}
-                          />
+                          <Checkbox checked={filters.location.includes(opt)} onCheckedChange={() => toggleFilterValue("location", opt)} />
                           {opt}
                         </label>
                       ))}
                     </div>
                   </div>
-
                   <Separator />
-
-                  {/* Salary */}
                   <div>
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Salary Range</p>
                     <div className="space-y-1.5">
                       {FILTER_OPTIONS.salary.map(opt => (
                         <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm text-foreground hover:bg-secondary/50 rounded px-2 py-1 -mx-2">
-                          <Checkbox
-                            checked={filters.salary.includes(opt)}
-                            onCheckedChange={() => toggleFilterValue("salary", opt)}
-                          />
+                          <Checkbox checked={filters.salary.includes(opt)} onCheckedChange={() => toggleFilterValue("salary", opt)} />
                           {opt}
                         </label>
                       ))}
                     </div>
                   </div>
-
                   <Separator />
-
-                  {/* Match Score */}
                   <div>
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Match Score</p>
                     <div className="flex gap-2">
@@ -674,19 +872,14 @@ const Jobs = () => {
                       ))}
                     </div>
                   </div>
-
                   <Separator />
-
-                  <Button size="sm" className="w-full" onClick={() => setFilterOpen(false)}>
-                    Apply Filters
-                  </Button>
+                  <Button size="sm" className="w-full" onClick={() => setFilterOpen(false)}>Apply Filters</Button>
                 </div>
               </PopoverContent>
             </Popover>
           </div>
         </CardHeader>
         <CardContent>
-          {/* Active filter tags */}
           {activeFilterTags.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-4">
               {activeFilterTags.map((tag, i) => (
@@ -708,9 +901,7 @@ const Jobs = () => {
               <div className="py-8 text-center">
                 <SlidersHorizontal className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
                 <p className="text-sm text-muted-foreground">No opportunities match your filters.</p>
-                <Button variant="ghost" size="sm" className="mt-2 text-xs" onClick={() => setFilters(emptyFilters)}>
-                  Clear filters
-                </Button>
+                <Button variant="ghost" size="sm" className="mt-2 text-xs" onClick={() => setFilters(emptyFilters)}>Clear filters</Button>
               </div>
             ) : (
               filteredListings.map((job, idx) => (
