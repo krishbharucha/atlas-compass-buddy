@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
-  Heart, Phone, Calendar, Users, BookOpen, MessageSquare, Clock,
-  ChevronRight, Shield, Zap, CheckCircle2, AlertTriangle,
-  Activity, Loader2, Circle, Send, Star, Video,
+  Phone, Calendar, Users, BookOpen, MessageSquare, Clock,
+  ChevronRight, Shield, Zap, CheckCircle2,
+  Loader2, Star, Video, ExternalLink,
   PhoneCall, X, Check, MapPin, User
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,63 +10,26 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-
-
-/* ─── TYPES ─── */
-type StepStatus = "queued" | "processing" | "completed";
-
-interface WorkflowStep {
-  id: string;
-  label: string;
-  status: StepStatus;
-  completedAt?: number;
-  duration: number;
-}
+import { useNavigate } from "react-router-dom";
 
 type BookingModal = null | "counseling" | "crisis-call" | "crisis-video" | "peer-group" | "workshop";
 type BookingPhase = "scanning" | "found" | "confirming" | "booked";
 
-/* ─── INITIAL DATA ─── */
-const initialSteps: WorkflowStep[] = [
-  { id: "trend", label: "Trend Analysis", status: "queued", duration: 1500 },
-  { id: "pattern", label: "Pattern Detection", status: "queued", duration: 1500 },
-  { id: "resource", label: "Resource Match", status: "queued", duration: 2000 },
-  { id: "appointment", label: "Appointment Booked", status: "queued", duration: 2000 },
-  { id: "advisor", label: "Advisor Alerted", status: "queued", duration: 1500 },
-  { id: "toolkit", label: "Toolkit Sent", status: "queued", duration: 1000 },
-];
-
-
-const atlasCapabilities = [
+const atlasHelpCards = [
   {
-    trigger: "Proactive wellness monitoring",
-    example: "Weekly pulse checks + trend tracking",
-    actions: [
-      "Sends weekly wellness pulse checks & tracks scores over time",
-      "Surfaces patterns before they become crises",
-      "Alerts advisor with confidential welfare flag after 2+ weeks of decline",
-      "Personalizes resources based on specific stress patterns",
-    ],
+    trigger: "Feeling overwhelmed?",
+    example: "\"I'm stressed about exams and can't sleep\"",
+    actions: ["Connect you with the right counselor or support group", "Help find workshops that fit your schedule", "Book appointments automatically"],
   },
   {
-    trigger: "Acute distress detection",
-    example: "\"I haven't slept in 4 days and I have 3 finals\"",
-    actions: [
-      "Triages urgency with 3 warm follow-up questions",
-      "Routes to appropriate care level (self-guided → peer → counselor → crisis)",
-      "Books same-day counselor slot with pre-filled intake form",
-      "Sends personalized \"tonight's toolkit\" via SMS",
-    ],
+    trigger: "Need someone to talk to?",
+    example: "\"I feel alone and don't know where to start\"",
+    actions: ["Find peer support groups on campus", "Schedule a counseling session", "Connect you with student mentors"],
   },
   {
-    trigger: "Crisis intervention",
-    example: "Student expresses hopelessness during any conversation",
-    actions: [
-      "Immediately and warmly pivots conversation tone",
-      "Pages on-call crisis counselor for direct callback",
-      "Sends 24/7 crisis support number to student's phone",
-      "Stays active until student confirms human connection",
-    ],
+    trigger: "Crisis or urgent help",
+    example: "Available 24/7 for immediate support",
+    actions: ["Connect directly with on-call crisis counselor", "Provide 24/7 crisis hotline numbers", "Stay with you until human support arrives"],
     isCrisis: true,
   },
 ];
@@ -89,40 +52,19 @@ const workshops = [
   { name: "Building Resilience", date: "Mar 18, 2026", time: "1:00 PM", location: "Student Union 101", duration: "75 min", capacity: "15 spots left" },
 ];
 
-const timeAgo = (ts?: number) => {
-  if (!ts) return "";
-  const diff = Math.floor((Date.now() - ts) / 1000);
-  if (diff < 5) return "Just now";
-  if (diff < 60) return `${diff}s ago`;
-  return `${Math.floor(diff / 60)}m ago`;
-};
+const upcomingEvents = [
+  { title: "Stress Management Workshop", date: "Mar 8, 2026", time: "2:00 PM", location: "Wellness Center 204" },
+  { title: "Meditation Circle", date: "Mar 10, 2026", time: "12:00 PM", location: "Student Union 101" },
+  { title: "Sleep Hygiene Seminar", date: "Mar 14, 2026", time: "4:00 PM", location: "Health Sciences 310" },
+  { title: "Peer Support: Anxiety", date: "Mar 15, 2026", time: "3:00 PM", location: "Wellness Center 102" },
+];
 
-/* ─── COMPONENT ─── */
 const Wellness = () => {
-  // Workflow
-  const [demoRunning, setDemoRunning] = useState(false);
-  const [demoCompleted, setDemoCompleted] = useState(false);
-  const [steps, setSteps] = useState<WorkflowStep[]>(initialSteps);
-  const [, setTick] = useState(0);
-  const runningRef = useRef(false);
+  const navigate = useNavigate();
 
-  // Student input
-  const [studentMessage, setStudentMessage] = useState("");
-  const [submittedMessage, setSubmittedMessage] = useState("");
-  const [analysisMessage, setAnalysisMessage] = useState<string | null>(null);
-  const [distressSignals, setDistressSignals] = useState<string[]>([]);
-  const [severityLabel, setSeverityLabel] = useState<string | null>(null);
-
-  // Dynamic state
-  const [distressLevel, setDistressLevel] = useState<"normal" | "elevated" | "high">("normal");
-  const [wellnessInsight, setWellnessInsight] = useState<string | null>(null);
   const [appointmentBooked, setAppointmentBooked] = useState(false);
   const [recommendedGroup, setRecommendedGroup] = useState<string | null>(null);
   const [recommendedWorkshop, setRecommendedWorkshop] = useState<string | null>(null);
-  const [recommendedEvents, setRecommendedEvents] = useState<Set<number>>(new Set());
-  const [advisorFlagged, setAdvisorFlagged] = useState(false);
-  const [toolkitItems, setToolkitItems] = useState<string[]>([]);
-  const [crisisDetected, setCrisisDetected] = useState(false);
 
   // Booking modals
   const [activeModal, setActiveModal] = useState<BookingModal>(null);
@@ -135,56 +77,13 @@ const Wellness = () => {
   const [callTimer, setCallTimer] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => setTick((t) => t + 1), 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Call timer
-  useEffect(() => {
     if (!callActive) return;
     const interval = setInterval(() => setCallTimer((t) => t + 1), 1000);
     return () => clearInterval(interval);
   }, [callActive]);
 
-  const completeStep = useCallback((idx: number) => {
-    setSteps((prev) => prev.map((s, i) => i === idx ? { ...s, status: "completed", completedAt: Date.now() } : s));
-  }, []);
+  const formatCallTime = (s: number) => `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
 
-  const startStep = useCallback((idx: number) => {
-    setSteps((prev) => prev.map((s, i) => i === idx ? { ...s, status: "processing" } : s));
-  }, []);
-
-  const analyzeMessage = (msg: string) => {
-    const lower = msg.toLowerCase();
-    const signals: string[] = [];
-    const severeKeywords = ["hopeless", "give up", "end it", "can't go on", "no point", "don't want to be here", "hurt myself"];
-    const stressKeywords: [string, string][] = [
-      ["sleep", "Sleep deprivation"], ["insomnia", "Sleep deprivation"], ["haven't slept", "Sleep deprivation"],
-      ["exam", "Exam stress"], ["finals", "Exam stress"], ["test", "Exam stress"],
-      ["overwhelm", "Feeling overwhelmed"], ["stress", "Academic stress"],
-      ["anxious", "Anxiety"], ["anxiety", "Anxiety"], ["panic", "Panic symptoms"],
-      ["lonely", "Social isolation"], ["alone", "Social isolation"],
-      ["sad", "Low mood"], ["depressed", "Low mood"], ["burnout", "Burnout"],
-      ["exhausted", "Exhaustion"], ["tired", "Fatigue"],
-    ];
-
-    const isCrisis = severeKeywords.some((k) => lower.includes(k));
-    const seen = new Set<string>();
-    for (const [keyword, label] of stressKeywords) {
-      if (lower.includes(keyword) && !seen.has(label)) { signals.push(label); seen.add(label); }
-    }
-    if (signals.length === 0) signals.push("General stress");
-
-    let level: "normal" | "elevated" | "high" = "normal";
-    let severity = "Low";
-    if (isCrisis) { level = "high"; severity = "High"; }
-    else if (signals.length >= 2) { level = "elevated"; severity = "Moderate"; }
-    if (level === "normal" && msg.trim().length > 15) { level = "elevated"; severity = "Moderate"; }
-
-    return { signals, level, severity, isCrisis };
-  };
-
-  // Booking workflow
   const runBookingFlow = useCallback(async (type: BookingModal) => {
     setActiveModal(type);
     setBookingPhase("scanning");
@@ -200,7 +99,7 @@ const Wellness = () => {
       await delay(800);
       addStep("Found 3 available counselors");
       await delay(600);
-      addStep("Matching based on your wellness profile");
+      addStep("Matching based on your needs");
       await delay(700);
       addStep("Pre-filling intake form from student record");
       await delay(500);
@@ -220,8 +119,6 @@ const Wellness = () => {
       await delay(600);
       addStep("Checking schedule compatibility");
       await delay(500);
-      addStep("Matching to your wellness concerns");
-      await delay(400);
       setBookingPhase("found");
     } else if (type === "workshop") {
       addStep("Browsing upcoming workshops...");
@@ -276,82 +173,18 @@ const Wellness = () => {
     });
   }, [selectedCounselor, selectedGroup, selectedWorkshop]);
 
-  const startCall = () => {
-    setCallActive(true);
-    setCallTimer(0);
-  };
-
+  const startCall = () => { setCallActive(true); setCallTimer(0); };
   const endCall = () => {
     setCallActive(false);
     setActiveModal(null);
     toast({ title: "Call ended", description: "Thank you for reaching out. Follow-up resources have been sent." });
   };
 
-  const formatCallTime = (s: number) => `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
-
-  const runWorkflow = useCallback(async (message: string) => {
-    if (runningRef.current) return;
-    runningRef.current = true;
-    setDemoRunning(true);
-    setDemoCompleted(false);
-    setSubmittedMessage(message);
-    setAnalysisMessage("Analyzing your message...");
-
-    setSteps(initialSteps.map((s) => ({ ...s, status: "queued", completedAt: undefined })));
-    setDistressLevel("normal"); setWellnessInsight(null);
-    setAppointmentBooked(false);
-    setRecommendedGroup(null); setRecommendedWorkshop(null);
-    setRecommendedEvents(new Set()); setAdvisorFlagged(false);
-    setToolkitItems([]); setCrisisDetected(false);
-    setDistressSignals([]); setSeverityLabel(null);
-
-    const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    const { signals, level, severity, isCrisis } = analyzeMessage(message);
-
-    await delay(800);
-    setAnalysisMessage(null);
-
-    startStep(0); await delay(1500); completeStep(0);
-    setDistressSignals(signals); setSeverityLabel(severity);
-
-    startStep(1); await delay(1500); completeStep(1);
-    setDistressLevel(level);
-    setWellnessInsight("Your recent check-in indicates elevated stress levels.");
-    toast({ title: "Concerns identified", description: `${signals.join(", ")} · ${severity} distress` });
-
-    startStep(2); await delay(2000); completeStep(2);
-    const groupPick = signals.some((s) => s.includes("Anxiety") || s.includes("Panic")) ? "Peer Support: Anxiety" : "Peer Support: Stress Management";
-    const workshopPick = signals.some((s) => s.includes("Sleep")) ? "Sleep Hygiene Seminar" : "Stress Management Workshop";
-    setRecommendedGroup(groupPick); setRecommendedWorkshop(workshopPick);
-    setRecommendedEvents(new Set([1, 2]));
-
-    if (level !== "normal") {
-      startStep(3); await delay(2000); completeStep(3);
-      setAppointmentBooked(true);
-      toast({ title: "Counselor appointment suggested", description: "Tomorrow at 3:00 PM with Dr. Maya Chen" });
-    } else { completeStep(3); }
-
-    startStep(4); await delay(1500); completeStep(4);
-    if (level === "elevated" || level === "high") setAdvisorFlagged(true);
-    if (isCrisis) { setCrisisDetected(true); setDistressLevel("high"); }
-
-    startStep(5); await delay(1000); completeStep(5);
-    const toolkit: string[] = [];
-    if (signals.some((s) => s.includes("Sleep"))) toolkit.push("Sleep reset guide sent via SMS");
-    toolkit.push("Stress relief exercises added to your dashboard");
-    if (level !== "normal") toolkit.push("Counselor appointment reminder scheduled");
-    if (signals.some((s) => s.includes("Exam"))) toolkit.push("Exam planning template added to your dashboard");
-    setToolkitItems(toolkit);
-    toast({ title: "Support toolkit delivered", description: "Personalized resources sent to your phone and dashboard" });
-
-    setDemoRunning(false); setDemoCompleted(true); runningRef.current = false;
-  }, [completeStep, startStep]);
-
   const resources = [
     {
       title: "Counseling Services",
       description: appointmentBooked
-        ? "Your next appointment has been reserved by Atlas."
+        ? "Your next appointment has been reserved."
         : "Schedule one-on-one sessions with licensed therapists. Confidential and free for all enrolled students.",
       icon: MessageSquare,
       availability: "Mon–Fri, 8AM–6PM",
@@ -361,53 +194,36 @@ const Wellness = () => {
     },
     {
       title: "Crisis Support",
-      description: distressLevel === "high"
-        ? "Atlas detected urgent distress signals. Immediate connection available."
-        : "24/7 crisis hotline and immediate support. Trained counselors available around the clock.",
+      description: "24/7 crisis hotline and immediate support. Trained counselors available around the clock.",
       icon: Phone,
       availability: "24/7",
-      action: distressLevel === "high" ? "Connect Now" : "Call Now",
+      action: "Call Now",
       urgent: true,
-      highPriority: distressLevel === "high",
       modalType: "crisis-call" as BookingModal,
     },
     {
       title: "Peer Support Groups",
       description: recommendedGroup
-        ? "Students with similar wellness patterns found this group helpful."
+        ? `You've joined ${recommendedGroup}.`
         : "Join student-led support circles for anxiety, stress management, identity, and more.",
       icon: Users,
       availability: "Weekly sessions",
-      action: "Join a Group",
+      action: recommendedGroup ? "View Details" : "Join a Group",
       recommended: recommendedGroup,
       modalType: "peer-group" as BookingModal,
     },
     {
       title: "Wellness Workshops",
       description: recommendedWorkshop
-        ? "Workshop suggested based on your wellness profile."
+        ? `Registered for ${recommendedWorkshop}.`
         : "Mindfulness, time management, sleep hygiene, and resilience-building workshops.",
       icon: BookOpen,
       availability: "Bi-weekly",
-      action: "Register",
+      action: recommendedWorkshop ? "View Details" : "Register",
       recommended: recommendedWorkshop,
       modalType: "workshop" as BookingModal,
     },
   ];
-
-  const upcomingEvents = [
-    { title: "Stress Management Workshop", date: "Mar 8, 2026", time: "2:00 PM", location: "Wellness Center 204" },
-    { title: "Meditation Circle", date: "Mar 10, 2026", time: "12:00 PM", location: "Student Union 101" },
-    { title: "Sleep Hygiene Seminar", date: "Mar 14, 2026", time: "4:00 PM", location: "Health Sciences 310" },
-    { title: "Peer Support: Anxiety", date: "Mar 15, 2026", time: "3:00 PM", location: "Wellness Center 102" },
-  ];
-
-  const sortedEvents = [...upcomingEvents].sort((a) => {
-    const aIdx = upcomingEvents.indexOf(a);
-    return recommendedEvents.has(aIdx) ? -1 : 0;
-  });
-
-  
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -423,168 +239,18 @@ const Wellness = () => {
       </div>
 
       {/* Emergency banner */}
-      <Card className={`mb-8 transition-all duration-500 ${crisisDetected || distressLevel === "high" ? "border-destructive/40 bg-destructive/10" : "border-destructive/20 bg-destructive/5"}`}>
+      <Card className="mb-8 border-destructive/20 bg-destructive/5">
         <CardContent className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Phone className={`w-5 h-5 text-destructive ${crisisDetected ? "animate-pulse" : ""}`} />
+            <Phone className="w-5 h-5 text-destructive" />
             <div>
-              <p className="text-sm font-medium text-foreground">
-                {crisisDetected ? "We're here to help. Immediate support is available." : distressLevel === "high" ? "We noticed you may be under significant stress." : "In crisis? Reach out now."}
-              </p>
+              <p className="text-sm font-medium text-foreground">In crisis? Reach out now.</p>
               <p className="text-xs text-muted-foreground">988 Suicide & Crisis Lifeline · Campus Emergency: (555) 123-4567</p>
             </div>
           </div>
-          <Button
-            variant={crisisDetected || distressLevel === "high" ? "default" : "outline"}
-            size="sm"
-            onClick={() => runBookingFlow("crisis-call")}
-          >
-            {crisisDetected ? "Connect to Counselor Now" : "Get Help Now"}
+          <Button variant="outline" size="sm" onClick={() => runBookingFlow("crisis-call")}>
+            Get Help Now
           </Button>
-        </CardContent>
-      </Card>
-
-      {/* Atlas AI — Wellness */}
-      <Card className="mb-8 border-primary/10">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-foreground" />
-            <CardTitle className="text-lg">Atlas AI — Mental Health Support</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-4">
-            Atlas monitors wellness trends, detects stress signals, recommends resources, schedules counseling support, and ensures students receive help before challenges escalate.
-          </p>
-
-          {/* Student input flow */}
-          {!demoRunning && !demoCompleted && (
-            <div className="mb-4 p-4 rounded-lg bg-muted/30 border border-border space-y-3">
-              <p className="text-sm font-medium text-foreground">How are you feeling today?</p>
-              <textarea
-                value={studentMessage}
-                onChange={(e) => setStudentMessage(e.target.value)}
-                placeholder="I haven't slept well and I feel overwhelmed about exams…"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
-                rows={3}
-              />
-              <Button size="sm" onClick={() => { if (studentMessage.trim()) runWorkflow(studentMessage.trim()); }} disabled={!studentMessage.trim()} className="gap-1.5">
-                <Send className="w-3.5 h-3.5" /> Check In With Atlas
-              </Button>
-            </div>
-          )}
-
-          {analysisMessage && (
-            <div className="mb-4 p-3 rounded-lg bg-muted/50 border border-border animate-fade-in flex items-center gap-2">
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">{analysisMessage}</p>
-            </div>
-          )}
-
-          {submittedMessage && !analysisMessage && (
-            <div className="mb-4 space-y-3">
-              <div className="p-3 rounded-lg bg-muted/30 border border-border">
-                <p className="text-xs text-muted-foreground mb-1">You shared:</p>
-                <p className="text-sm text-foreground italic">"{submittedMessage}"</p>
-              </div>
-              {distressSignals.length > 0 && (
-                <div className="p-3 rounded-lg bg-muted/50 border border-border animate-fade-in">
-                  <p className="text-xs font-medium text-foreground mb-1.5">Thanks for sharing that. Here's what I noticed:</p>
-                  <div className="flex flex-wrap gap-1.5 mb-2">
-                    {distressSignals.map((signal) => (
-                      <span key={signal} className="pill-warning text-[10px]">{signal}</span>
-                    ))}
-                  </div>
-                  {severityLabel && (
-                    <p className="text-xs text-muted-foreground">
-                      Distress level: <span className={`font-medium ${severityLabel === "High" ? "text-destructive" : "text-foreground"}`}>{severityLabel}</span>
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {demoCompleted && (
-            <div className="mb-4">
-              <Button variant="outline" size="sm" className="text-xs gap-1" onClick={() => {
-                setDemoCompleted(false); setSubmittedMessage(""); setStudentMessage("");
-                setDistressSignals([]); setSeverityLabel(null);
-                setSteps(initialSteps.map((s) => ({ ...s, status: "queued", completedAt: undefined })));
-                setDistressLevel("normal"); setWellnessInsight(null);
-                setAppointmentBooked(false);
-                setRecommendedGroup(null); setRecommendedWorkshop(null);
-                setRecommendedEvents(new Set()); setAdvisorFlagged(false);
-                setToolkitItems([]); setCrisisDetected(false);
-              }}>
-                Check in again
-              </Button>
-            </div>
-          )}
-
-          {(demoRunning || demoCompleted) && (
-            <div className="mb-4 space-y-3">
-              <div className="flex flex-wrap gap-2">
-                {steps.map((step) => (
-                  <div key={step.id} className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all duration-300 ${
-                    step.status === "completed" ? "bg-success/10 text-success" : step.status === "processing" ? "bg-warning/15 text-warning" : "bg-muted text-muted-foreground"
-                  }`}>
-                    {step.status === "completed" ? <CheckCircle2 className="w-3 h-3" /> : step.status === "processing" ? <Loader2 className="w-3 h-3 animate-spin" /> : <Circle className="w-3 h-3" />}
-                    <span>{step.label}</span>
-                    {step.status === "completed" && step.completedAt && <span className="text-[10px] opacity-70">{timeAgo(step.completedAt)}</span>}
-                  </div>
-                ))}
-              </div>
-
-              {wellnessInsight && (
-                <div className="p-3 rounded-lg bg-muted/50 border border-border animate-fade-in">
-                  <p className="text-xs font-medium text-foreground mb-1 flex items-center gap-1.5"><Activity className="w-3 h-3" /> Last Wellness Insight</p>
-                  <p className="text-xs text-muted-foreground">{wellnessInsight}</p>
-                </div>
-              )}
-
-              {advisorFlagged && (
-                <div className="p-3 rounded-lg bg-muted/50 border border-border animate-fade-in">
-                  <p className="text-xs font-medium text-foreground flex items-center gap-1.5"><Shield className="w-3 h-3" /> Student wellness advisor notified (confidential flag created).</p>
-                  <p className="text-[10px] text-muted-foreground mt-1 italic">No personal conversation data shared.</p>
-                </div>
-              )}
-
-              {toolkitItems.length > 0 && (
-                <div className="p-3 rounded-lg bg-success/5 border border-success/20 animate-fade-in">
-                  <p className="text-xs font-medium text-foreground mb-1.5 flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-success" /> Toolkit Sent</p>
-                  <div className="space-y-1">
-                    {toolkitItems.map((item, i) => (
-                      <p key={i} className="text-xs text-muted-foreground flex items-center gap-1.5"><span className="w-1 h-1 rounded-full bg-success shrink-0" />{item}</p>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Capability cards */}
-          <div className="space-y-4">
-            {atlasCapabilities.map((cap) => (
-              <div key={cap.trigger} className={`border rounded-lg p-4 ${cap.isCrisis ? "border-destructive/20 bg-destructive/5" : "border-border"}`}>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    {cap.isCrisis && <AlertTriangle className="w-3.5 h-3.5 text-destructive" />}
-                    <span className="text-sm font-semibold text-foreground">{cap.trigger}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground font-mono-accent">{cap.example}</span>
-                </div>
-                <div className="grid sm:grid-cols-2 gap-2">
-                  {cap.actions.map((action, i) => (
-                    <div key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                      <CheckCircle2 className="w-3 h-3 mt-0.5 shrink-0 text-foreground/40" />
-                      <span>{action}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
         </CardContent>
       </Card>
 
@@ -595,9 +261,7 @@ const Wellness = () => {
           return (
             <Card
               key={resource.title}
-              className={`hover:border-foreground/10 transition-all duration-300 cursor-pointer group ${
-                resource.highPriority ? "border-destructive/30 bg-destructive/5" : ""
-              } ${resource.recommended ? "border-primary/20" : ""}`}
+              className={`hover:border-foreground/10 transition-all duration-300 cursor-pointer group ${resource.recommended ? "border-primary/20" : ""}`}
             >
               <CardContent className="p-5">
                 <div className="flex items-start justify-between mb-3">
@@ -605,12 +269,11 @@ const Wellness = () => {
                     <Icon className="w-5 h-5 text-foreground" />
                   </div>
                   <div className="flex items-center gap-2">
-                    {resource.highPriority && <Badge variant="destructive" className="text-[10px]">High Priority</Badge>}
                     {resource.appointmentInfo && (
-                      <Badge variant="secondary" className="text-[10px]"><Zap className="w-2.5 h-2.5 mr-0.5" /> Reserved by Atlas</Badge>
+                      <Badge variant="secondary" className="text-[10px]"><Zap className="w-2.5 h-2.5 mr-0.5" /> Reserved</Badge>
                     )}
                     {resource.recommended && (
-                      <Badge variant="secondary" className="text-[10px]"><Star className="w-2.5 h-2.5 mr-0.5" /> Recommended</Badge>
+                      <Badge variant="secondary" className="text-[10px]"><Star className="w-2.5 h-2.5 mr-0.5" /> Joined</Badge>
                     )}
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Clock className="w-3 h-3" /> {resource.availability}
@@ -618,10 +281,9 @@ const Wellness = () => {
                   </div>
                 </div>
                 <h3 className="font-heading font-semibold text-foreground mb-1">{resource.title}</h3>
-                {resource.recommended && <p className="text-xs font-medium text-foreground mb-1">Recommended: {resource.recommended}</p>}
                 <p className="text-sm text-muted-foreground leading-relaxed mb-3">{resource.description}</p>
                 {resource.appointmentInfo && (
-                  <div className="p-2.5 rounded-lg bg-muted/50 border border-border mb-3 animate-fade-in">
+                  <div className="p-2.5 rounded-lg bg-muted/50 border border-border mb-3">
                     <p className="text-xs font-medium text-foreground">Next Appointment</p>
                     <p className="text-sm font-semibold text-foreground">{resource.appointmentInfo.time}</p>
                     <p className="text-xs text-muted-foreground">Counselor: {resource.appointmentInfo.counselor}</p>
@@ -629,7 +291,7 @@ const Wellness = () => {
                 )}
                 <div className="flex gap-2">
                   <Button
-                    variant={resource.highPriority ? "default" : "outline"}
+                    variant={resource.urgent ? "default" : "outline"}
                     size="sm"
                     className="gap-1"
                     onClick={() => runBookingFlow(resource.modalType)}
@@ -648,37 +310,59 @@ const Wellness = () => {
         })}
       </div>
 
-      <div className="grid lg:grid-cols-1 gap-4">
-        {/* Upcoming Events */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">Upcoming Events</CardTitle>
-            <Button variant="outline" size="sm">View Calendar</Button>
-          </CardHeader>
-          <CardContent>
-            <div className="divide-y divide-border">
-              {sortedEvents.map((event) => {
-                const origIdx = upcomingEvents.findIndex((e) => e.title === event.title);
-                const isRecommended = recommendedEvents.has(origIdx);
-                return (
-                  <div key={event.title} className={`py-3 flex items-center justify-between hover:bg-secondary/50 -mx-6 px-6 transition-all duration-300 cursor-pointer group ${isRecommended ? "bg-muted/30" : ""}`}>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-foreground">{event.title}</p>
-                        {isRecommended && <span className="pill-blue text-[10px]"><Star className="w-2.5 h-2.5 mr-0.5 inline" /> Suggested</span>}
-                      </div>
-                      <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
-                        <span>{event.date}</span><span>·</span><span>{event.time}</span><span>·</span><span>{event.location}</span>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+      {/* Upcoming Events */}
+      <Card className="mb-8">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-lg">Upcoming Events</CardTitle>
+          <Button variant="outline" size="sm">View Calendar</Button>
+        </CardHeader>
+        <CardContent>
+          <div className="divide-y divide-border">
+            {upcomingEvents.map((event) => (
+              <div key={event.title} className="py-3 flex items-center justify-between hover:bg-secondary/50 -mx-6 px-6 transition-all duration-300 cursor-pointer group">
+                <div>
+                  <p className="text-sm font-medium text-foreground">{event.title}</p>
+                  <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+                    <span>{event.date}</span><span>·</span><span>{event.time}</span><span>·</span><span>{event.location}</span>
                   </div>
-                );
-              })}
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Atlas Help — bottom card like Financial */}
+      <Card className="border-primary/10 bg-secondary/30">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-primary" />
+              <CardTitle className="text-base">Need Help With Your Wellbeing?</CardTitle>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+            <Button size="sm" variant="outline" onClick={() => navigate("/chat")} className="gap-1 text-xs">
+              Open Atlas Chat <ExternalLink className="w-3.5 h-3.5" />
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">Atlas can help you find the right support, book appointments, and connect you with campus resources — just ask.</p>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="grid sm:grid-cols-3 gap-3">
+            {atlasHelpCards.map((cap) => (
+              <div
+                key={cap.trigger}
+                className={`border rounded-lg p-3 hover:bg-secondary/50 transition-colors cursor-pointer ${cap.isCrisis ? "border-destructive/20" : "border-border"}`}
+                onClick={() => navigate("/chat")}
+              >
+                <p className="text-sm font-medium text-foreground mb-1">{cap.trigger}</p>
+                <p className="text-xs text-muted-foreground italic mb-2">{cap.example}</p>
+                <p className="text-[11px] text-muted-foreground">{cap.actions[0]}</p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* ─── BOOKING MODALS ─── */}
 
@@ -689,30 +373,21 @@ const Wellness = () => {
             <DialogTitle className="font-heading flex items-center gap-2"><MessageSquare className="w-4 h-4" /> Book Counseling Appointment</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            {/* Agent steps */}
             <div className="space-y-1.5">
               {bookingSteps.map((step, i) => (
                 <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground animate-fade-in">
-                  <CheckCircle2 className="w-3 h-3 text-success shrink-0" />
-                  <span>{step}</span>
+                  <CheckCircle2 className="w-3 h-3 text-success shrink-0" /> <span>{step}</span>
                 </div>
               ))}
               {bookingPhase === "scanning" && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Loader2 className="w-3 h-3 animate-spin" /> <span>Working...</span>
-                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground"><Loader2 className="w-3 h-3 animate-spin" /> Working...</div>
               )}
             </div>
-
             {(bookingPhase === "found" || bookingPhase === "confirming") && (
               <div className="space-y-2">
                 <p className="text-xs font-medium text-foreground">Select a counselor:</p>
                 {counselors.map((c, i) => (
-                  <div
-                    key={c.name}
-                    onClick={() => setSelectedCounselor(i)}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${selectedCounselor === i ? "border-primary bg-primary/5" : "border-border hover:border-foreground/20"}`}
-                  >
+                  <div key={c.name} onClick={() => setSelectedCounselor(i)} className={`p-3 rounded-lg border cursor-pointer transition-colors ${selectedCounselor === i ? "border-primary bg-primary/5" : "border-border hover:border-foreground/20"}`}>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm font-medium text-foreground">{c.name}</p>
@@ -730,12 +405,9 @@ const Wellness = () => {
                 </Button>
               </div>
             )}
-
             {bookingPhase === "booked" && (
               <div className="text-center space-y-3 py-4">
-                <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center mx-auto">
-                  <Check className="w-6 h-6 text-success" />
-                </div>
+                <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center mx-auto"><Check className="w-6 h-6 text-success" /></div>
                 <div>
                   <p className="text-sm font-semibold text-foreground">Appointment Confirmed</p>
                   <p className="text-xs text-muted-foreground">{counselors[selectedCounselor].name} · {counselors[selectedCounselor].nextSlot}</p>
@@ -780,7 +452,7 @@ const Wellness = () => {
                     </div>
                     <Button className="w-full gap-2" onClick={startCall}>
                       {activeModal === "crisis-video" ? <Video className="w-4 h-4" /> : <PhoneCall className="w-4 h-4" />}
-                      Start {activeModal === "crisis-video" ? "Video" : ""} Call
+                      Start {activeModal === "crisis-video" ? "Video " : ""}Call
                     </Button>
                     <p className="text-[10px] text-muted-foreground">This is a confidential conversation.</p>
                   </div>
@@ -822,16 +494,11 @@ const Wellness = () => {
                 <div className="flex items-center gap-2 text-xs text-muted-foreground"><Loader2 className="w-3 h-3 animate-spin" /> Working...</div>
               )}
             </div>
-
             {(bookingPhase === "found" || bookingPhase === "confirming") && (
               <div className="space-y-2">
                 <p className="text-xs font-medium text-foreground">Available groups:</p>
                 {peerGroups.map((g, i) => (
-                  <div
-                    key={g.name}
-                    onClick={() => setSelectedGroup(i)}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${selectedGroup === i ? "border-primary bg-primary/5" : "border-border hover:border-foreground/20"}`}
-                  >
+                  <div key={g.name} onClick={() => setSelectedGroup(i)} className={`p-3 rounded-lg border cursor-pointer transition-colors ${selectedGroup === i ? "border-primary bg-primary/5" : "border-border hover:border-foreground/20"}`}>
                     <p className="text-sm font-medium text-foreground">{g.name}</p>
                     <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{g.day} {g.time}</span>
@@ -847,7 +514,6 @@ const Wellness = () => {
                 </Button>
               </div>
             )}
-
             {bookingPhase === "booked" && (
               <div className="text-center space-y-3 py-4">
                 <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center mx-auto"><Check className="w-6 h-6 text-success" /></div>
@@ -879,16 +545,11 @@ const Wellness = () => {
                 <div className="flex items-center gap-2 text-xs text-muted-foreground"><Loader2 className="w-3 h-3 animate-spin" /> Working...</div>
               )}
             </div>
-
             {(bookingPhase === "found" || bookingPhase === "confirming") && (
               <div className="space-y-2">
                 <p className="text-xs font-medium text-foreground">Available workshops:</p>
                 {workshops.map((w, i) => (
-                  <div
-                    key={w.name}
-                    onClick={() => setSelectedWorkshop(i)}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors ${selectedWorkshop === i ? "border-primary bg-primary/5" : "border-border hover:border-foreground/20"}`}
-                  >
+                  <div key={w.name} onClick={() => setSelectedWorkshop(i)} className={`p-3 rounded-lg border cursor-pointer transition-colors ${selectedWorkshop === i ? "border-primary bg-primary/5" : "border-border hover:border-foreground/20"}`}>
                     <p className="text-sm font-medium text-foreground">{w.name}</p>
                     <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{w.date} · {w.time}</span>
@@ -905,7 +566,6 @@ const Wellness = () => {
                 </Button>
               </div>
             )}
-
             {bookingPhase === "booked" && (
               <div className="text-center space-y-3 py-4">
                 <div className="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center mx-auto"><Check className="w-6 h-6 text-success" /></div>
