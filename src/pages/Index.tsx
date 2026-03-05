@@ -141,7 +141,7 @@ const Index = () => {
                   <MessageSquare className="w-4 h-4" />
                   Try the Demo
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate("/login")} className="gap-2 border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white">
+                <Button size="lg" variant="outline" onClick={() => navigate("/login")} className="gap-2 !bg-transparent !border-white/30 !text-white hover:!bg-white/10">
                   Sign in with .edu email
                   <ArrowRight className="w-4 h-4" />
                 </Button>

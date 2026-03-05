@@ -11,25 +11,25 @@ const getGreeting = () => {
 
 const stats = [
   {
-    icon: <DollarSign className="w-4 h-4 text-accent" />, iconBg: "bg-yellow-light", label: "Financial Aid",
+    icon: <DollarSign className="w-4 h-4 text-foreground" />, iconBg: "bg-secondary", label: "Financial Aid",
     value: "$3,200", subLabel: "Balance outstanding",
     pill: { text: "Action Needed", className: "pill-warning" }, delay: 0,
     path: "/financial",
   },
   {
-    icon: <BookOpen className="w-4 h-4 text-primary" />, iconBg: "bg-purple-light", label: "GPA",
+    icon: <BookOpen className="w-4 h-4 text-foreground" />, iconBg: "bg-secondary", label: "GPA",
     value: "3.41", subLabel: "87 of 180 credits complete",
     pill: { text: "On Track", className: "pill-success" }, delay: 80,
     path: "/academic",
   },
   {
-    icon: <Briefcase className="w-4 h-4 text-accent" />, iconBg: "bg-yellow-light", label: "Applications",
+    icon: <Briefcase className="w-4 h-4 text-foreground" />, iconBg: "bg-secondary", label: "Applications",
     value: "4 Active", subLabel: "2 due this week",
     pill: { text: "Urgent", className: "pill-danger" }, delay: 160,
     path: "/jobs",
   },
   {
-    icon: <Heart className="w-4 h-4 text-primary" />, iconBg: "bg-purple-light", label: "Wellness",
+    icon: <Heart className="w-4 h-4 text-foreground" />, iconBg: "bg-secondary", label: "Wellness",
     value: "60%", subLabel: "Composite score · Sleep low",
     pill: { text: "Check In", className: "pill-purple" }, delay: 240,
     path: "/wellness",
@@ -46,12 +46,12 @@ const activities = [
 ];
 
 const deadlines = [
-  { border: "border-l-destructive", text: "Microsoft PM Application", time: "Friday", urgent: true, link: "/jobs" },
-  { border: "border-l-destructive", text: "Amazon SDE Application", time: "Monday", urgent: true, link: "/jobs" },
-  { border: "border-l-accent", text: "MATH 208 Tutoring", time: "Today 4pm", urgent: false, link: "/academic" },
-  { border: "border-l-primary", text: "Counseling — Dr. Maya Chen", time: "Tomorrow 3pm", urgent: false, link: "/wellness" },
-  { border: "border-l-primary", text: "Peer Support Group", time: "Tuesday 5pm", urgent: false, link: "/wellness" },
-  { border: "border-l-accent", text: "Sleep Hygiene Seminar", time: "Mar 14 4pm", urgent: false, link: "/wellness" },
+  { border: "border-l-foreground", text: "Microsoft PM Application", time: "Friday", urgent: true, link: "/jobs" },
+  { border: "border-l-foreground", text: "Amazon SDE Application", time: "Monday", urgent: true, link: "/jobs" },
+  { border: "border-l-muted-foreground", text: "MATH 208 Tutoring", time: "Today 4pm", urgent: false, link: "/academic" },
+  { border: "border-l-muted-foreground", text: "Counseling — Dr. Maya Chen", time: "Tomorrow 3pm", urgent: false, link: "/wellness" },
+  { border: "border-l-muted-foreground", text: "Peer Support Group", time: "Tuesday 5pm", urgent: false, link: "/wellness" },
+  { border: "border-l-muted-foreground", text: "Sleep Hygiene Seminar", time: "Mar 14 4pm", urgent: false, link: "/wellness" },
 ];
 
 const Dashboard = () => {

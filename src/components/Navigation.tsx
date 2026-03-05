@@ -117,7 +117,7 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-card border-b border-border">
+    <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top bar */}
         <div className="flex items-center justify-between h-14">
@@ -173,9 +173,8 @@ const Navigation = () => {
                       {notifications.map((notif) => (
                         <div
                           key={notif.id}
-                          className={`flex items-start gap-3 px-4 py-3 hover:bg-secondary/50 transition-colors cursor-pointer group ${
-                            !notif.read ? "bg-primary/[0.03]" : ""
-                          }`}
+                          className={`flex items-start gap-3 px-4 py-3 hover:bg-secondary/50 transition-colors cursor-pointer group ${!notif.read ? "bg-primary/[0.03]" : ""
+                            }`}
                           onClick={() => handleNotifClick(notif)}
                         >
                           <div className="mt-0.5 shrink-0">{notif.icon}</div>
@@ -293,11 +292,10 @@ const Navigation = () => {
               <RouterNavLink
                 key={item.to}
                 to={item.to}
-                className={`flex items-center gap-1.5 px-3 py-2.5 text-[13px] font-medium border-b-2 transition-colors whitespace-nowrap ${
-                  isActive
+                className={`flex items-center gap-1.5 px-3 py-2.5 text-[13px] font-medium border-b-2 transition-colors whitespace-nowrap ${isActive
                     ? "border-foreground text-foreground"
                     : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                }`}
+                  }`}
               >
                 <Icon className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">{item.label}</span>

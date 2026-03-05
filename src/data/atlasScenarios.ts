@@ -13,6 +13,7 @@ export interface ActionItem {
   description: string;
   status: "Complete" | "In Progress" | "Awaiting" | "Ready" | "Human Taking Over";
   isCrisis?: boolean;
+  agentforceNote?: string;
 }
 
 export interface Scenario {
@@ -76,12 +77,12 @@ export const scenarios: Scenario[] = [
       },
     ],
     actions: [
-      { id: "F1", pillar: "financial", title: "Root Cause Identified", description: "EFC increase + missing income verification document (2025 IRS Tax Return Transcript)", status: "Complete" },
-      { id: "F2", pillar: "financial", title: "Verification Form Pre-filled", description: "Income verification submission form ready — awaiting IRS transcript upload", status: "Awaiting" },
-      { id: "F3", pillar: "financial", title: "Aid Appeal Filed & Routed", description: "Pre-filled appeal sent to Financial Aid with urgency flag — ETA 5 business days", status: "In Progress" },
-      { id: "F4", pillar: "financial", title: "Hold Prevention Flag Placed", description: "Account protected — Spring registration safe during appeal process", status: "Complete" },
-      { id: "F5", pillar: "financial", title: "Emergency Grant Application", description: "University Emergency Grant ($500) — pre-filled, ready to submit", status: "Ready" },
-      { id: "F6", pillar: "financial", title: "Dean's Fund Application", description: "Dean's Discretionary Fund ($1,000) — pre-filled, ready to submit", status: "Ready" },
+      { id: "F1", pillar: "financial", title: "Root Cause Identified", description: "EFC increase + missing income verification document (2025 IRS Tax Return Transcript)", status: "Complete", agentforceNote: "Data Cloud · Cross-system record analysis" },
+      { id: "F2", pillar: "financial", title: "Verification Form Pre-filled", description: "Income verification submission form ready — awaiting IRS transcript upload", status: "Awaiting", agentforceNote: "Flow Orchestration · Auto-fill workflow" },
+      { id: "F3", pillar: "financial", title: "Aid Appeal Filed & Routed", description: "Pre-filled appeal sent to Financial Aid with urgency flag — ETA 5 business days", status: "In Progress", agentforceNote: "Service Cloud · Case creation & escalation" },
+      { id: "F4", pillar: "financial", title: "Hold Prevention Flag Placed", description: "Account protected — Spring registration safe during appeal process", status: "Complete", agentforceNote: "Flow Orchestration · Preventive hold logic" },
+      { id: "F5", pillar: "financial", title: "Emergency Grant Application", description: "University Emergency Grant ($500) — pre-filled, ready to submit", status: "Ready", agentforceNote: "Einstein AI · Eligibility matching" },
+      { id: "F6", pillar: "financial", title: "Dean's Fund Application", description: "Dean's Discretionary Fund ($1,000) — pre-filled, ready to submit", status: "Ready", agentforceNote: "Knowledge Base · Fund catalogue lookup" },
     ],
   },
   {
@@ -112,10 +113,10 @@ export const scenarios: Scenario[] = [
       },
     ],
     actions: [
-      { id: "F7", pillar: "financial", title: "Textbook Lending Program", description: "3 of 4 textbooks available for free semester loan — pickup at Library Room 102", status: "Complete" },
-      { id: "F8", pillar: "financial", title: "Open Textbook Alternative Found", description: "MATH 208: OpenStax equivalent approved by professor — download link sent", status: "Complete" },
-      { id: "F9", pillar: "financial", title: "Emergency Micro-Grant Filed", description: "CS 301 textbook ($150) — application submitted, ETA 24 hours", status: "In Progress" },
-      { id: "F10", pillar: "financial", title: "Work-Study Opportunities Surfaced", description: "3 on-campus positions available — 10-15 hrs/week, $15/hr", status: "Ready" },
+      { id: "F7", pillar: "financial", title: "Textbook Lending Program", description: "3 of 4 textbooks available for free semester loan — pickup at Library Room 102", status: "Complete", agentforceNote: "MuleSoft · Library inventory API" },
+      { id: "F8", pillar: "financial", title: "Open Textbook Alternative Found", description: "MATH 208: OpenStax equivalent approved by professor — download link sent", status: "Complete", agentforceNote: "Knowledge Base · OER database search" },
+      { id: "F9", pillar: "financial", title: "Emergency Micro-Grant Filed", description: "CS 301 textbook ($150) — application submitted, ETA 24 hours", status: "In Progress", agentforceNote: "Flow Orchestration · Grant application pipeline" },
+      { id: "F10", pillar: "financial", title: "Work-Study Opportunities Surfaced", description: "3 on-campus positions available — 10-15 hrs/week, $15/hr", status: "Ready", agentforceNote: "Data Cloud · Employment matching" },
     ],
   },
 
@@ -164,11 +165,11 @@ export const scenarios: Scenario[] = [
       },
     ],
     actions: [
-      { id: "W1", pillar: "wellness", title: "Urgency Triage Completed", description: "3 warm follow-up questions assessed — routed to same-day counselor slot", status: "Complete" },
-      { id: "W2", pillar: "wellness", title: "Counseling Appointment Booked", description: "Tomorrow 10:00 AM — Wellness Center Room 204, intake form pre-sent", status: "Complete" },
-      { id: "W3", pillar: "wellness", title: "Tonight's Toolkit Sent", description: "3 personalized resources: 4-7-8 breathing, sleep hygiene guide, exam stress meditation — sent via SMS", status: "Complete" },
-      { id: "W4", pillar: "wellness", title: "Wellness Trend Alert", description: "Declining scores for 3 consecutive weeks — confidential welfare flag sent to advisor", status: "Complete" },
-      { id: "W5", pillar: "wellness", title: "Finals Study Plan Adjusted", description: "Suggested modified study schedule accounting for recovery sleep — sent to your calendar", status: "Ready" },
+      { id: "W1", pillar: "wellness", title: "Urgency Triage Completed", description: "3 warm follow-up questions assessed — routed to same-day counselor slot", status: "Complete", agentforceNote: "Einstein AI · Sentiment & urgency scoring" },
+      { id: "W2", pillar: "wellness", title: "Counseling Appointment Booked", description: "Tomorrow 10:00 AM — Wellness Center Room 204, intake form pre-sent", status: "Complete", agentforceNote: "MuleSoft · Calendar system integration" },
+      { id: "W3", pillar: "wellness", title: "Tonight's Toolkit Sent", description: "3 personalized resources: 4-7-8 breathing, sleep hygiene guide, exam stress meditation — sent via SMS", status: "Complete", agentforceNote: "Marketing Cloud · Personalized SMS dispatch" },
+      { id: "W4", pillar: "wellness", title: "Wellness Trend Alert", description: "Declining scores for 3 consecutive weeks — confidential welfare flag sent to advisor", status: "Complete", agentforceNote: "CRM Analytics · Trend detection & alerting" },
+      { id: "W5", pillar: "wellness", title: "Finals Study Plan Adjusted", description: "Suggested modified study schedule accounting for recovery sleep — sent to your calendar", status: "Ready", agentforceNote: "Einstein AI · Schedule optimization" },
     ],
   },
   {
@@ -199,10 +200,10 @@ export const scenarios: Scenario[] = [
       },
     ],
     actions: [
-      { id: "W6", pillar: "wellness", title: "Crisis Support Activated", description: "On-call crisis counselor paged — direct callback within minutes", status: "Human Taking Over", isCrisis: true },
-      { id: "W7", pillar: "wellness", title: "Direct Callback Number Sent", description: "24/7 crisis support number sent to student's phone via SMS", status: "Complete" },
-      { id: "W8", pillar: "wellness", title: "Welfare Concern Logged", description: "Interaction logged confidentially — counseling team notified", status: "Complete" },
-      { id: "W9", pillar: "wellness", title: "Conversation Held Safely", description: "Atlas remaining active until student confirms human connection", status: "In Progress" },
+      { id: "W6", pillar: "wellness", title: "Crisis Support Activated", description: "On-call crisis counselor paged — direct callback within minutes", status: "Human Taking Over", isCrisis: true, agentforceNote: "Service Cloud · Emergency escalation protocol" },
+      { id: "W7", pillar: "wellness", title: "Direct Callback Number Sent", description: "24/7 crisis support number sent to student's phone via SMS", status: "Complete", agentforceNote: "Marketing Cloud · Priority SMS dispatch" },
+      { id: "W8", pillar: "wellness", title: "Welfare Concern Logged", description: "Interaction logged confidentially — counseling team notified", status: "Complete", agentforceNote: "Slack Integration · Staff alert channel" },
+      { id: "W9", pillar: "wellness", title: "Conversation Held Safely", description: "Atlas remaining active until student confirms human connection", status: "In Progress", agentforceNote: "Einstein AI · Continuous sentiment monitoring" },
     ],
   },
 
@@ -246,11 +247,11 @@ export const scenarios: Scenario[] = [
       },
     ],
     actions: [
-      { id: "C1", pillar: "career", title: "Academic Record Parsed", description: "6 relevant courses + 2 projects mapped to PM job descriptions. Gaps: SQL, case study portfolio", status: "Complete" },
-      { id: "C2", pillar: "career", title: "PM Resume Generated", description: "Baseline resume built from transcript data — ready for review and polish", status: "Ready" },
-      { id: "C3", pillar: "career", title: "Alumni Network Queried", description: "5 warm contacts at target companies — personalized outreach drafts ready", status: "Complete" },
-      { id: "C4", pillar: "career", title: "Recruiting Calendar Synced", description: "Amazon (3 weeks), Microsoft info session (Thursday), Google PM (just opened) — added to calendar", status: "Complete" },
-      { id: "C5", pillar: "career", title: "8-Week Action Plan Created", description: "12 milestones: resume → outreach → applications → interviews → offers", status: "Ready" },
+      { id: "C1", pillar: "career", title: "Academic Record Parsed", description: "6 relevant courses + 2 projects mapped to PM job descriptions. Gaps: SQL, case study portfolio", status: "Complete", agentforceNote: "Data Cloud · Transcript analysis engine" },
+      { id: "C2", pillar: "career", title: "PM Resume Generated", description: "Baseline resume built from transcript data — ready for review and polish", status: "Ready", agentforceNote: "Einstein AI · Resume generation model" },
+      { id: "C3", pillar: "career", title: "Alumni Network Queried", description: "5 warm contacts at target companies — personalized outreach drafts ready", status: "Complete", agentforceNote: "Data Cloud · Alumni graph search" },
+      { id: "C4", pillar: "career", title: "Recruiting Calendar Synced", description: "Amazon (3 weeks), Microsoft info session (Thursday), Google PM (just opened) — added to calendar", status: "Complete", agentforceNote: "MuleSoft · Calendar & job board integration" },
+      { id: "C5", pillar: "career", title: "8-Week Action Plan Created", description: "12 milestones: resume → outreach → applications → interviews → offers", status: "Ready", agentforceNote: "Flow Orchestration · Multi-step plan builder" },
     ],
   },
   {
@@ -290,10 +291,10 @@ export const scenarios: Scenario[] = [
       },
     ],
     actions: [
-      { id: "C6", pillar: "career", title: "Market Comp Data Pulled", description: "Median: $28/hr for PM intern in Seattle. Your offer: $22/hr (below market ~20%)", status: "Complete" },
-      { id: "C7", pillar: "career", title: "Cost-of-Living Calculated", description: "Seattle rent avg $1,800/mo shared. Net take-home analysis complete", status: "Complete" },
-      { id: "C8", pillar: "career", title: "Negotiation Email Drafted", description: "Professional counter-offer requesting $27/hr or $3K housing stipend", status: "Ready" },
-      { id: "C9", pillar: "career", title: "Career Counselor Booked", description: "15-minute session tomorrow AM to review negotiation strategy", status: "Complete" },
+      { id: "C6", pillar: "career", title: "Market Comp Data Pulled", description: "Median: $28/hr for PM intern in Seattle. Your offer: $22/hr (below market ~20%)", status: "Complete", agentforceNote: "MuleSoft · Levels.fyi & salary API" },
+      { id: "C7", pillar: "career", title: "Cost-of-Living Calculated", description: "Seattle rent avg $1,800/mo shared. Net take-home analysis complete", status: "Complete", agentforceNote: "CRM Analytics · Compensation modeling" },
+      { id: "C8", pillar: "career", title: "Negotiation Email Drafted", description: "Professional counter-offer requesting $27/hr or $3K housing stipend", status: "Ready", agentforceNote: "Einstein AI · Professional email generation" },
+      { id: "C9", pillar: "career", title: "Career Counselor Booked", description: "15-minute session tomorrow AM to review negotiation strategy", status: "Complete", agentforceNote: "MuleSoft · Calendar system integration" },
     ],
   },
 
@@ -337,10 +338,10 @@ export const scenarios: Scenario[] = [
       },
     ],
     actions: [
-      { id: "A1", pillar: "academic", title: "Degree Audit Analyzed", description: "Complete audit pulled — 87/120 credits, all prerequisites checked", status: "Complete" },
-      { id: "A2", pillar: "academic", title: "Two Graduation Pathways Generated", description: "Option A: standard timeline. Option B: summer accelerated. Both feasible for May 2027", status: "Complete" },
-      { id: "A3", pillar: "academic", title: "Course Conflicts Checked", description: "DS 410 bottleneck identified — only offered Fall semester. Mapped into pathway", status: "Complete" },
-      { id: "A4", pillar: "academic", title: "Minor Declaration Pre-filled", description: "Form ready with pathway analysis attached — pending advisor signature", status: "Awaiting" },
+      { id: "A1", pillar: "academic", title: "Degree Audit Analyzed", description: "Complete audit pulled — 87/120 credits, all prerequisites checked", status: "Complete", agentforceNote: "Data Cloud · Degree audit aggregation" },
+      { id: "A2", pillar: "academic", title: "Two Graduation Pathways Generated", description: "Option A: standard timeline. Option B: summer accelerated. Both feasible for May 2027", status: "Complete", agentforceNote: "Einstein AI · Pathway optimization model" },
+      { id: "A3", pillar: "academic", title: "Course Conflicts Checked", description: "DS 410 bottleneck identified — only offered Fall semester. Mapped into pathway", status: "Complete", agentforceNote: "MuleSoft · Course catalog API" },
+      { id: "A4", pillar: "academic", title: "Minor Declaration Pre-filled", description: "Form ready with pathway analysis attached — pending advisor signature", status: "Awaiting", agentforceNote: "Flow Orchestration · Form routing workflow" },
     ],
   },
   {
@@ -380,10 +381,10 @@ export const scenarios: Scenario[] = [
       },
     ],
     actions: [
-      { id: "A5", pillar: "academic", title: "GPA Impact Calculated", description: "Withdraw: GPA stays 3.52. Fail: GPA drops to 3.18. Aid + eligibility checked", status: "Complete" },
-      { id: "A6", pillar: "academic", title: "Emergency Advising Booked", description: "Wed 2pm with Dr. Patel — decision brief pre-sent with both scenario analyses", status: "Complete" },
-      { id: "A7", pillar: "academic", title: "Tutoring Sessions Scheduled", description: "Mon/Wed/Fri 4pm for 4 weeks — MATH 208 Tutoring Center. Pending confirmation", status: "Awaiting" },
-      { id: "A8", pillar: "academic", title: "Professor Email Drafted", description: "Office hours request to Prof. Liu — personalized, ready to send with one tap", status: "Ready" },
+      { id: "A5", pillar: "academic", title: "GPA Impact Calculated", description: "Withdraw: GPA stays 3.52. Fail: GPA drops to 3.18. Aid + eligibility checked", status: "Complete", agentforceNote: "CRM Analytics · GPA scenario engine" },
+      { id: "A6", pillar: "academic", title: "Emergency Advising Booked", description: "Wed 2pm with Dr. Patel — decision brief pre-sent with both scenario analyses", status: "Complete", agentforceNote: "MuleSoft · Advisor calendar API" },
+      { id: "A7", pillar: "academic", title: "Tutoring Sessions Scheduled", description: "Mon/Wed/Fri 4pm for 4 weeks — MATH 208 Tutoring Center. Pending confirmation", status: "Awaiting", agentforceNote: "Flow Orchestration · Tutoring queue workflow" },
+      { id: "A8", pillar: "academic", title: "Professor Email Drafted", description: "Office hours request to Prof. Liu — personalized, ready to send with one tap", status: "Ready", agentforceNote: "Einstein AI · Professional email generation" },
     ],
   },
 
@@ -423,10 +424,10 @@ export const scenarios: Scenario[] = [
       },
     ],
     actions: [
-      { id: "D1", pillar: "admin", title: "Hold Type Identified", description: "Library Fine Hold ($47.50) — placed Feb 10. Required: payment or dispute form", status: "Complete" },
-      { id: "D2", pillar: "admin", title: "Direct Resolution Request Filed", description: "Routed to Library Circulation Manager (bypassing general inbox backlog)", status: "In Progress" },
-      { id: "D3", pillar: "admin", title: "Escalated to Dean of Students", description: "Registration deadline in 6 days — full 3-week documentation trail attached", status: "In Progress" },
-      { id: "D4", pillar: "admin", title: "Course Selections Protected", description: "Saved selections will auto-process when hold clears — no re-registration needed", status: "Complete" },
+      { id: "D1", pillar: "admin", title: "Hold Type Identified", description: "Library Fine Hold ($47.50) — placed Feb 10. Required: payment or dispute form", status: "Complete", agentforceNote: "Data Cloud · Account hold detection" },
+      { id: "D2", pillar: "admin", title: "Direct Resolution Request Filed", description: "Routed to Library Circulation Manager (bypassing general inbox backlog)", status: "In Progress", agentforceNote: "Service Cloud · Smart case routing" },
+      { id: "D3", pillar: "admin", title: "Escalated to Dean of Students", description: "Registration deadline in 6 days — full 3-week documentation trail attached", status: "In Progress", agentforceNote: "Service Cloud · Priority escalation" },
+      { id: "D4", pillar: "admin", title: "Course Selections Protected", description: "Saved selections will auto-process when hold clears — no re-registration needed", status: "Complete", agentforceNote: "Flow Orchestration · Auto-enroll trigger" },
     ],
   },
   {
@@ -466,9 +467,9 @@ export const scenarios: Scenario[] = [
       },
     ],
     actions: [
-      { id: "D5", pillar: "admin", title: "Notary Locations Found", description: "2 free campus locations: Student Legal Services (HUB 306) + Registrar (Mary Gates 120)", status: "Complete" },
-      { id: "D6", pillar: "admin", title: "Availability Checked", description: "Legal Services: walk-in today until 4:30 PM. Registrar: tomorrow 11 AM by appointment", status: "Complete" },
-      { id: "D7", pillar: "admin", title: "Appointment Booked", description: "Today 3:00 PM — Student Legal Services, HUB Room 306. ~10 minutes", status: "Complete" },
+      { id: "D5", pillar: "admin", title: "Notary Locations Found", description: "2 free campus locations: Student Legal Services (HUB 306) + Registrar (Mary Gates 120)", status: "Complete", agentforceNote: "Knowledge Base · Campus services directory" },
+      { id: "D6", pillar: "admin", title: "Availability Checked", description: "Legal Services: walk-in today until 4:30 PM. Registrar: tomorrow 11 AM by appointment", status: "Complete", agentforceNote: "MuleSoft · Office hours API" },
+      { id: "D7", pillar: "admin", title: "Appointment Booked", description: "Today 3:00 PM — Student Legal Services, HUB Room 306. ~10 minutes", status: "Complete", agentforceNote: "Flow Orchestration · Appointment scheduler" },
     ],
   },
 ];
