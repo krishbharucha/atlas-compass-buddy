@@ -91,7 +91,7 @@ Student ID: [Your ID]`,
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
           {[
-            { icon: TrendingUp, label: "Cumulative GPA", value: "3.52", sub: "Dean's List" },
+            { icon: TrendingUp, label: "Cumulative GPA", value: "3.41", sub: "On Track" },
             { icon: BookOpen, label: "Current Credits", value: "17", sub: "Spring 2026" },
             { icon: Calendar, label: "Expected Graduation", value: "May 2027", sub: "On track" },
             { icon: FileText, label: "Advisor", value: "Dr. Patel", sub: "CS Department" },
@@ -209,9 +209,8 @@ Student ID: [Your ID]`,
                       {courseRecipients.map((r) => (
                         <div
                           key={r.id}
-                          className={`flex items-center justify-between p-3 rounded-md border cursor-pointer transition-colors ${
-                            courseEmailRecipient === r.label ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"
-                          }`}
+                          className={`flex items-center justify-between p-3 rounded-md border cursor-pointer transition-colors ${courseEmailRecipient === r.label ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"
+                            }`}
                           onClick={() => setCourseEmailRecipient(r.label)}
                         >
                           <div>
@@ -547,9 +546,8 @@ Student ID: [Your ID]`,
                   {recipients.map((r) => (
                     <div
                       key={r.id}
-                      className={`flex items-center justify-between p-3 rounded-md border cursor-pointer transition-colors ${
-                        currentRecipient === r.label ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"
-                      }`}
+                      className={`flex items-center justify-between p-3 rounded-md border cursor-pointer transition-colors ${currentRecipient === r.label ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"
+                        }`}
                       onClick={() => setEmailRecipient(r.label)}
                     >
                       <div>

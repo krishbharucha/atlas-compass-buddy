@@ -1,43 +1,67 @@
 import { useNavigate } from "react-router-dom";
 import { GraduationCap, DollarSign, BookOpen, Briefcase, Heart, Settings, ArrowRight, Shield, ChevronRight, Zap, MessageSquare, CheckCircle2, AlertTriangle, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { BentoGrid, BentoCard } from "@/components/ui/bento-grid";
+import { SplineScene } from "@/components/ui/splite";
+import { Spotlight } from "@/components/ui/spotlight";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const features = [
   {
-    icon: DollarSign,
-    title: "💰 Financial Aid & Money Stress",
-    description: "Atlas pulls your complete aid history, identifies root causes of changes, files appeals, finds emergency funding, and protects your registration — all in one conversation.",
-    actions: ["Award letter analysis", "Emergency bridge funding", "Hold prevention", "Textbook assistance"],
-    path: "/financial",
+    Icon: DollarSign,
+    name: "Financial Aid & Money Stress",
+    description: "Atlas pulls your aid history, files appeals, finds emergency funding, and protects your registration — all in one conversation.",
+    href: "/financial",
+    cta: "Explore",
+    background: (
+      <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/80 via-transparent to-transparent dark:from-yellow-900/20 dark:via-transparent" />
+    ),
+    className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
   },
   {
-    icon: Heart,
-    title: "🧠 Mental Health & Wellbeing",
-    description: "Proactive wellness monitoring with weekly pulse checks. Reactive distress detection mid-conversation. Crisis intervention with immediate human handoff.",
-    actions: ["Same-day counselor booking", "Personalized coping toolkits", "Crisis escalation protocol", "Wellness trend tracking"],
-    path: "/wellness",
+    Icon: Heart,
+    name: "Mental Health & Wellbeing",
+    description: "Proactive wellness monitoring. Same-day counselor booking. Crisis intervention with immediate human handoff.",
+    href: "/wellness",
+    cta: "Explore",
+    background: (
+      <div className="absolute inset-0 bg-gradient-to-br from-pink-50/80 via-transparent to-transparent dark:from-pink-900/20 dark:via-transparent" />
+    ),
+    className: "lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-4",
   },
   {
-    icon: Briefcase,
-    title: "🎯 Career & Job Searching",
-    description: "From first-time job seekers to offer negotiation. Atlas builds recruiting plans, runs mock interviews, and evaluates offers with real market data.",
-    actions: ["8-week recruiting plans", "Alumni network warm intros", "Mock interviews with scoring", "Offer evaluation + negotiation"],
-    path: "/jobs",
+    Icon: Briefcase,
+    name: "Career & Job Searching",
+    description: "8-week recruiting plans, mock interviews, alumni outreach, and offer evaluation.",
+    href: "/jobs",
+    cta: "Explore",
+    background: (
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-transparent to-transparent dark:from-blue-900/20 dark:via-transparent" />
+    ),
+    className: "lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
   },
   {
-    icon: BookOpen,
-    title: "📚 Academic Support & Advising",
-    description: "Real-time degree audits, GPA impact scenarios, and automated action — booking advising, scheduling tutoring, and filing forms simultaneously.",
-    actions: ["Degree pathway generation", "GPA impact calculator", "Emergency advising", "Professor communication"],
-    path: "/academic",
+    Icon: BookOpen,
+    name: "Academic Advising",
+    description: "Degree audits, GPA scenarios, tutoring, and advisor booking.",
+    href: "/academic",
+    cta: "Explore",
+    background: (
+      <div className="absolute inset-0 bg-gradient-to-br from-green-50/80 via-transparent to-transparent dark:from-green-900/20 dark:via-transparent" />
+    ),
+    className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
   },
   {
-    icon: Settings,
-    title: "🏛️ Campus Navigation & Admin",
-    description: "Solves the most universally hated student experience — getting bounced between offices. Atlas routes requests to the right person, not a general inbox.",
-    actions: ["Hold resolution + escalation", "Service discovery + booking", "Document routing", "Registration protection"],
-    path: "/admin",
+    Icon: Settings,
+    name: "Campus Navigation & Admin",
+    description: "Hold resolution, document routing, and registration protection.",
+    href: "/chat",
+    cta: "Explore",
+    background: (
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-50/80 via-transparent to-transparent dark:from-purple-900/20 dark:via-transparent" />
+    ),
+    className: "lg:col-start-3 lg:col-end-3 lg:row-start-2 lg:row-end-4",
   },
 ];
 
@@ -68,35 +92,51 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="py-20 sm:py-28 border-b border-border">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-2 mb-6">
-              <Zap className="w-4 h-4 text-foreground" />
-              <span className="text-sm font-medium text-muted-foreground font-mono-accent">Agentic AI · Powered by Salesforce Agentforce</span>
+      {/* Hero with 3D Scene */}
+      <section className="border-b border-border">
+        <Card className="w-full min-h-[540px] bg-black/[0.96] relative overflow-hidden rounded-none border-0">
+          <Spotlight
+            className="-top-40 left-0 md:left-60 md:-top-20"
+            fill="white"
+          />
+
+          <div className="flex h-full min-h-[540px]">
+            {/* Left content */}
+            <div className="flex-1 p-8 sm:p-12 lg:p-16 relative z-10 flex flex-col justify-center">
+              <div className="flex items-center gap-2 mb-6">
+                <Zap className="w-4 h-4 text-purple-400" />
+                <span className="text-sm font-medium text-neutral-400 font-mono-accent">Agentic AI · Powered by Salesforce Agentforce</span>
+              </div>
+              <h1 className="font-heading text-4xl sm:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 tracking-tight leading-[1.1] mb-5">
+                One conversation.<br />Every problem solved.
+              </h1>
+              <p className="text-base text-neutral-300 leading-relaxed mb-4 max-w-lg">
+                Atlas doesn't just answer questions — it takes action. Financial aid appeals filed. Counseling appointments booked. Career plans built. Holds resolved.
+              </p>
+              <p className="text-sm text-neutral-500 mb-8 max-w-lg">
+                20 automated actions across 5 pillars. No more getting bounced between offices.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Button size="lg" onClick={() => navigate("/chat")} className="gap-2 bg-white text-black hover:bg-neutral-200">
+                  <MessageSquare className="w-4 h-4" />
+                  Try the Demo
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => navigate("/login")} className="gap-2 border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white">
+                  Sign in with .edu email
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
-            <h1 className="font-heading text-4xl sm:text-5xl font-bold text-foreground tracking-tight leading-[1.1] mb-5">
-              One conversation.<br />Every problem solved.
-            </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-4 max-w-2xl">
-              Atlas doesn't just answer questions — it takes action. Financial aid appeals filed. Counseling appointments booked. Career plans built. Holds resolved. All from a single chat interface connected to every university system.
-            </p>
-            <p className="text-sm text-muted-foreground mb-8 max-w-2xl">
-              20 automated actions across 5 pillars. No more getting bounced between offices. No more waiting weeks for email replies. Atlas handles it in minutes.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Button size="lg" onClick={() => navigate("/chat")} className="gap-2">
-                <MessageSquare className="w-4 h-4" />
-                Try the Demo
-              </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/login")} className="gap-2">
-                Sign in with .edu email
-                <ArrowRight className="w-4 h-4" />
-              </Button>
+
+            {/* Right content — 3D Scene */}
+            <div className="flex-1 relative hidden md:block">
+              <SplineScene
+                scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                className="w-full h-full"
+              />
             </div>
           </div>
-        </div>
+        </Card>
       </section>
 
       {/* How Atlas Works */}
@@ -135,7 +175,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 5 Pillars */}
+      {/* 5 Pillars — BentoGrid */}
       <section id="features" className="py-16 sm:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-12">
@@ -143,29 +183,11 @@ const Index = () => {
             <p className="text-muted-foreground max-w-xl">Each pillar connects to real university systems. Atlas doesn't just inform — it acts, resolves, and follows up.</p>
           </div>
 
-          <div className="space-y-4">
-            {features.map((feature, i) => (
-              <button
-                key={feature.path}
-                onClick={() => navigate(feature.path)}
-                className="w-full glass-card p-6 text-left hover:border-foreground/20 transition-all duration-200 group animate-fade-in-up cursor-pointer"
-                style={{ animationDelay: `${i * 80}ms` }}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="font-heading text-lg font-semibold text-foreground">{feature.title}</h3>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground group-hover:translate-x-0.5 transition-all mt-1" />
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4 max-w-3xl">{feature.description}</p>
-                <div className="flex flex-wrap gap-2">
-                  {feature.actions.map((action) => (
-                    <span key={action} className="px-2.5 py-1 bg-secondary text-xs font-medium text-muted-foreground rounded-md">
-                      {action}
-                    </span>
-                  ))}
-                </div>
-              </button>
+          <BentoGrid className="lg:grid-rows-3">
+            {features.map((feature) => (
+              <BentoCard key={feature.name} {...feature} />
             ))}
-          </div>
+          </BentoGrid>
         </div>
       </section>
 

@@ -164,12 +164,12 @@ const Wellness = () => {
 
     setBookingPhase("booked");
     toast({
-      title: "✓ Booking confirmed",
+      title: "Booking confirmed",
       description: type === "counseling"
         ? `Appointment with ${counselors[selectedCounselor].name}`
         : type === "peer-group"
-        ? `Joined ${peerGroups[selectedGroup].name}`
-        : `Registered for ${workshops[selectedWorkshop].name}`,
+          ? `Joined ${peerGroups[selectedGroup].name}`
+          : `Registered for ${workshops[selectedWorkshop].name}`,
     });
   }, [selectedCounselor, selectedGroup, selectedWorkshop]);
 
@@ -333,36 +333,7 @@ const Wellness = () => {
         </CardContent>
       </Card>
 
-      {/* Atlas Help — bottom card like Financial */}
-      <Card className="border-primary/10 bg-secondary/30">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-primary" />
-              <CardTitle className="text-base">Need Help With Your Wellbeing?</CardTitle>
-            </div>
-            <Button size="sm" variant="outline" onClick={() => navigate("/chat")} className="gap-1 text-xs">
-              Open Atlas Chat <ExternalLink className="w-3.5 h-3.5" />
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground mt-1">Atlas can help you find the right support, book appointments, and connect you with campus resources — just ask.</p>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="grid sm:grid-cols-3 gap-3">
-            {atlasHelpCards.map((cap) => (
-              <div
-                key={cap.trigger}
-                className={`border rounded-lg p-3 hover:bg-secondary/50 transition-colors cursor-pointer ${cap.isCrisis ? "border-destructive/20" : "border-border"}`}
-                onClick={() => navigate("/chat")}
-              >
-                <p className="text-sm font-medium text-foreground mb-1">{cap.trigger}</p>
-                <p className="text-xs text-muted-foreground italic mb-2">{cap.example}</p>
-                <p className="text-[11px] text-muted-foreground">{cap.actions[0]}</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+
 
       {/* ─── BOOKING MODALS ─── */}
 
@@ -395,7 +366,7 @@ const Wellness = () => {
                       </div>
                       <div className="text-right">
                         <p className="text-xs font-medium text-foreground">{c.nextSlot}</p>
-                        <p className="text-[10px] text-muted-foreground">★ {c.rating}</p>
+                        <p className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Star className="w-2.5 h-2.5" /> {c.rating}</p>
                       </div>
                     </div>
                   </div>

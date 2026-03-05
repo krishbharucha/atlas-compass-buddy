@@ -474,9 +474,9 @@ export const scenarios: Scenario[] = [
 ];
 
 export const pillarConfig = {
-  financial: { label: "💰 Financial Aid", color: "text-foreground" },
-  wellness: { label: "🧠 Mental Health", color: "text-foreground" },
-  career: { label: "🎯 Career & Jobs", color: "text-foreground" },
-  academic: { label: "📚 Academic", color: "text-foreground" },
-  admin: { label: "🏛️ Campus Admin", color: "text-foreground" },
+  financial: { label: "Financial Aid", color: "text-foreground" },
+  wellness: { label: "Mental Health", color: "text-foreground" },
+  career: { label: "Career & Jobs", color: "text-foreground" },
+  academic: { label: "Academic", color: "text-foreground" },
+  admin: { label: "Campus Admin", color: "text-foreground" },
 };

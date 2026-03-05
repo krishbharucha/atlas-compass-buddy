@@ -3,7 +3,8 @@ import {
   Briefcase, MapPin, Clock, Building2, ExternalLink, Search, Filter,
   ChevronRight, Bookmark, Star, Zap, CheckCircle2, Loader2, Circle,
   FileText, Send, Copy, X, AlertCircle, CalendarCheck, Users,
-  User, Target, ListTodo, Mail, GraduationCap, RotateCcw, SlidersHorizontal
+  User, Target, ListTodo, Mail, GraduationCap, RotateCcw, SlidersHorizontal,
+  Calendar, Plus, Video
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,15 @@ interface StepDetail {
   guardrail?: string;
 }
 
+interface Interview {
+  company: string;
+  role: string;
+  date: string;
+  time: string;
+  type: "Phone" | "Video" | "On-site";
+  addedToCalendar: boolean;
+}
+
 interface Application {
   company: string;
   role: string;
@@ -44,6 +54,8 @@ interface Application {
   location: string;
   atlasGenerated?: boolean;
   tasks?: string[];
+  interviewDate?: string;
+  interviewTime?: string;
 }
 
 interface Listing {
@@ -97,8 +109,8 @@ const getStepDetails = (role: string): Record<string, StepDetail> => {
         items: isPM
           ? ["Microsoft PM Intern — 92% — Due Mar 12", "Amazon PM Intern — 89% — Due Mar 15", "Adobe Product Intern — 84% — Due Mar 20"]
           : isData
-          ? ["Meta Data Science Intern — 94% — Due Mar 14", "Goldman Sachs Data Analyst — 88% — Due Mar 18", "Pfizer Data Analyst Intern — 82% — Due Mar 22"]
-          : ["Amazon SDE Intern — 94% — Due Mar 12", "Microsoft SWE Intern — 91% — Due Mar 15", "Apple ML Intern — 87% — Due Mar 20"],
+            ? ["Meta Data Science Intern — 94% — Due Mar 14", "Goldman Sachs Data Analyst — 88% — Due Mar 18", "Pfizer Data Analyst Intern — 82% — Due Mar 22"]
+            : ["Amazon SDE Intern — 94% — Due Mar 12", "Microsoft SWE Intern — 91% — Due Mar 15", "Apple ML Intern — 87% — Due Mar 20"],
       },
     },
     resume: {
@@ -111,15 +123,15 @@ const getStepDetails = (role: string): Record<string, StepDetail> => {
       ],
       sampleBullets: isPM
         ? [
-            "Built a data pipeline in Python to analyze trends and present insights.",
-            "Designed a product-style feature brief based on user needs and constraints.",
-          ]
+          "Built a data pipeline in Python to analyze trends and present insights.",
+          "Designed a product-style feature brief based on user needs and constraints.",
+        ]
         : isData
-        ? [
+          ? [
             "Developed a Tableau dashboard to visualize enrollment trends across 3 semesters.",
             "Performed regression analysis in R to identify key drivers of student retention.",
           ]
-        : [
+          : [
             "Implemented a REST API in Java handling 1K+ requests/day with 99.9% uptime.",
             "Optimized database queries reducing average response time by 40%.",
           ],
@@ -138,8 +150,8 @@ const getStepDetails = (role: string): Record<string, StepDetail> => {
         items: isPM
           ? ["Tailor resume for Microsoft PM — Due in 2 days", "Submit Microsoft application — Due Mar 12", "Draft STAR stories — Due in 4 days"]
           : isData
-          ? ["Tailor resume for Meta Data Science — Due in 2 days", "Submit Goldman Sachs application — Due Mar 18", "Prepare SQL case study — Due in 4 days"]
-          : ["Tailor resume for Amazon SDE — Due in 2 days", "Submit Amazon application — Due Mar 12", "Practice system design — Due in 4 days"],
+            ? ["Tailor resume for Meta Data Science — Due in 2 days", "Submit Goldman Sachs application — Due Mar 18", "Prepare SQL case study — Due in 4 days"]
+            : ["Tailor resume for Amazon SDE — Due in 2 days", "Submit Amazon application — Due Mar 12", "Practice system design — Due in 4 days"],
       },
     },
     outreach: {
@@ -153,8 +165,8 @@ const getStepDetails = (role: string): Record<string, StepDetail> => {
         isPM
           ? "\"Hi Sarah, I'm Jordan — a junior studying IS. I'd love to hear about your PM path at Microsoft…\""
           : isData
-          ? "\"Hi Alex, I'm Jordan — a junior studying IS. Your data science work at Meta really resonated with me…\""
-          : "\"Hi Marcus, I'm Jordan — a CS junior. I'd love to learn about your engineering journey at Google…\"",
+            ? "\"Hi Alex, I'm Jordan — a junior studying IS. Your data science work at Meta really resonated with me…\""
+            : "\"Hi Marcus, I'm Jordan — a CS junior. I'd love to learn about your engineering journey at Google…\"",
       ],
     },
     coaching: {
@@ -171,10 +183,14 @@ const getStepDetails = (role: string): Record<string, StepDetail> => {
 
 /* ─── INITIAL DATA ─── */
 const initialApps: Application[] = [
-  { company: "Google", role: "Software Engineering Intern", status: "Interview", date: "Applied Feb 20", location: "Mountain View, CA", tasks: ["Prep system design"] },
+  { company: "Google", role: "Software Engineering Intern", status: "Interview", date: "Applied Feb 20", location: "Mountain View, CA", tasks: ["Prep system design"], interviewDate: "Mar 8, 2026", interviewTime: "2:00 PM" },
   { company: "Microsoft", role: "Product Management Intern", status: "Under Review", date: "Applied Feb 15", location: "Redmond, WA", tasks: ["Follow up Mar 10"] },
   { company: "Stripe", role: "Backend Engineering Intern", status: "Applied", date: "Applied Mar 1", location: "San Francisco, CA", tasks: ["Tailor resume"] },
   { company: "JPMorgan", role: "Technology Analyst", status: "Rejected", date: "Applied Jan 30", location: "New York, NY" },
+];
+
+const initialInterviews: Interview[] = [
+  { company: "Google", role: "Software Engineering Intern", date: "Mar 8, 2026", time: "2:00 PM", type: "Video", addedToCalendar: false },
 ];
 
 const initialListings: Listing[] = [
@@ -258,7 +274,14 @@ const Jobs = () => {
   const [targetRole, setTargetRole] = useState("PM internship");
 
   // Dynamic data
-  const [metrics, setMetrics] = useState({ applications: 12, interviews: 3, companies: 8, saved: 15 });
+  const [metrics, setMetrics] = useState({ applications: 4, interviews: 1, companies: 8 });
+  const [interviews, setInterviews] = useState<Interview[]>(initialInterviews);
+
+  // Section refs for KPI scroll
+  const applicationsRef = useRef<HTMLDivElement>(null);
+  const interviewsRef = useRef<HTMLDivElement>(null);
+  const companiesRef = useRef<HTMLDivElement>(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
   const [metricFlash, setMetricFlash] = useState<Record<string, boolean>>({});
   const [applications, setApplications] = useState<Application[]>(initialApps);
   const [listings, setListings] = useState<Listing[]>(initialListings);
@@ -323,7 +346,7 @@ const Jobs = () => {
     setSteps(initialWorkflowSteps.map((s) => ({ ...s, status: "queued" as StepStatus, completedAt: undefined })));
     setApplications(initialApps);
     setListings(initialListings);
-    setMetrics({ applications: 12, interviews: 3, companies: 8, saved: 15 });
+    setMetrics({ applications: 4, interviews: 1, companies: 8 });
 
     const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -336,8 +359,7 @@ const Jobs = () => {
     startStep(1);
     await delay(1800);
     completeStep(1);
-    setMetrics((m) => ({ ...m, saved: m.saved + 5 }));
-    flashMetric("saved");
+    // Matches found
     setListings((prev) =>
       prev.map((l, i) => ({
         ...l,
@@ -366,7 +388,7 @@ const Jobs = () => {
       ...prev.map((a, i) => i === 2 ? { ...a, status: "Under Review" } : a),
     ]);
     setSummaryPills(p => [...p, { label: "tasks", value: "6 tasks created" }]);
-    toast({ title: "📋 Recruiting tasks created", description: "6 tasks added to your pipeline" });
+    toast({ title: "Recruiting tasks created", description: "6 tasks added to your pipeline" });
 
     // Step 4: Outreach
     startStep(4);
@@ -376,7 +398,7 @@ const Jobs = () => {
     flashMetric("companies");
     setOutreachReady(true);
     setSummaryPills(p => [...p, { label: "outreach", value: "2 outreach drafts" }]);
-    toast({ title: "✉️ Alumni outreach drafts ready", description: "2 personalized messages prepared" });
+    toast({ title: "Alumni outreach drafts ready", description: "2 personalized messages prepared" });
 
     // Step 5: Coaching
     startStep(5);
@@ -385,7 +407,7 @@ const Jobs = () => {
     setMetrics((m) => ({ ...m, interviews: m.interviews + 1 }));
     flashMetric("interviews");
     setActiveStatusText("Career preparation completed");
-    toast({ title: "📅 Career coaching scheduled", description: "Session booked for tomorrow at 2:00 PM" });
+    toast({ title: "Career coaching scheduled", description: "Session booked for tomorrow at 2:00 PM" });
 
     setDemoRunning(false);
     setDemoCompleted(true);
@@ -402,7 +424,8 @@ const Jobs = () => {
     setSelectedStepId(null);
     setApplications(initialApps);
     setListings(initialListings);
-    setMetrics({ applications: 12, interviews: 3, companies: 8, saved: 15 });
+    setMetrics({ applications: 4, interviews: 1, companies: 8 });
+    setInterviews(initialInterviews);
     runningRef.current = false;
   }, []);
 
@@ -410,7 +433,7 @@ const Jobs = () => {
     const filteredJob = filteredListings[idx];
     const originalIdx = listings.findIndex(l => l.company === filteredJob.company && l.role === filteredJob.role);
     setListings((prev) => prev.map((l, i) => i === originalIdx ? { ...l, taskCreated: true } : l));
-    toast({ title: "✅ Task created", description: `"Apply to ${filteredJob.role}" added to tasks` });
+    toast({ title: "Task created", description: `"Apply to ${filteredJob.role}" added to tasks` });
     setTimeout(() => {
       setMetrics((m) => ({ ...m, applications: m.applications + 1 }));
       flashMetric("applications");
@@ -426,7 +449,7 @@ const Jobs = () => {
           : a
       )
     );
-    toast({ title: "🚀 Application submitted", description: `${draftModal.role} at ${draftModal.company}` });
+    toast({ title: "Application submitted", description: `${draftModal.role} at ${draftModal.company}` });
     setDraftModal(null);
   };
 
@@ -477,11 +500,37 @@ const Jobs = () => {
     });
   }, [listings, filters, searchQuery]);
 
+  const scrollToSection = (key: string) => {
+    setActiveSection(key);
+    const ref = key === "applications" ? applicationsRef : key === "interviews" ? interviewsRef : companiesRef;
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => setActiveSection(null), 2000);
+  };
+
+  const handleAddToCalendar = (idx: number) => {
+    setInterviews(prev => prev.map((iv, i) => i === idx ? { ...iv, addedToCalendar: true } : iv));
+    toast({ title: "Added to calendar", description: `Interview at ${interviews[idx].company} on ${interviews[idx].date}` });
+  };
+
+  const handleScheduleInterview = (app: Application) => {
+    const newInterview: Interview = {
+      company: app.company,
+      role: app.role,
+      date: app.interviewDate || "TBD",
+      time: app.interviewTime || "TBD",
+      type: "Video",
+      addedToCalendar: false,
+    };
+    setInterviews(prev => [...prev, newInterview]);
+    setMetrics(m => ({ ...m, interviews: m.interviews + 1 }));
+    flashMetric("interviews");
+    toast({ title: "Interview scheduled", description: `${app.role} at ${app.company}` });
+  };
+
   const metricCards = [
     { icon: Briefcase, label: "Applications", value: metrics.applications, sub: "This semester", key: "applications" },
-    { icon: Star, label: "Interviews", value: metrics.interviews, sub: "Scheduled", key: "interviews" },
+    { icon: Calendar, label: "Interviews", value: metrics.interviews, sub: "Scheduled", key: "interviews" },
     { icon: Building2, label: "Companies", value: metrics.companies, sub: "Contacted", key: "companies" },
-    { icon: Bookmark, label: "Saved Jobs", value: metrics.saved, sub: "Active listings", key: "saved" },
   ];
 
   const showWorkflow = demoRunning || demoCompleted;
@@ -505,12 +554,16 @@ const Jobs = () => {
         </Button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      {/* Stats — clickable KPIs */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
         {metricCards.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card key={stat.key} className="transition-all duration-300">
+            <Card
+              key={stat.key}
+              className="transition-all duration-300 cursor-pointer hover:ring-1 hover:ring-foreground/10"
+              onClick={() => scrollToSection(stat.key)}
+            >
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <Icon className="w-4 h-4 text-muted-foreground" />
@@ -597,17 +650,15 @@ const Jobs = () => {
                         type="button"
                         disabled={!isClickable}
                         onClick={() => isClickable && setSelectedStepId(step.id === selectedStepId ? null : step.id)}
-                        className={`flex flex-col items-center gap-1.5 flex-shrink-0 px-2 py-1.5 rounded-lg transition-all duration-200 ${
-                          isSelected ? "bg-primary/10 ring-1 ring-primary/20" : isActive ? "bg-primary/5" : ""
-                        } ${isClickable ? "cursor-pointer hover:bg-primary/8" : "cursor-default"}`}
+                        className={`flex flex-col items-center gap-1.5 flex-shrink-0 px-2 py-1.5 rounded-lg transition-all duration-200 ${isSelected ? "bg-primary/10 ring-1 ring-primary/20" : isActive ? "bg-primary/5" : ""
+                          } ${isClickable ? "cursor-pointer hover:bg-primary/8" : "cursor-default"}`}
                       >
-                        <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 ${
-                          isCompleted
-                            ? "bg-success/15 text-success"
-                            : isActive
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300 ${isCompleted
+                          ? "bg-success/15 text-success"
+                          : isActive
                             ? "bg-primary/15 text-primary"
                             : "bg-muted text-muted-foreground"
-                        }`}>
+                          }`}>
                           {isCompleted ? (
                             <CheckCircle2 className="w-3.5 h-3.5" />
                           ) : isActive ? (
@@ -616,16 +667,14 @@ const Jobs = () => {
                             <Circle className="w-3 h-3" />
                           )}
                         </div>
-                        <span className={`text-[10px] font-medium leading-none transition-colors ${
-                          isSelected ? "text-foreground" : isCompleted ? "text-success" : isActive ? "text-foreground" : "text-muted-foreground"
-                        }`}>
+                        <span className={`text-[10px] font-medium leading-none transition-colors ${isSelected ? "text-foreground" : isCompleted ? "text-success" : isActive ? "text-foreground" : "text-muted-foreground"
+                          }`}>
                           {step.label}
                         </span>
                       </button>
                       {i < steps.length - 1 && (
-                        <div className={`h-px flex-1 min-w-[12px] transition-colors duration-300 ${
-                          isCompleted ? "bg-success/30" : "bg-border"
-                        }`} />
+                        <div className={`h-px flex-1 min-w-[12px] transition-colors duration-300 ${isCompleted ? "bg-success/30" : "bg-border"
+                          }`} />
                       )}
                     </div>
                   );
@@ -726,229 +775,295 @@ const Jobs = () => {
         </CardContent>
       </Card>
 
-      {/* Applications tracker */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-lg">My Applications</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="divide-y divide-border">
-            {applications.map((app) => (
-              <div
-                key={app.company + app.role}
-                className={`py-3 flex items-center justify-between hover:bg-secondary/50 -mx-6 px-6 transition-all duration-300 cursor-pointer group ${
-                  app.atlasGenerated ? "animate-fade-in-up" : ""
-                }`}
-                onClick={() => app.status === "Draft Ready" ? setDraftModal(app) : undefined}
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-medium text-foreground">{app.role}</span>
-                    {app.atlasGenerated && (
-                      <Badge variant="secondary" className="text-[10px]">
-                        <Zap className="w-2.5 h-2.5 mr-0.5" /> Atlas
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1"><Building2 className="w-3 h-3" />{app.company}</span>
-                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{app.location}</span>
-                    <span className="hidden sm:inline">{app.date}</span>
-                  </div>
-                  {app.tasks && app.tasks.length > 0 && (
-                    <div className="flex gap-1.5 mt-1.5 flex-wrap">
-                      {app.tasks.map((t, i) => (
-                        <span key={i} className="pill-neutral text-[10px] py-0 px-1.5">{t}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-3 flex-shrink-0">
-                  <span className={statusStyle(app.status)}>{app.status}</span>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Job Listings */}
-      <Card>
-        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <CardTitle className="text-lg">Recommended Opportunities</CardTitle>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-              <Input
-                placeholder="Search roles..."
-                className="pl-9 h-8 w-48 text-sm"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <Popover open={filterOpen} onOpenChange={setFilterOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-1 relative">
-                  <Filter className="w-3.5 h-3.5" />
-                  Filter
-                  {hasActiveFilters && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[9px] flex items-center justify-center font-bold">
-                      {activeFilterTags.length}
-                    </span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80 p-0" align="end">
-                <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-foreground">Filters</span>
-                    <Button variant="ghost" size="sm" className="text-xs h-6 px-2" onClick={() => setFilters(emptyFilters)}>
-                      Clear All
-                    </Button>
-                  </div>
-
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Job Type</p>
-                    <div className="space-y-1.5">
-                      {FILTER_OPTIONS.jobType.map(opt => (
-                        <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm text-foreground hover:bg-secondary/50 rounded px-2 py-1 -mx-2">
-                          <Checkbox checked={filters.jobType.includes(opt)} onCheckedChange={() => toggleFilterValue("jobType", opt)} />
-                          {opt}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Industry</p>
-                    <div className="space-y-1.5">
-                      {FILTER_OPTIONS.industry.map(opt => (
-                        <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm text-foreground hover:bg-secondary/50 rounded px-2 py-1 -mx-2">
-                          <Checkbox checked={filters.industry.includes(opt)} onCheckedChange={() => toggleFilterValue("industry", opt)} />
-                          {opt}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Location</p>
-                    <div className="space-y-1.5">
-                      {FILTER_OPTIONS.location.map(opt => (
-                        <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm text-foreground hover:bg-secondary/50 rounded px-2 py-1 -mx-2">
-                          <Checkbox checked={filters.location.includes(opt)} onCheckedChange={() => toggleFilterValue("location", opt)} />
-                          {opt}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Salary Range</p>
-                    <div className="space-y-1.5">
-                      {FILTER_OPTIONS.salary.map(opt => (
-                        <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm text-foreground hover:bg-secondary/50 rounded px-2 py-1 -mx-2">
-                          <Checkbox checked={filters.salary.includes(opt)} onCheckedChange={() => toggleFilterValue("salary", opt)} />
-                          {opt}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                  <Separator />
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Match Score</p>
-                    <div className="flex gap-2">
-                      {FILTER_OPTIONS.matchScore.map(score => (
-                        <Button
-                          key={score}
-                          variant={filters.matchScore === score ? "default" : "outline"}
-                          size="sm"
-                          className="text-xs h-7 px-3"
-                          onClick={() => setFilters(prev => ({ ...prev, matchScore: prev.matchScore === score ? null : score }))}
-                        >
-                          {score}%+
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                  <Separator />
-                  <Button size="sm" className="w-full" onClick={() => setFilterOpen(false)}>Apply Filters</Button>
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {activeFilterTags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-4">
-              {activeFilterTags.map((tag, i) => (
-                <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                  {tag.label}
-                  <button onClick={() => removeFilter(tag.category, tag.value)} className="hover:bg-primary/20 rounded-full p-0.5">
-                    <X className="w-2.5 h-2.5" />
-                  </button>
-                </span>
-              ))}
-              <button onClick={() => setFilters(emptyFilters)} className="text-xs text-muted-foreground hover:text-foreground transition-colors px-1">
-                Clear all
-              </button>
-            </div>
-          )}
-
-          <div className="divide-y divide-border">
-            {filteredListings.length === 0 ? (
+      {/* Interview Calendar Section */}
+      <div ref={interviewsRef} className={`mb-8 transition-all duration-500 ${activeSection === "interviews" ? "ring-2 ring-primary/30 rounded-xl" : ""}`}>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-primary" />
+              Interview Calendar
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {interviews.length === 0 ? (
               <div className="py-8 text-center">
-                <SlidersHorizontal className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">No opportunities match your filters.</p>
-                <Button variant="ghost" size="sm" className="mt-2 text-xs" onClick={() => setFilters(emptyFilters)}>Clear filters</Button>
+                <Calendar className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No interviews scheduled yet.</p>
+                <p className="text-xs text-muted-foreground mt-1">Interviews will appear here when applications advance.</p>
               </div>
             ) : (
-              filteredListings.map((job, idx) => (
-                <div key={job.company + job.role} className="py-3 flex items-center justify-between hover:bg-secondary/50 -mx-6 px-6 transition-colors cursor-pointer group">
+              <div className="divide-y divide-border">
+                {interviews.map((iv, idx) => (
+                  <div key={iv.company + iv.role + idx} className="py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center">
+                        {iv.type === "Video" ? <Video className="w-5 h-5 text-foreground" /> : <Briefcase className="w-5 h-5 text-foreground" />}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{iv.role}</p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                          <span className="flex items-center gap-1"><Building2 className="w-3 h-3" />{iv.company}</span>
+                          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{iv.date}</span>
+                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{iv.time}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-[10px]">{iv.type}</Badge>
+                      {iv.addedToCalendar ? (
+                        <span className="pill-success text-[10px] flex items-center gap-0.5">
+                          <CheckCircle2 className="w-2.5 h-2.5" /> In Calendar
+                        </span>
+                      ) : (
+                        <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => handleAddToCalendar(idx)}>
+                          <Plus className="w-3 h-3" /> Add to Calendar
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Applications tracker */}
+      <div ref={applicationsRef} className={`mb-8 transition-all duration-500 ${activeSection === "applications" ? "ring-2 ring-primary/30 rounded-xl" : ""}`}>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">My Applications</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="divide-y divide-border">
+              {applications.map((app) => (
+                <div
+                  key={app.company + app.role}
+                  className={`py-3 flex items-center justify-between hover:bg-secondary/50 -mx-6 px-6 transition-all duration-300 cursor-pointer group ${app.atlasGenerated ? "animate-fade-in-up" : ""
+                    }`}
+                  onClick={() => app.status === "Draft Ready" ? setDraftModal(app) : undefined}
+                >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-medium text-foreground">{job.role}</span>
-                      <Badge variant="secondary" className="text-[10px] font-mono-accent">{job.type}</Badge>
-                      {job.matchScore && (
-                        <span className={`pill-${job.matchScore >= 90 ? "success" : job.matchScore >= 75 ? "warning" : "neutral"} text-[10px]`}>
-                          {job.matchScore}% match
-                        </span>
-                      )}
-                      {job.deadline && (
-                        <span className="pill-danger text-[10px] flex items-center gap-0.5">
-                          <AlertCircle className="w-2.5 h-2.5" /> Due {job.deadline}
-                        </span>
+                      <span className="text-sm font-medium text-foreground">{app.role}</span>
+                      {app.atlasGenerated && (
+                        <Badge variant="secondary" className="text-[10px]">
+                          <Zap className="w-2.5 h-2.5 mr-0.5" /> Atlas
+                        </Badge>
                       )}
                     </div>
                     <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><Building2 className="w-3 h-3" />{job.company}</span>
-                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{job.location}</span>
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{job.posted}</span>
+                      <span className="flex items-center gap-1"><Building2 className="w-3 h-3" />{app.company}</span>
+                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{app.location}</span>
+                      <span className="hidden sm:inline">{app.date}</span>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {!job.taskCreated ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-[10px] h-6 px-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e) => { e.stopPropagation(); handleAddTask(idx); }}
-                      >
-                        Add to Tasks
-                      </Button>
-                    ) : (
-                      <span className="pill-success text-[10px]"><CheckCircle2 className="w-2.5 h-2.5 mr-0.5 inline" />Task created</span>
+                    {app.tasks && app.tasks.length > 0 && (
+                      <div className="flex gap-1.5 mt-1.5 flex-wrap">
+                        {app.tasks.map((t, i) => (
+                          <span key={i} className="pill-neutral text-[10px] py-0 px-1.5">{t}</span>
+                        ))}
+                      </div>
                     )}
-                    <Bookmark className={`w-4 h-4 transition-all duration-300 ${job.saved ? "text-foreground fill-foreground" : "text-muted-foreground"}`} />
+                  </div>
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <span className={statusStyle(app.status)}>{app.status}</span>
+                    {app.status === "Interview" && app.interviewDate && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-6 text-[10px] gap-1"
+                        onClick={(e) => { e.stopPropagation(); handleScheduleInterview(app); }}
+                      >
+                        <Calendar className="w-3 h-3" /> Schedule
+                      </Button>
+                    )}
                     <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </div>
-              ))
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Job Listings — companies section */}
+      <div ref={companiesRef} className={`transition-all duration-500 ${activeSection === "companies" ? "ring-2 ring-primary/30 rounded-xl" : ""}`}>
+        <Card>
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <CardTitle className="text-lg">Recommended Opportunities</CardTitle>
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                <Input
+                  placeholder="Search roles..."
+                  className="pl-9 h-8 w-48 text-sm"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <Popover open={filterOpen} onOpenChange={setFilterOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-1 relative">
+                    <Filter className="w-3.5 h-3.5" />
+                    Filter
+                    {hasActiveFilters && (
+                      <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary text-primary-foreground text-[9px] flex items-center justify-center font-bold">
+                        {activeFilterTags.length}
+                      </span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-0" align="end">
+                  <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-foreground">Filters</span>
+                      <Button variant="ghost" size="sm" className="text-xs h-6 px-2" onClick={() => setFilters(emptyFilters)}>
+                        Clear All
+                      </Button>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Job Type</p>
+                      <div className="space-y-1.5">
+                        {FILTER_OPTIONS.jobType.map(opt => (
+                          <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm text-foreground hover:bg-secondary/50 rounded px-2 py-1 -mx-2">
+                            <Checkbox checked={filters.jobType.includes(opt)} onCheckedChange={() => toggleFilterValue("jobType", opt)} />
+                            {opt}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <Separator />
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Industry</p>
+                      <div className="space-y-1.5">
+                        {FILTER_OPTIONS.industry.map(opt => (
+                          <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm text-foreground hover:bg-secondary/50 rounded px-2 py-1 -mx-2">
+                            <Checkbox checked={filters.industry.includes(opt)} onCheckedChange={() => toggleFilterValue("industry", opt)} />
+                            {opt}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <Separator />
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Location</p>
+                      <div className="space-y-1.5">
+                        {FILTER_OPTIONS.location.map(opt => (
+                          <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm text-foreground hover:bg-secondary/50 rounded px-2 py-1 -mx-2">
+                            <Checkbox checked={filters.location.includes(opt)} onCheckedChange={() => toggleFilterValue("location", opt)} />
+                            {opt}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <Separator />
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Salary Range</p>
+                      <div className="space-y-1.5">
+                        {FILTER_OPTIONS.salary.map(opt => (
+                          <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm text-foreground hover:bg-secondary/50 rounded px-2 py-1 -mx-2">
+                            <Checkbox checked={filters.salary.includes(opt)} onCheckedChange={() => toggleFilterValue("salary", opt)} />
+                            {opt}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <Separator />
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Match Score</p>
+                      <div className="flex gap-2">
+                        {FILTER_OPTIONS.matchScore.map(score => (
+                          <Button
+                            key={score}
+                            variant={filters.matchScore === score ? "default" : "outline"}
+                            size="sm"
+                            className="text-xs h-7 px-3"
+                            onClick={() => setFilters(prev => ({ ...prev, matchScore: prev.matchScore === score ? null : score }))}
+                          >
+                            {score}%+
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    <Separator />
+                    <Button size="sm" className="w-full" onClick={() => setFilterOpen(false)}>Apply Filters</Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {activeFilterTags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                {activeFilterTags.map((tag, i) => (
+                  <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                    {tag.label}
+                    <button onClick={() => removeFilter(tag.category, tag.value)} className="hover:bg-primary/20 rounded-full p-0.5">
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                  </span>
+                ))}
+                <button onClick={() => setFilters(emptyFilters)} className="text-xs text-muted-foreground hover:text-foreground transition-colors px-1">
+                  Clear all
+                </button>
+              </div>
             )}
-          </div>
-        </CardContent>
-      </Card>
+
+            <div className="divide-y divide-border">
+              {filteredListings.length === 0 ? (
+                <div className="py-8 text-center">
+                  <SlidersHorizontal className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">No opportunities match your filters.</p>
+                  <Button variant="ghost" size="sm" className="mt-2 text-xs" onClick={() => setFilters(emptyFilters)}>Clear filters</Button>
+                </div>
+              ) : (
+                filteredListings.map((job, idx) => (
+                  <div key={job.company + job.role} className="py-3 flex items-center justify-between hover:bg-secondary/50 -mx-6 px-6 transition-colors cursor-pointer group">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-medium text-foreground">{job.role}</span>
+                        <Badge variant="secondary" className="text-[10px] font-mono-accent">{job.type}</Badge>
+                        {job.matchScore && (
+                          <span className={`pill-${job.matchScore >= 90 ? "success" : job.matchScore >= 75 ? "warning" : "neutral"} text-[10px]`}>
+                            {job.matchScore}% match
+                          </span>
+                        )}
+                        {job.deadline && (
+                          <span className="pill-danger text-[10px] flex items-center gap-0.5">
+                            <AlertCircle className="w-2.5 h-2.5" /> Due {job.deadline}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><Building2 className="w-3 h-3" />{job.company}</span>
+                        <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{job.location}</span>
+                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{job.posted}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {!job.taskCreated ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-[10px] h-6 px-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => { e.stopPropagation(); handleAddTask(idx); }}
+                        >
+                          Add to Tasks
+                        </Button>
+                      ) : (
+                        <span className="pill-success text-[10px]"><CheckCircle2 className="w-2.5 h-2.5 mr-0.5 inline" />Task created</span>
+                      )}
+                      <Bookmark className={`w-4 h-4 transition-all duration-300 ${job.saved ? "text-foreground fill-foreground" : "text-muted-foreground"}`} />
+                      <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Draft Review Modal */}
       <Dialog open={!!draftModal} onOpenChange={() => setDraftModal(null)}>
@@ -1021,7 +1136,7 @@ const Jobs = () => {
                         onClick={() => {
                           setSentDrafts((p) => new Set(p).add(i));
                           setConfirmSendIdx(null);
-                          toast({ title: "📨 Message sent", description: `Outreach to ${d.name} delivered` });
+                          toast({ title: "Message sent", description: `Outreach to ${d.name} delivered` });
                         }}
                       >
                         Confirm Send
