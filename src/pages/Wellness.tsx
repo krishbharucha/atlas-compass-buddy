@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Heart, Phone, Calendar, Users, BookOpen, MessageSquare, Clock,
   ChevronRight, Shield, Zap, CheckCircle2, AlertTriangle,
-  Activity, Loader2, Circle, Send, Star, AlertCircle, Video,
+  Activity, Loader2, Circle, Send, Star, Video,
   PhoneCall, X, Check, MapPin, User
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { Progress } from "@/components/ui/progress";
+
 
 /* ─── TYPES ─── */
 type StepStatus = "queued" | "processing" | "completed";
@@ -36,21 +36,6 @@ const initialSteps: WorkflowStep[] = [
   { id: "toolkit", label: "Toolkit Sent", status: "queued", duration: 1000 },
 ];
 
-const initialPulse = [
-  { week: "Week 8", score: 6, trend: "stable" as const },
-  { week: "Week 7", score: 5, trend: "down" as const },
-  { week: "Week 6", score: 7, trend: "up" as const },
-  { week: "Week 5", score: 7, trend: "stable" as const },
-];
-
-const wellnessCriteria = [
-  { id: "sleep", label: "Sleep Quality", description: "Hours of sleep, consistency, difficulty falling asleep", score: 5, max: 10 },
-  { id: "stress", label: "Perceived Stress", description: "Academic pressure, workload, deadlines", score: 7, max: 10 },
-  { id: "social", label: "Social Connection", description: "Frequency of meaningful social interactions", score: 6, max: 10 },
-  { id: "physical", label: "Physical Activity", description: "Exercise frequency, energy levels, appetite", score: 7, max: 10 },
-  { id: "mood", label: "Overall Mood", description: "General emotional state, motivation, enjoyment", score: 5, max: 10 },
-  { id: "academic", label: "Academic Confidence", description: "Feeling prepared for classes and exams", score: 6, max: 10 },
-];
 
 const atlasCapabilities = [
   {
@@ -131,8 +116,6 @@ const Wellness = () => {
   // Dynamic state
   const [distressLevel, setDistressLevel] = useState<"normal" | "elevated" | "high">("normal");
   const [wellnessInsight, setWellnessInsight] = useState<string | null>(null);
-  const [pulseInsight, setPulseInsight] = useState<string | null>(null);
-  const [pulseAlerts, setPulseAlerts] = useState<Set<number>>(new Set());
   const [appointmentBooked, setAppointmentBooked] = useState(false);
   const [recommendedGroup, setRecommendedGroup] = useState<string | null>(null);
   const [recommendedWorkshop, setRecommendedWorkshop] = useState<string | null>(null);
@@ -315,8 +298,8 @@ const Wellness = () => {
     setAnalysisMessage("Analyzing your message...");
 
     setSteps(initialSteps.map((s) => ({ ...s, status: "queued", completedAt: undefined })));
-    setDistressLevel("normal"); setWellnessInsight(null); setPulseInsight(null);
-    setPulseAlerts(new Set()); setAppointmentBooked(false);
+    setDistressLevel("normal"); setWellnessInsight(null);
+    setAppointmentBooked(false);
     setRecommendedGroup(null); setRecommendedWorkshop(null);
     setRecommendedEvents(new Set()); setAdvisorFlagged(false);
     setToolkitItems([]); setCrisisDetected(false);
@@ -333,9 +316,7 @@ const Wellness = () => {
 
     startStep(1); await delay(1500); completeStep(1);
     setDistressLevel(level);
-    setWellnessInsight("Your wellness score has declined for two consecutive weeks.");
-    setPulseInsight("Detected decline across last two weeks.");
-    setPulseAlerts(new Set([0, 1]));
+    setWellnessInsight("Your recent check-in indicates elevated stress levels.");
     toast({ title: "Concerns identified", description: `${signals.join(", ")} · ${severity} distress` });
 
     startStep(2); await delay(2000); completeStep(2);
@@ -426,7 +407,7 @@ const Wellness = () => {
     return recommendedEvents.has(aIdx) ? -1 : 0;
   });
 
-  const compositeScore = Math.round(wellnessCriteria.reduce((sum, c) => sum + c.score, 0) / wellnessCriteria.length * 10);
+  
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -530,8 +511,8 @@ const Wellness = () => {
                 setDemoCompleted(false); setSubmittedMessage(""); setStudentMessage("");
                 setDistressSignals([]); setSeverityLabel(null);
                 setSteps(initialSteps.map((s) => ({ ...s, status: "queued", completedAt: undefined })));
-                setDistressLevel("normal"); setWellnessInsight(null); setPulseInsight(null);
-                setPulseAlerts(new Set()); setAppointmentBooked(false);
+                setDistressLevel("normal"); setWellnessInsight(null);
+                setAppointmentBooked(false);
                 setRecommendedGroup(null); setRecommendedWorkshop(null);
                 setRecommendedEvents(new Set()); setAdvisorFlagged(false);
                 setToolkitItems([]); setCrisisDetected(false);
@@ -667,7 +648,7 @@ const Wellness = () => {
         })}
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-4">
+      <div className="grid lg:grid-cols-1 gap-4">
         {/* Upcoming Events */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
@@ -695,72 +676,6 @@ const Wellness = () => {
                 );
               })}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Wellness Pulse — Expanded with criteria */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Activity className="w-4 h-4" /> Wellness Pulse
-              </CardTitle>
-              <div className="text-right">
-                <p className="text-2xl font-heading font-bold text-foreground">{compositeScore}%</p>
-                <p className="text-[10px] text-muted-foreground">Composite Score</p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            {/* Criteria breakdown */}
-            <div className="space-y-3">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Self-Reported Criteria</p>
-              {wellnessCriteria.map((criterion) => (
-                <div key={criterion.id} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{criterion.label}</p>
-                      <p className="text-[10px] text-muted-foreground">{criterion.description}</p>
-                    </div>
-                    <span className="text-xs font-mono-accent text-muted-foreground">{criterion.score}/{criterion.max}</span>
-                  </div>
-                  <Progress value={criterion.score * 10} className="h-1.5" />
-                </div>
-              ))}
-            </div>
-
-            {/* Weekly trend */}
-            <div className="space-y-2 pt-2 border-t border-border">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Weekly Trend</p>
-              {initialPulse.map((pulse, idx) => (
-                <div key={pulse.week} className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-sm font-medium text-foreground">{pulse.week}</span>
-                    {pulseAlerts.has(idx) && <AlertCircle className="w-3.5 h-3.5 text-warning animate-fade-in" />}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: 10 }).map((_, i) => (
-                        <div key={i} className={`w-3 h-3 rounded-sm transition-colors duration-300 ${
-                          i < pulse.score ? (pulseAlerts.has(idx) ? "bg-warning/40" : "bg-foreground/20") : "bg-secondary"
-                        }`} />
-                      ))}
-                    </div>
-                    <span className="text-xs font-mono-accent text-muted-foreground w-8 text-right">{pulse.score}/10</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <p className="text-[10px] text-muted-foreground italic pt-1">
-              All scores are self-reported. This is not a clinical assessment or diagnosis. If you need professional support, please reach out to Counseling Services.
-            </p>
-
-            {pulseInsight ? (
-              <p className="text-xs text-warning flex items-center gap-1.5"><AlertCircle className="w-3 h-3" />{pulseInsight}</p>
-            ) : (
-              <p className="text-xs text-muted-foreground">Atlas monitors trends and proactively reaches out if scores decline for 2+ consecutive weeks.</p>
-            )}
           </CardContent>
         </Card>
       </div>
