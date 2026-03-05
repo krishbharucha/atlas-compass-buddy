@@ -14,7 +14,6 @@ import Academic from "./pages/Academic";
 import Financial from "./pages/Financial";
 import Jobs from "./pages/Jobs";
 import Wellness from "./pages/Wellness";
-import Administration from "./pages/Administration";
 import NotFound from "./pages/NotFound";
 import AtlasDrawer from "./components/AtlasDrawer";
 
@@ -39,7 +38,6 @@ const AppLayout = () => {
         <Route path="/financial" element={<Financial />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/wellness" element={<Wellness />} />
-        <Route path="/admin" element={<Administration />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {showNav && <AtlasDrawer />}
