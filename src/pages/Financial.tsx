@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { DollarSign, CreditCard, TrendingDown, Award, FileText, ChevronRight, ArrowUpRight, ArrowDownRight, Zap, AlertTriangle, CheckCircle2, ExternalLink, Clock, Info } from "lucide-react";
+import { DollarSign, Award, FileText, ChevronRight, ArrowUpRight, ArrowDownRight, Zap, AlertTriangle, CheckCircle2, ExternalLink, Clock, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -55,7 +55,7 @@ const Financial = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           {/* Card 1 — Balance Due */}
           <Card className="relative overflow-hidden">
             <CardContent className="p-4">
@@ -112,29 +112,6 @@ const Financial = () => {
             </CardContent>
           </Card>
 
-          {/* Card 3 */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <CreditCard className="w-4 h-4 text-muted-foreground" />
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Payments Made</span>
-              </div>
-              <p className="text-xl font-bold font-heading text-foreground">$5,000.00</p>
-              <p className="text-xs mt-0.5 text-muted-foreground">Year to date</p>
-            </CardContent>
-          </Card>
-
-          {/* Card 4 */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingDown className="w-4 h-4 text-muted-foreground" />
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Charges</span>
-              </div>
-              <p className="text-xl font-bold font-heading text-foreground">$23,000.00</p>
-              <p className="text-xs mt-0.5 text-muted-foreground">Spring 2026</p>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Flow Panels */}

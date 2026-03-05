@@ -43,9 +43,40 @@ const Academic = () => {
   const [selectedCourse, setSelectedCourse] = useState("");
   const [emailReviewed, setEmailReviewed] = useState(false);
   const [showEmailPreview, setShowEmailPreview] = useState(false);
+  const [emailRecipient, setEmailRecipient] = useState("");
+  const [showCourseEmailDialog, setShowCourseEmailDialog] = useState(false);
+  const [courseEmailTarget, setCourseEmailTarget] = useState<typeof courses[0] | null>(null);
   const { toast } = useToast();
 
   const selectedCourseData = useMemo(() => courses.find(c => c.code === selectedCourse), [selectedCourse]);
+
+  const recipients = useMemo(() => {
+    const prof = selectedCourseData?.professor ?? "";
+    const list = [
+      { id: "professor", label: prof, role: "Course Professor" },
+      { id: "advisor", label: "Dr. Patel", role: "Academic Advisor" },
+      { id: "department", label: "CS Department Office", role: "Department Contact" },
+    ];
+    return list;
+  }, [selectedCourseData]);
+
+  const getEmailDraft = (recipientLabel: string, courseCode: string, courseName: string) => ({
+    to: recipientLabel,
+    subject: `Request for Support — ${courseCode} ${courseName}`,
+    body: `Dear ${recipientLabel},
+
+I hope this message finds you well. I am writing to discuss my current standing in ${courseCode} — ${courseName}.
+
+I have been facing some challenges this quarter that have affected my performance, and I would like to explore any options available to help me improve. I have also scheduled tutoring sessions and an advising appointment to develop a stronger study plan.
+
+Would it be possible to meet during your office hours this week to discuss strategies for the remaining assignments and exams? I am committed to putting in the effort needed to finish the course on the best possible terms.
+
+Thank you for your time and understanding.
+
+Best regards,
+[Your Name]
+Student ID: [Your ID]`,
+  });
 
   // ── Landing ──
   if (flow === "landing") {
@@ -140,7 +171,15 @@ const Academic = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="font-heading font-semibold text-foreground">{course.grade}</span>
-                    {course.status === "Completed" ? <CheckCircle className="w-4 h-4 text-muted-foreground" /> : <Clock className="w-4 h-4 text-muted-foreground" />}
+                    {course.status === "At Risk" ? (
+                      <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => { setCourseEmailTarget(course); setShowCourseEmailDialog(true); }}>
+                        <FileText className="w-3 h-3" /> Reach Out
+                      </Button>
+                    ) : course.status === "Completed" ? (
+                      <CheckCircle className="w-4 h-4 text-muted-foreground" />
+                    ) : (
+                      <Clock className="w-4 h-4 text-muted-foreground" />
+                    )}
                   </div>
                 </div>
               ))}
@@ -388,23 +427,8 @@ const Academic = () => {
   }
 
   if (flow === "course-actions") {
-    const emailDraft = {
-      to: selectedCourseData?.professor ?? "Professor",
-      subject: `Request for Support — ${selectedCourse} ${selectedCourseData?.name ?? ""}`,
-      body: `Dear ${selectedCourseData?.professor ?? "Professor"},
-
-I hope this message finds you well. I am writing to discuss my current standing in ${selectedCourse} — ${selectedCourseData?.name ?? "your course"}.
-
-I have been facing some challenges this quarter that have affected my performance, and I would like to explore any options available to help me improve. I have also scheduled tutoring sessions and an advising appointment to develop a stronger study plan.
-
-Would it be possible to meet during your office hours this week to discuss strategies for the remaining assignments and exams? I am committed to putting in the effort needed to finish the course on the best possible terms.
-
-Thank you for your time and understanding.
-
-Best regards,
-[Your Name]
-Student ID: [Your ID]`,
-    };
+    const currentRecipient = emailRecipient || recipients[0]?.label || "Professor";
+    const emailDraft = getEmailDraft(currentRecipient, selectedCourse, selectedCourseData?.name ?? "");
 
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 animate-fade-in-up">
@@ -416,7 +440,7 @@ Student ID: [Your ID]`,
               {[
                 { label: "Advising appointment booked — Wed 2:30pm", done: true },
                 { label: "Tutoring sessions scheduled (3 this week)", done: true },
-                { label: "Email to professor", done: emailReviewed, action: true },
+                { label: "Email to professor / advisor", done: emailReviewed, action: true },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -433,33 +457,55 @@ Student ID: [Your ID]`,
                 </div>
               ))}
             </div>
-            <Button variant="outline" onClick={() => { setFlow("landing"); setSelectedCourse(""); setEmailReviewed(false); }} className="w-full mt-4">
+            <Button variant="outline" onClick={() => { setFlow("landing"); setSelectedCourse(""); setEmailReviewed(false); setEmailRecipient(""); }} className="w-full mt-4">
               Back to Academic
             </Button>
           </CardContent>
         </Card>
 
         <Dialog open={showEmailPreview} onOpenChange={setShowEmailPreview}>
-          <DialogContent className="max-w-lg">
+          <DialogContent className="w-[95vw] max-w-lg sm:max-w-xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-base">Review Email to Professor</DialogTitle>
+              <DialogTitle className="text-base">Review Email</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
+              {/* Recipient selector */}
+              <div>
+                <p className="text-xs text-muted-foreground mb-2">Who would you like to reach out to?</p>
+                <div className="space-y-2">
+                  {recipients.map((r) => (
+                    <div
+                      key={r.id}
+                      className={`flex items-center justify-between p-3 rounded-md border cursor-pointer transition-colors ${
+                        currentRecipient === r.label ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"
+                      }`}
+                      onClick={() => setEmailRecipient(r.label)}
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{r.label}</p>
+                        <p className="text-xs text-muted-foreground">{r.role}</p>
+                      </div>
+                      {currentRecipient === r.label && <Check className="w-4 h-4 text-primary" />}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="space-y-3 text-sm">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="text-muted-foreground w-16 shrink-0">To:</span>
                   <span className="text-foreground font-medium">{emailDraft.to}</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="text-muted-foreground w-16 shrink-0">Subject:</span>
-                  <span className="text-foreground font-medium">{emailDraft.subject}</span>
+                  <span className="text-foreground font-medium break-all">{emailDraft.subject}</span>
                 </div>
               </div>
-              <div className="border border-border rounded-md p-4 bg-muted/30">
-                <pre className="text-sm text-foreground whitespace-pre-wrap font-sans leading-relaxed">{emailDraft.body}</pre>
+              <div className="border border-border rounded-md p-3 sm:p-4 bg-muted/30">
+                <pre className="text-xs sm:text-sm text-foreground whitespace-pre-wrap font-sans leading-relaxed">{emailDraft.body}</pre>
               </div>
               <p className="text-xs text-muted-foreground">Atlas drafted this email based on your situation. Review the content and send when ready.</p>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Button variant="outline" className="flex-1" onClick={() => setShowEmailPreview(false)}>
                   Cancel
                 </Button>
@@ -478,7 +524,57 @@ Student ID: [Your ID]`,
     );
   }
 
-  return null;
+  // At-risk course email dialog (from landing page)
+  return (
+    <>
+      <Dialog open={showCourseEmailDialog} onOpenChange={setShowCourseEmailDialog}>
+        <DialogContent className="w-[95vw] max-w-lg sm:max-w-xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-base">Reach Out — {courseEmailTarget?.code}</DialogTitle>
+          </DialogHeader>
+          {courseEmailTarget && (() => {
+            const draft = getEmailDraft(courseEmailTarget.professor, courseEmailTarget.code, courseEmailTarget.name);
+            const courseRecipients = [
+              { id: "prof", label: courseEmailTarget.professor, role: "Course Professor" },
+              { id: "advisor", label: "Dr. Patel", role: "Academic Advisor" },
+            ];
+            return (
+              <div className="space-y-4">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-2">Select who to contact:</p>
+                  <div className="space-y-2">
+                    {courseRecipients.map((r) => (
+                      <div
+                        key={r.id}
+                        className="flex items-center justify-between p-3 rounded-md border border-border hover:border-primary/30 cursor-pointer transition-colors"
+                        onClick={() => {
+                          setShowCourseEmailDialog(false);
+                          toast({ title: "Email sent", description: `Message sent to ${r.label}.` });
+                        }}
+                      >
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{r.label}</p>
+                          <p className="text-xs text-muted-foreground">{r.role}</p>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="border border-border rounded-md p-3 bg-muted/30">
+                  <p className="text-xs text-muted-foreground mb-1">Preview:</p>
+                  <pre className="text-xs text-foreground whitespace-pre-wrap font-sans leading-relaxed">{draft.body}</pre>
+                </div>
+                <Button variant="outline" className="w-full" onClick={() => setShowCourseEmailDialog(false)}>
+                  Cancel
+                </Button>
+              </div>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 };
 
 export default Academic;
