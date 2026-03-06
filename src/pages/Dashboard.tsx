@@ -76,7 +76,7 @@ const Dashboard = () => {
       </div>
 
       {/* Stats — clickable */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6" data-tutorial="stat-cards">
         {stats.map((s) => (
           <div key={s.label} onClick={() => navigate(s.path)} className="cursor-pointer hover:ring-1 hover:ring-foreground/10 rounded-xl transition-all">
             <StatCard {...s} />
@@ -140,7 +140,7 @@ const Dashboard = () => {
         </div>
 
         {/* Deadlines sidebar */}
-        <div className="glass-card animate-fade-in-up" style={{ animationDelay: "400ms" }}>
+        <div className="glass-card animate-fade-in-up" style={{ animationDelay: "400ms" }} data-tutorial="deadlines">
           <div className="flex items-center justify-between p-4 border-b border-border">
             <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <Calendar className="w-4 h-4 text-primary" />

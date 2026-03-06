@@ -294,7 +294,7 @@ const AtlasChat = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative z-10">
       {/* Mode Toggle */}
-      <div className="mb-4 animate-fade-in-up flex items-center gap-3 flex-wrap">
+      <div className="mb-4 animate-fade-in-up flex items-center gap-3 flex-wrap" data-tutorial="scenario-tabs">
         <div className="flex items-center gap-1 bg-secondary rounded-lg p-1">
           <button
             onClick={() => setMode("live")}
@@ -441,6 +441,7 @@ const AtlasChat = () => {
                     sendMessage(input);
                   }}
                   className="flex gap-2"
+                  data-tutorial="chat-input"
                 >
                   <input
                     value={input}
@@ -526,7 +527,7 @@ const AtlasChat = () => {
         </div>
 
         {/* RIGHT: Actions */}
-        <div className="lg:w-[55%] flex flex-col glass-card overflow-hidden">
+        <div className="lg:w-[55%] flex flex-col glass-card overflow-hidden" data-tutorial="action-log">
           <div className="px-4 py-3 border-b border-border flex items-center justify-between">
             <h2 className="text-sm font-semibold text-foreground">Action Log</h2>
             <div className="flex items-center gap-2">

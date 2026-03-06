@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Navigation from "./components/Navigation";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -16,6 +17,7 @@ import Jobs from "./pages/Jobs";
 import Wellness from "./pages/Wellness";
 import NotFound from "./pages/NotFound";
 import AtlasDrawer from "./components/AtlasDrawer";
+import TutorialOverlay from "./components/TutorialOverlay";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +25,14 @@ const AppLayout = () => {
   const location = useLocation();
   const noNavRoutes = ["/", "/login"];
   const showNav = !noNavRoutes.includes(location.pathname);
+  const [tourRunning, setTourRunning] = useState(false);
+
+  // Listen for custom event from Navigation "Start Tour" button
+  useEffect(() => {
+    const handler = () => setTourRunning(true);
+    window.addEventListener("start-atlas-tour", handler);
+    return () => window.removeEventListener("start-atlas-tour", handler);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -41,6 +51,7 @@ const AppLayout = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       {showNav && <AtlasDrawer />}
+      <TutorialOverlay run={tourRunning} onClose={() => setTourRunning(false)} />
     </div>
   );
 };

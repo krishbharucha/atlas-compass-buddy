@@ -55,7 +55,7 @@ const Financial = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4" data-tutorial="financial-summary">
           {/* Card 1 — Balance Due */}
           <Card className="relative overflow-hidden">
             <CardContent className="p-4">
@@ -119,7 +119,7 @@ const Financial = () => {
         <DisbursementFlow open={disbursementFlowOpen} onClose={() => setDisbursementFlowOpen(false)} />
 
         {/* Alerts */}
-        <div className="mt-8">
+        <div className="mt-8" data-tutorial="financial-alerts">
           <AlertsSection />
         </div>
 

@@ -113,7 +113,7 @@ const Profile = () => {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10">
 
       {/* ─── Profile Header ─── */}
-      <div className="glass-card overflow-hidden animate-fade-in-up mb-6">
+      <div className="glass-card overflow-hidden animate-fade-in-up mb-6" data-tutorial="profile-header">
         <div className="gradient-header px-6 py-8">
           <div className="flex items-center gap-5">
             <div className="w-20 h-20 rounded-2xl bg-primary-foreground/20 flex items-center justify-center text-primary-foreground text-2xl font-bold font-heading border-2 border-primary-foreground/10">
@@ -166,14 +166,14 @@ const Profile = () => {
         </div>
 
         {/* Tab navigation */}
-        <div className="flex border-b border-border">
+        <div className="flex border-b border-border" data-tutorial="profile-tabs">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`flex-1 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === tab.key
-                  ? "border-foreground text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                ? "border-foreground text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
             >
               {tab.label}

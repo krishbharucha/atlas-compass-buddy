@@ -645,7 +645,7 @@ const Jobs = () => {
       </div>
 
       {/* Atlas Career Card */}
-      <Card className="mb-8 border-primary/10">
+      <Card className="mb-8 border-primary/10" data-tutorial="career-check">
         <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-foreground" />
@@ -835,7 +835,7 @@ const Jobs = () => {
       </Card>
 
       {/* My Tasks Section */}
-      <div ref={interviewsRef} className={`mb-8 transition-all duration-500 ${activeSection === "interviews" ? "ring-2 ring-primary/30 rounded-xl" : ""}`}>
+      <div ref={interviewsRef} className={`mb-8 transition-all duration-500 ${activeSection === "interviews" ? "ring-2 ring-primary/30 rounded-xl" : ""}`} data-tutorial="my-tasks">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">
@@ -877,7 +877,7 @@ const Jobs = () => {
       </div>
 
       {/* Applications tracker */}
-      <div ref={applicationsRef} className={`mb-8 transition-all duration-500 ${activeSection === "applications" ? "ring-2 ring-primary/30 rounded-xl" : ""}`}>
+      <div ref={applicationsRef} className={`mb-8 transition-all duration-500 ${activeSection === "applications" ? "ring-2 ring-primary/30 rounded-xl" : ""}`} data-tutorial="my-applications">
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">My Applications</CardTitle>
@@ -935,7 +935,7 @@ const Jobs = () => {
       </div>
 
       {/* Job Listings — companies section */}
-      <div ref={companiesRef} className={`transition-all duration-500 ${activeSection === "companies" ? "ring-2 ring-primary/30 rounded-xl" : ""}`}>
+      <div ref={companiesRef} className={`transition-all duration-500 ${activeSection === "companies" ? "ring-2 ring-primary/30 rounded-xl" : ""}`} data-tutorial="recommended-opportunities">
         <Card>
           <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <CardTitle className="text-lg">Recommended Opportunities</CardTitle>

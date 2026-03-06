@@ -241,7 +241,7 @@ const Wellness = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex items-start justify-between mb-8" data-tutorial="wellness-header">
         <div>
           <h1 className="font-heading text-2xl font-bold text-foreground mb-1">Wellness & Support</h1>
           <p className="text-sm text-muted-foreground">Mental health resources, counseling, and campus wellness programs.</p>
@@ -253,7 +253,7 @@ const Wellness = () => {
       </div>
 
       {/* Emergency banner */}
-      <Card className="mb-8 border-destructive/20 bg-destructive/5">
+      <Card className="mb-8 border-destructive/20 bg-destructive/5" data-tutorial="crisis-banner">
         <CardContent className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Phone className="w-5 h-5 text-destructive" />
@@ -269,7 +269,7 @@ const Wellness = () => {
       </Card>
 
       {/* Resources */}
-      <div className="grid sm:grid-cols-2 gap-4 mb-8">
+      <div className="grid sm:grid-cols-2 gap-4 mb-8" data-tutorial="wellness-pulse">
         {resources.map((resource) => {
           const Icon = resource.icon;
           return (

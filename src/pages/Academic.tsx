@@ -83,7 +83,7 @@ Student ID: [Your ID]`,
   if (flow === "landing") {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-10">
+        <div className="mb-10" data-tutorial="academic-header">
           <h1 className="font-heading text-2xl font-bold text-foreground mb-1">Academic Support</h1>
           <p className="text-sm text-muted-foreground">Make informed decisions before deadlines hit.</p>
         </div>

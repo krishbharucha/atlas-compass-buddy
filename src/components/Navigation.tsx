@@ -117,7 +117,7 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border">
+    <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border" data-tutorial="nav-bar">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top bar */}
         <div className="flex items-center justify-between h-14">
@@ -133,6 +133,19 @@ const Navigation = () => {
           </button>
 
           <div className="flex items-center gap-1.5">
+            {/* Start Tour button */}
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent("start-atlas-tour"))}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+              title="Start guided tour"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff88] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00ff88]" />
+              </span>
+              <span className="hidden sm:inline">Tour</span>
+            </button>
+
             <ThemeToggle />
 
             {/* Notification bell */}
@@ -293,8 +306,8 @@ const Navigation = () => {
                 key={item.to}
                 to={item.to}
                 className={`flex items-center gap-1.5 px-3 py-2.5 text-[13px] font-medium border-b-2 transition-colors whitespace-nowrap ${isActive
-                    ? "border-foreground text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+                  ? "border-foreground text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
                   }`}
               >
                 <Icon className="w-3.5 h-3.5" />
