@@ -96,13 +96,6 @@ const AlertsSection = () => {
           })}
         </div>
 
-        {/* More alerts banner */}
-        <div className="mt-4 glass-card p-3 border-l-2 border-primary">
-          <p className="text-xs text-muted-foreground">
-            + 4 more alerts available: Verification Document Reminders, Award Letter Change Detection, IRS Transcript Monitor, Zero Balance Celebration{" "}
-            <button className="text-primary hover:underline font-medium">Set Up More →</button>
-          </p>
-        </div>
       </div>
 
       <AlertConfigDrawer open={configOpen} onClose={() => setConfigOpen(false)} alertId={configAlert} />

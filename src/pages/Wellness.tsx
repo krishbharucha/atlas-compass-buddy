@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import DemoCalendar, { CalendarEvent } from "@/components/DemoCalendar";
 
 type BookingModal = null | "counseling" | "crisis-call" | "crisis-video" | "peer-group" | "workshop";
 type BookingPhase = "scanning" | "found" | "confirming" | "booked";
@@ -75,6 +76,19 @@ const Wellness = () => {
   const [selectedWorkshop, setSelectedWorkshop] = useState(0);
   const [callActive, setCallActive] = useState(false);
   const [callTimer, setCallTimer] = useState(0);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
+  // Calendar events for wellness
+  const wellnessCalendarEvents: CalendarEvent[] = [
+    { date: "2026-03-08", title: "Stress Management Workshop", color: "bg-foreground", type: "workshop" },
+    { date: "2026-03-10", title: "Meditation Circle", color: "bg-muted-foreground", type: "event" },
+    { date: "2026-03-14", title: "Sleep Hygiene Seminar", color: "bg-foreground", type: "workshop" },
+    { date: "2026-03-15", title: "Peer Support: Anxiety", color: "bg-muted-foreground", type: "group" },
+    { date: "2026-03-15", title: "Counseling — Dr. Maya Chen", color: "bg-foreground", type: "appointment" },
+    { date: "2026-03-18", title: "Building Resilience", color: "bg-muted-foreground", type: "workshop" },
+    { date: "2026-03-22", title: "Anxiety Support Circle", color: "bg-muted-foreground", type: "group" },
+    { date: "2026-03-25", title: "Mindfulness for Finals", color: "bg-foreground", type: "workshop" },
+  ];
 
   useEffect(() => {
     if (!callActive) return;
@@ -232,10 +246,10 @@ const Wellness = () => {
           <h1 className="font-heading text-2xl font-bold text-foreground mb-1">Wellness & Support</h1>
           <p className="text-sm text-muted-foreground">Mental health resources, counseling, and campus wellness programs.</p>
         </div>
-        <Button variant="outline" size="sm" className="gap-1">
-          <Shield className="w-3.5 h-3.5" />
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-border bg-secondary text-xs font-medium text-muted-foreground">
+          <Shield className="w-3 h-3" />
           All services are confidential
-        </Button>
+        </span>
       </div>
 
       {/* Emergency banner */}
@@ -310,7 +324,7 @@ const Wellness = () => {
       <Card className="mb-8">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg">Upcoming Events</CardTitle>
-          <Button variant="outline" size="sm">View Calendar</Button>
+          <Button variant="outline" size="sm" onClick={() => setCalendarOpen(true)}>View Calendar</Button>
         </CardHeader>
         <CardContent>
           <div className="divide-y divide-border">
@@ -544,6 +558,19 @@ const Wellness = () => {
               </div>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Wellness Calendar Dialog */}
+      <Dialog open={calendarOpen} onOpenChange={setCalendarOpen}>
+        <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Wellness Calendar
+            </DialogTitle>
+          </DialogHeader>
+          <DemoCalendar events={wellnessCalendarEvents} className="border border-border rounded-xl p-4" />
         </DialogContent>
       </Dialog>
     </div>

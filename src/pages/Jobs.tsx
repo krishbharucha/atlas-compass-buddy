@@ -4,7 +4,7 @@ import {
   ChevronRight, Bookmark, Star, Zap, CheckCircle2, Loader2, Circle,
   FileText, Send, Copy, X, AlertCircle, CalendarCheck, Users,
   User, Target, ListTodo, Mail, GraduationCap, RotateCcw, SlidersHorizontal,
-  Calendar, Plus, Video
+  Calendar, Plus, Video, BookmarkCheck, Square, CheckSquare
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { toast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import DemoCalendar, { CalendarEvent } from "@/components/DemoCalendar";
 
 /* ─── TYPES ─── */
 type StepStatus = "queued" | "processing" | "completed";
@@ -78,6 +79,14 @@ interface Filters {
   location: string[];
   salary: string[];
   matchScore: number | null;
+  saved: boolean;
+}
+
+interface TaskItem {
+  id: string;
+  label: string;
+  source: string;
+  done: boolean;
 }
 
 /* ─── STEP DETAILS BY ROLE ─── */
@@ -260,7 +269,7 @@ const FILTER_OPTIONS = {
   matchScore: [70, 80, 90],
 };
 
-const emptyFilters: Filters = { jobType: [], industry: [], location: [], salary: [], matchScore: null };
+const emptyFilters: Filters = { jobType: [], industry: [], location: [], salary: [], matchScore: null, saved: false };
 
 /* ─── COMPONENT ─── */
 const Jobs = () => {
@@ -276,6 +285,14 @@ const Jobs = () => {
   // Dynamic data
   const [metrics, setMetrics] = useState({ applications: 4, interviews: 1, companies: 8 });
   const [interviews, setInterviews] = useState<Interview[]>(initialInterviews);
+
+  // Task list
+  const [taskList, setTaskList] = useState<TaskItem[]>([
+    { id: "t1", label: "Prep system design — Google", source: "Application", done: false },
+  ]);
+
+  // Schedule interview dialog
+  const [scheduleModal, setScheduleModal] = useState<Application | null>(null);
 
   // Section refs for KPI scroll
   const applicationsRef = useRef<HTMLDivElement>(null);
@@ -433,11 +450,23 @@ const Jobs = () => {
     const filteredJob = filteredListings[idx];
     const originalIdx = listings.findIndex(l => l.company === filteredJob.company && l.role === filteredJob.role);
     setListings((prev) => prev.map((l, i) => i === originalIdx ? { ...l, taskCreated: true } : l));
+    setTaskList(prev => [...prev, { id: `listing-${Date.now()}`, label: `Apply to ${filteredJob.role} — ${filteredJob.company}`, source: "Opportunity", done: false }]);
     toast({ title: "Task created", description: `"Apply to ${filteredJob.role}" added to tasks` });
     setTimeout(() => {
       setMetrics((m) => ({ ...m, applications: m.applications + 1 }));
       flashMetric("applications");
     }, 2000);
+  };
+
+  const handleToggleSave = (idx: number) => {
+    const filteredJob = filteredListings[idx];
+    const originalIdx = listings.findIndex(l => l.company === filteredJob.company && l.role === filteredJob.role);
+    setListings((prev) => prev.map((l, i) => i === originalIdx ? { ...l, saved: !l.saved } : l));
+    toast({ title: filteredJob.saved ? "Removed from saved" : "Saved", description: filteredJob.role });
+  };
+
+  const handleToggleTask = (id: string) => {
+    setTaskList(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
   };
 
   const handleApproveSubmit = () => {
@@ -454,7 +483,7 @@ const Jobs = () => {
   };
 
   // Filter logic
-  const hasActiveFilters = filters.jobType.length > 0 || filters.industry.length > 0 || filters.location.length > 0 || filters.salary.length > 0 || filters.matchScore !== null;
+  const hasActiveFilters = filters.jobType.length > 0 || filters.industry.length > 0 || filters.location.length > 0 || filters.salary.length > 0 || filters.matchScore !== null || filters.saved;
 
   const activeFilterTags = useMemo(() => {
     const tags: { label: string; category: keyof Filters; value: string | number }[] = [];
@@ -463,12 +492,14 @@ const Jobs = () => {
     filters.location.forEach(v => tags.push({ label: v, category: "location", value: v }));
     filters.salary.forEach(v => tags.push({ label: v, category: "salary", value: v }));
     if (filters.matchScore) tags.push({ label: `${filters.matchScore}%+`, category: "matchScore", value: filters.matchScore });
+    if (filters.saved) tags.push({ label: "Saved Only", category: "saved" as keyof Filters, value: "true" });
     return tags;
   }, [filters]);
 
   const removeFilter = (category: keyof Filters, value: string | number) => {
     setFilters(prev => {
       if (category === "matchScore") return { ...prev, matchScore: null };
+      if (category === "saved") return { ...prev, saved: false };
       return { ...prev, [category]: (prev[category] as string[]).filter(v => v !== value) };
     });
   };
@@ -496,6 +527,7 @@ const Jobs = () => {
       if (filters.location.length > 0 && !filters.location.some(loc => locationMatch(job.location, loc))) return false;
       if (filters.salary.length > 0 && !filters.salary.includes(job.salary)) return false;
       if (filters.matchScore && (!job.matchScore || job.matchScore < filters.matchScore)) return false;
+      if (filters.saved && !job.saved) return false;
       return true;
     });
   }, [listings, filters, searchQuery]);
@@ -513,19 +545,46 @@ const Jobs = () => {
   };
 
   const handleScheduleInterview = (app: Application) => {
+    setScheduleModal(app);
+  };
+
+  const confirmSchedule = () => {
+    if (!scheduleModal) return;
     const newInterview: Interview = {
-      company: app.company,
-      role: app.role,
-      date: app.interviewDate || "TBD",
-      time: app.interviewTime || "TBD",
+      company: scheduleModal.company,
+      role: scheduleModal.role,
+      date: scheduleModal.interviewDate || "TBD",
+      time: scheduleModal.interviewTime || "TBD",
       type: "Video",
-      addedToCalendar: false,
+      addedToCalendar: true,
     };
     setInterviews(prev => [...prev, newInterview]);
+    setTaskList(prev => [...prev, { id: `interview-${Date.now()}`, label: `Prep for ${scheduleModal.role} interview — ${scheduleModal.company}`, source: "Interview", done: false }]);
     setMetrics(m => ({ ...m, interviews: m.interviews + 1 }));
     flashMetric("interviews");
-    toast({ title: "Interview scheduled", description: `${app.role} at ${app.company}` });
+    toast({ title: "Interview scheduled & added to calendar", description: `${scheduleModal.role} at ${scheduleModal.company}` });
+    setScheduleModal(null);
   };
+
+  // Calendar events for interview schedule dialog
+  const calendarEvents: CalendarEvent[] = useMemo(() => {
+    const events: CalendarEvent[] = [];
+    interviews.forEach(iv => {
+      const dateMatch = iv.date.match(/(\w+)\s+(\d+),\s+(\d+)/);
+      if (dateMatch) {
+        const months: Record<string, string> = { Jan: "01", Feb: "02", Mar: "03", Apr: "04", May: "05", Jun: "06", Jul: "07", Aug: "08", Sep: "09", Oct: "10", Nov: "11", Dec: "12" };
+        const m = months[dateMatch[1]] || "01";
+        events.push({ date: `${dateMatch[3]}-${m}-${dateMatch[2].padStart(2, "0")}`, title: `${iv.role} — ${iv.company}`, color: "bg-foreground", type: "interview" });
+      }
+    });
+    // Add some sample calendar events to make it feel like a real Google Calendar
+    events.push({ date: "2026-03-05", title: "CS 301 Office Hours", color: "bg-muted-foreground", type: "class" });
+    events.push({ date: "2026-03-10", title: "Career Fair", color: "bg-foreground", type: "event" });
+    events.push({ date: "2026-03-12", title: "MATH 208 Midterm", color: "bg-muted-foreground", type: "exam" });
+    events.push({ date: "2026-03-15", title: "Counseling — Dr. Maya Chen", color: "bg-muted-foreground/60", type: "wellness" });
+    events.push({ date: "2026-03-18", title: "Building Resilience Workshop", color: "bg-muted-foreground/60", type: "wellness" });
+    return events;
+  }, [interviews]);
 
   const metricCards = [
     { icon: Briefcase, label: "Applications", value: metrics.applications, sub: "This semester", key: "applications" },
@@ -775,51 +834,40 @@ const Jobs = () => {
         </CardContent>
       </Card>
 
-      {/* Interview Calendar Section */}
+      {/* My Tasks Section */}
       <div ref={interviewsRef} className={`mb-8 transition-all duration-500 ${activeSection === "interviews" ? "ring-2 ring-primary/30 rounded-xl" : ""}`}>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-primary" />
-              Interview Calendar
+              <ListTodo className="w-5 h-5 text-primary" />
+              My Tasks
             </CardTitle>
+            <span className="text-xs text-muted-foreground font-mono-accent">{taskList.filter(t => !t.done).length} remaining</span>
           </CardHeader>
           <CardContent>
-            {interviews.length === 0 ? (
+            {taskList.length === 0 ? (
               <div className="py-8 text-center">
-                <Calendar className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">No interviews scheduled yet.</p>
-                <p className="text-xs text-muted-foreground mt-1">Interviews will appear here when applications advance.</p>
+                <ListTodo className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No tasks yet.</p>
+                <p className="text-xs text-muted-foreground mt-1">Tasks from career checks and saved opportunities will appear here.</p>
               </div>
             ) : (
-              <div className="divide-y divide-border">
-                {interviews.map((iv, idx) => (
-                  <div key={iv.company + iv.role + idx} className="py-3 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center">
-                        {iv.type === "Video" ? <Video className="w-5 h-5 text-foreground" /> : <Briefcase className="w-5 h-5 text-foreground" />}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-foreground">{iv.role}</p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                          <span className="flex items-center gap-1"><Building2 className="w-3 h-3" />{iv.company}</span>
-                          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{iv.date}</span>
-                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{iv.time}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-[10px]">{iv.type}</Badge>
-                      {iv.addedToCalendar ? (
-                        <span className="pill-success text-[10px] flex items-center gap-0.5">
-                          <CheckCircle2 className="w-2.5 h-2.5" /> In Calendar
-                        </span>
-                      ) : (
-                        <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => handleAddToCalendar(idx)}>
-                          <Plus className="w-3 h-3" /> Add to Calendar
-                        </Button>
-                      )}
-                    </div>
+              <div className="space-y-1">
+                {taskList.map((task) => (
+                  <div
+                    key={task.id}
+                    className={`flex items-center gap-3 py-2.5 px-3 rounded-lg hover:bg-secondary/50 transition-colors cursor-pointer ${task.done ? "opacity-50" : ""}`}
+                    onClick={() => handleToggleTask(task.id)}
+                  >
+                    {task.done ? (
+                      <CheckSquare className="w-4 h-4 text-foreground shrink-0" />
+                    ) : (
+                      <Square className="w-4 h-4 text-muted-foreground shrink-0" />
+                    )}
+                    <span className={`text-sm flex-1 ${task.done ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                      {task.label}
+                    </span>
+                    <Badge variant="secondary" className="text-[10px] font-mono-accent">{task.source}</Badge>
                   </div>
                 ))}
               </div>
@@ -987,6 +1035,14 @@ const Jobs = () => {
                       </div>
                     </div>
                     <Separator />
+                    <div>
+                      <label className="flex items-center gap-2 cursor-pointer text-sm text-foreground hover:bg-secondary/50 rounded px-2 py-1 -mx-2">
+                        <Checkbox checked={filters.saved} onCheckedChange={() => setFilters(prev => ({ ...prev, saved: !prev.saved }))} />
+                        <BookmarkCheck className="w-3.5 h-3.5" />
+                        Saved Only
+                      </label>
+                    </div>
+                    <Separator />
                     <Button size="sm" className="w-full" onClick={() => setFilterOpen(false)}>Apply Filters</Button>
                   </div>
                 </PopoverContent>
@@ -1054,7 +1110,12 @@ const Jobs = () => {
                       ) : (
                         <span className="pill-success text-[10px]"><CheckCircle2 className="w-2.5 h-2.5 mr-0.5 inline" />Task created</span>
                       )}
-                      <Bookmark className={`w-4 h-4 transition-all duration-300 ${job.saved ? "text-foreground fill-foreground" : "text-muted-foreground"}`} />
+                      <button
+                        className="p-1 rounded hover:bg-secondary transition-colors"
+                        onClick={(e) => { e.stopPropagation(); handleToggleSave(idx); }}
+                      >
+                        <Bookmark className={`w-4 h-4 transition-all duration-300 ${job.saved ? "text-foreground fill-foreground" : "text-muted-foreground"}`} />
+                      </button>
                       <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                   </div>
@@ -1064,6 +1125,38 @@ const Jobs = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Schedule Interview Dialog (with Calendar) */}
+      <Dialog open={!!scheduleModal} onOpenChange={() => setScheduleModal(null)}>
+        <DialogContent className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Schedule Interview
+            </DialogTitle>
+            <DialogDescription>
+              {scheduleModal?.role} at {scheduleModal?.company}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="my-2">
+            <div className="flex items-center gap-2 mb-3 p-3 rounded-lg bg-secondary">
+              <Video className="w-4 h-4 text-foreground" />
+              <div>
+                <p className="text-sm font-medium text-foreground">{scheduleModal?.interviewDate || "TBD"} · {scheduleModal?.interviewTime || "TBD"}</p>
+                <p className="text-xs text-muted-foreground">Video Interview</p>
+              </div>
+            </div>
+            <DemoCalendar events={calendarEvents} className="border border-border rounded-xl p-4" />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setScheduleModal(null)}>Cancel</Button>
+            <Button onClick={confirmSchedule} className="gap-1">
+              <CalendarCheck className="w-3.5 h-3.5" />
+              Confirm & Add to Calendar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Draft Review Modal */}
       <Dialog open={!!draftModal} onOpenChange={() => setDraftModal(null)}>
