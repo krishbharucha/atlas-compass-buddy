@@ -211,29 +211,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Crisis Safety */}
-      <section className="py-12 border-t border-border">
+      {/* Stats KPI Band */}
+      <section className="py-10 border-t border-border bg-foreground">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="glass-card p-6 border-destructive/10">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0">
-                <AlertTriangle className="w-5 h-5 text-destructive" />
-              </div>
-              <div>
-                <h3 className="font-heading font-semibold text-foreground mb-1">Safety-first design</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
-                  Atlas includes real-time crisis detection. If a student expresses distress during any conversation — about finances, grades, or anything — Atlas immediately pivots to support mode, pages an on-call counselor, and stays present until the student is connected with a human. No student falls through the cracks.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="py-16 border-t border-border bg-card">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-6 sm:gap-0 sm:divide-x sm:divide-background/20">
             {[
               { value: "20+", label: "Automated Actions" },
               { value: "5", label: "Support Pillars" },
@@ -241,11 +222,22 @@ const Index = () => {
               { value: "24/7", label: "Crisis Support" },
               { value: "0", label: "Office Visits Needed" },
             ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <p className="text-2xl sm:text-3xl font-bold font-heading text-foreground">{stat.value}</p>
-                <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+              <div key={stat.label} className="text-center px-4">
+                <p className="text-2xl sm:text-3xl font-bold font-heading text-background">{stat.value}</p>
+                <p className="text-xs text-background/60 mt-1 uppercase tracking-wider font-mono-accent">{stat.label}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Safety-first Tag */}
+      <section className="py-6 border-t border-border">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-destructive/20 bg-destructive/5">
+            <AlertTriangle className="w-3.5 h-3.5 text-destructive" />
+            <span className="text-xs font-medium text-foreground">Safety-first design</span>
+            <span className="text-xs text-muted-foreground">— Real-time crisis detection · On-call counselor paging · No student falls through the cracks</span>
           </div>
         </div>
       </section>

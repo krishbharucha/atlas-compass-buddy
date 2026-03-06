@@ -298,11 +298,7 @@ const Wellness = () => {
                   >
                     {resource.action} <ChevronRight className="w-3.5 h-3.5" />
                   </Button>
-                  {resource.title === "Crisis Support" && (
-                    <Button variant="outline" size="sm" className="gap-1" onClick={() => runBookingFlow("crisis-video")}>
-                      <Video className="w-3.5 h-3.5" /> Video Call
-                    </Button>
-                  )}
+
                 </div>
               </CardContent>
             </Card>
