@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { NavLink as RouterNavLink, useLocation, useNavigate } from "react-router-dom";
 import { Bell, GraduationCap, LayoutDashboard, MessageSquare, User, BookOpen, DollarSign, Briefcase, Heart, ClipboardList, ChevronDown, X, Check, Clock, AlertTriangle, Calendar, FileText } from "lucide-react";
-import ThemeToggle from "./ThemeToggle";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -117,7 +116,7 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border" data-tutorial="nav-bar">
+    <nav className="sticky top-0 z-50 bg-[#39275b] border-b border-[#2d1f4b]" data-tutorial="nav-bar">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top bar */}
         <div className="flex items-center justify-between h-14">
@@ -125,36 +124,34 @@ const Navigation = () => {
             onClick={() => navigate("/")}
             className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
           >
-            <div className="w-7 h-7 rounded-md gradient-header flex items-center justify-center">
-              <GraduationCap className="w-4 h-4 text-primary-foreground" />
+            <div className="w-7 h-7 rounded-md bg-white/10 flex items-center justify-center">
+              <GraduationCap className="w-4 h-4 text-white" />
             </div>
-            <span className="font-heading font-bold text-lg tracking-tight text-foreground">Atlas</span>
-            <span className="hidden sm:inline text-xs text-muted-foreground font-mono-accent ml-1 bg-secondary px-2 py-0.5 rounded">Student Portal</span>
+            <span className="font-heading font-bold text-lg tracking-tight text-white">Atlas</span>
+            <span className="hidden sm:inline text-xs text-white/70 font-mono-accent ml-1 bg-white/10 px-2 py-0.5 rounded">Student Portal</span>
           </button>
 
           <div className="flex items-center gap-1.5">
             {/* Start Tour button */}
             <button
               onClick={() => window.dispatchEvent(new CustomEvent("start-atlas-tour"))}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-white/80 hover:text-white hover:bg-white/10 transition-all"
               title="Start guided tour"
             >
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00ff88] opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00ff88]" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E3BF42] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E3BF42]" />
               </span>
               <span className="hidden sm:inline">Tour</span>
             </button>
 
-            <ThemeToggle />
-
-            {/* Notification bell */}
             <div className="relative" ref={notifRef}>
               <button
                 onClick={() => setNotifOpen(!notifOpen)}
-                className="relative p-2 rounded-lg hover:bg-secondary transition-colors"
+                className="relative p-2 rounded-lg hover:bg-white/10 transition-colors"
+                title="Notifications"
               >
-                <Bell className="w-4 h-4 text-muted-foreground" />
+                <Bell className="w-4 h-4 text-white/80 hover:text-white" />
                 {unreadCount > 0 && (
                   <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full flex items-center justify-center">
                     {unreadCount}
@@ -230,16 +227,17 @@ const Navigation = () => {
             <div className="relative hidden sm:block" ref={profileRef}>
               <button
                 onClick={() => setProfileOpen(!profileOpen)}
-                className="flex items-center gap-2 ml-2 pl-3 border-l border-border hover:bg-secondary/50 rounded-r-lg pr-2 py-1 transition-colors"
+                className="flex items-center gap-2 ml-2 pl-3 border-l border-white/20 hover:bg-white/10 rounded-r-lg pr-2 py-1 transition-colors"
+                title="Profile Menu"
               >
-                <div className="w-7 h-7 rounded-md gradient-header flex items-center justify-center text-primary-foreground text-xs font-semibold">
+                <div className="w-7 h-7 rounded-md bg-white/20 flex items-center justify-center text-white text-xs font-semibold">
                   JM
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-foreground leading-none">Jordan M.</p>
-                  <p className="text-[10px] text-muted-foreground leading-tight mt-0.5">CS · Junior</p>
+                  <p className="text-sm font-medium text-white leading-none">Jordan M.</p>
+                  <p className="text-[10px] text-white/70 leading-tight mt-0.5">CS · Junior</p>
                 </div>
-                <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${profileOpen ? "rotate-180" : ""}`} />
+                <ChevronDown className={`w-3.5 h-3.5 text-white/70 transition-transform ${profileOpen ? "rotate-180" : ""}`} />
               </button>
 
               {profileOpen && (
@@ -306,8 +304,8 @@ const Navigation = () => {
                 key={item.to}
                 to={item.to}
                 className={`flex items-center gap-1.5 px-3 py-2.5 text-[13px] font-medium border-b-2 transition-colors whitespace-nowrap ${isActive
-                  ? "border-foreground text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+                  ? "border-[#E3BF42] text-[#E3BF42]"
+                  : "border-transparent text-white/70 hover:text-white hover:border-[#E3BF42]/50"
                   }`}
               >
                 <Icon className="w-3.5 h-3.5" />

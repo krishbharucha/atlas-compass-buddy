@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BentoGrid, BentoCard } from "@/components/ui/bento-grid";
 import { SplineScene } from "@/components/ui/splite";
-import { Spotlight } from "@/components/ui/spotlight";
-import ThemeToggle from "@/components/ThemeToggle";
 
 const features = [
   {
@@ -91,65 +89,59 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card">
+      <header className="border-b border-[#2d1f4b] bg-[#39275b]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-md gradient-header flex items-center justify-center">
-              <GraduationCap className="w-4.5 h-4.5 text-primary-foreground" />
+            <div className="w-8 h-8 rounded-md bg-white/10 flex items-center justify-center">
+              <GraduationCap className="w-4.5 h-4.5 text-white" />
             </div>
-            <span className="font-heading font-bold text-lg tracking-tight text-foreground">Atlas</span>
-            <span className="hidden sm:inline text-xs text-muted-foreground font-mono-accent ml-1 bg-secondary px-2 py-0.5 rounded">Student Portal</span>
+            <span className="font-heading font-bold text-lg tracking-tight text-white">Atlas</span>
+            <span className="hidden sm:inline text-xs text-white/70 font-mono-accent ml-1 bg-white/10 px-2 py-0.5 rounded">Student Portal</span>
           </div>
           <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Button variant="outline" size="sm" onClick={() => navigate("/login")}>
+            <Button variant="outline" size="sm" onClick={() => navigate("/login")} className="border-white/20 text-white bg-white/5 hover:bg-white/20 hover:text-white transition-colors">
               Sign In
             </Button>
-            <Button size="sm" onClick={() => navigate("/login")}>
+            <Button size="sm" onClick={() => navigate("/login")} className="bg-[#E3BF42] text-[#39275b] hover:bg-[#d7c896] hover:text-[#39275b] transition-colors font-medium border-0">
               Get Started
             </Button>
           </div>
         </div>
       </header>
 
-      {/* Hero with 3D Scene */}
+      {/* Hero with Illustration */}
       <section className="border-b border-border">
-        <Card className="w-full min-h-[540px] bg-black/[0.96] relative overflow-hidden rounded-none border-0">
-          <Spotlight
-            className="-top-40 left-0 md:left-60 md:-top-20"
-            fill="white"
-          />
-
-          <div className="flex h-full min-h-[540px]">
+        <Card className="w-full min-h-[540px] bg-gradient-to-br from-[#DFDDE8] via-[#DFDDE8]/60 to-white relative overflow-hidden rounded-none border-0">
+          <div className="flex flex-col md:flex-row h-full min-h-[540px]">
             {/* Left content */}
             <div className="flex-1 p-8 sm:p-12 lg:p-16 relative z-10 flex flex-col justify-center">
               <div className="flex items-center gap-2 mb-6">
-                <Zap className="w-4 h-4 text-purple-400" />
-                <span className="text-sm font-medium text-neutral-400 font-mono-accent">Agentic AI · Powered by Salesforce Agentforce</span>
+                <Shield className="w-4 h-4 text-[#39275b]" />
+                <span className="text-sm font-medium text-[#39275b]/80 font-mono-accent">University of Washington · Agentic AI</span>
               </div>
-              <h1 className="font-heading text-4xl sm:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 tracking-tight leading-[1.1] mb-5">
-                One conversation.<br />Every problem solved.
+              <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-[#39275b] tracking-tight leading-[1.1] mb-5">
+                Atlas &mdash;<br /> Your UW Student Success Assistant
               </h1>
-              <p className="text-base text-neutral-300 leading-relaxed mb-4 max-w-lg">
-                Atlas doesn't just answer questions — it takes action. Financial aid appeals filed. Counseling appointments booked. Career plans built. Holds resolved.
+              <p className="text-base sm:text-lg text-[#39275b]/80 font-medium leading-relaxed mb-4 max-w-lg">
+                One conversation. Every campus service connected.
               </p>
-              <p className="text-sm text-neutral-500 mb-8 max-w-lg">
-                20 automated actions across 5 pillars. No more getting bounced between offices.
+              <p className="text-sm text-[#39275b]/60 mb-8 max-w-lg">
+                Atlas takes action across departments to resolve holds, coordinate financial aid, and build career plans. No more getting bounced between offices.
               </p>
               <div className="flex flex-wrap gap-3">
-                <Button size="lg" onClick={() => navigate("/chat")} className="gap-2 bg-white text-black hover:bg-neutral-200">
+                <Button size="lg" onClick={() => navigate("/chat")} className="gap-2 bg-[#39275b] text-white hover:bg-[#E3BF42] hover:text-[#39275b] transition-colors border-0 shadow-sm">
                   <MessageSquare className="w-4 h-4" />
                   Try the Demo
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate("/login")} className="gap-2 !bg-transparent !border-white/30 !text-white hover:!bg-white/10">
-                  Sign in with .edu email
+                <Button size="lg" variant="outline" onClick={() => navigate("/login")} className="gap-2 bg-transparent border-2 border-[#39275b] text-[#39275b] hover:bg-[#E3BF42] hover:text-[#39275b] hover:border-[#E3BF42] transition-colors">
+                  Sign in with UW NetID
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
             </div>
 
             {/* Right content — 3D Scene */}
-            <div className="flex-1 relative hidden md:block">
+            <div className="flex-1 relative hidden md:block opacity-95 mix-blend-multiply filter contrast-[1.15] brightness-90 saturate-[1.5] sepia-[.3] hue-rotate-[250deg] drop-shadow-[0_0_30px_rgba(227,191,66,0.3)]">
               <SplineScene
                 scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
                 className="w-full h-full"

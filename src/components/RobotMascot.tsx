@@ -65,7 +65,7 @@ export default function RobotMascot({ state = "idle", className = "", size = 80 
                         bottom: size * 0.15,
                         left: "50%",
                         transform: "translateX(-50%)",
-                        background: "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 40%, #1a1a1a 100%)",
+                        background: "linear-gradient(135deg, #4c367a 0%, #5d4494 40%, #39275b 100%)",
                         borderRadius: `${4 * scale}px`,
                         border: "1px solid rgba(255,255,255,0.08)",
                         boxShadow: "0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)",
@@ -81,8 +81,8 @@ export default function RobotMascot({ state = "idle", className = "", size = 80 
                             left: "50%",
                             transform: "translate(-50%, -50%)",
                             borderRadius: "50%",
-                            background: state === "talking" ? "#00ff88" : "#666",
-                            boxShadow: state === "talking" ? "0 0 8px #00ff88, 0 0 16px rgba(0,255,136,0.3)" : "none",
+                            background: state === "talking" ? "#E3BF42" : "#666",
+                            boxShadow: state === "talking" ? "0 0 8px #E3BF42, 0 0 16px rgba(227,191,66,0.4)" : "none",
                             transition: "all 0.3s ease",
                         }}
                     />
@@ -94,9 +94,7 @@ export default function RobotMascot({ state = "idle", className = "", size = 80 
                             width: 6 * scale,
                             height: size * 0.22,
                             left: -8 * scale,
-                            top: size * 0.05,
-                            background: "linear-gradient(180deg, #222 0%, #1a1a1a 100%)",
-                            borderRadius: `${3 * scale}px`,
+                            background: "linear-gradient(180deg, #4c367a 0%, #39275b 100%)",
                             border: "1px solid rgba(255,255,255,0.06)",
                             transformOrigin: "top center",
                             animation: state === "pointing" ? "armWave 1s ease-in-out infinite" : "none",
@@ -110,9 +108,7 @@ export default function RobotMascot({ state = "idle", className = "", size = 80 
                             width: 6 * scale,
                             height: size * 0.22,
                             right: -8 * scale,
-                            top: size * 0.05,
-                            background: "linear-gradient(180deg, #222 0%, #1a1a1a 100%)",
-                            borderRadius: `${3 * scale}px`,
+                            background: "linear-gradient(180deg, #4c367a 0%, #39275b 100%)",
                             border: "1px solid rgba(255,255,255,0.06)",
                             transformOrigin: "top center",
                             animation: state === "pointing" ? "armPoint 1s ease-in-out infinite" : "none",
@@ -129,7 +125,7 @@ export default function RobotMascot({ state = "idle", className = "", size = 80 
                         top: size * 0.12,
                         left: "50%",
                         transform: "translateX(-50%)",
-                        background: "linear-gradient(160deg, #2a2a2a 0%, #1a1a1a 50%, #111 100%)",
+                        background: "linear-gradient(160deg, #5d4494 0%, #4c367a 50%, #39275b 100%)",
                         borderRadius: `${6 * scale}px`,
                         border: "1px solid rgba(255,255,255,0.1)",
                         boxShadow: "0 6px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15)",
@@ -158,8 +154,8 @@ export default function RobotMascot({ state = "idle", className = "", size = 80 
                                 top: "50%",
                                 transform: "translateY(-50%)",
                                 borderRadius: "50%",
-                                background: "radial-gradient(circle, #00ff88 20%, #00cc66 60%, transparent 100%)",
-                                boxShadow: "0 0 6px #00ff88, 0 0 12px rgba(0,255,136,0.4)",
+                                background: "radial-gradient(circle, #E3BF42 20%, #d7c896 60%, transparent 100%)",
+                                boxShadow: "0 0 6px #E3BF42, 0 0 12px rgba(227,191,66,0.5)",
                                 transition: "height 0.1s ease",
                             }}
                         />
@@ -173,8 +169,8 @@ export default function RobotMascot({ state = "idle", className = "", size = 80 
                                 top: "50%",
                                 transform: "translateY(-50%)",
                                 borderRadius: "50%",
-                                background: "radial-gradient(circle, #00ff88 20%, #00cc66 60%, transparent 100%)",
-                                boxShadow: "0 0 6px #00ff88, 0 0 12px rgba(0,255,136,0.4)",
+                                background: "radial-gradient(circle, #E3BF42 20%, #d7c896 60%, transparent 100%)",
+                                boxShadow: "0 0 6px #E3BF42, 0 0 12px rgba(227,191,66,0.5)",
                                 transition: "height 0.1s ease",
                             }}
                         />
@@ -190,7 +186,7 @@ export default function RobotMascot({ state = "idle", className = "", size = 80 
                         top: size * 0.02,
                         left: "50%",
                         transform: "translateX(-50%)",
-                        background: "#333",
+                        background: "#39275b",
                     }}
                 >
                     {/* Antenna tip */}
@@ -203,8 +199,8 @@ export default function RobotMascot({ state = "idle", className = "", size = 80 
                             left: "50%",
                             transform: "translateX(-50%)",
                             borderRadius: "50%",
-                            background: "#00ff88",
-                            boxShadow: "0 0 8px #00ff88, 0 0 16px rgba(0,255,136,0.5)",
+                            background: "#E3BF42",
+                            boxShadow: "0 0 8px #E3BF42, 0 0 16px rgba(227,191,66,0.6)",
                             animation: "antennaPulse 2s ease-in-out infinite",
                         }}
                     />
@@ -212,8 +208,8 @@ export default function RobotMascot({ state = "idle", className = "", size = 80 
 
                 {/* Legs */}
                 <div className="absolute" style={{ bottom: size * 0.02, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 6 * scale }}>
-                    <div style={{ width: 8 * scale, height: size * 0.14, background: "linear-gradient(180deg, #1a1a1a, #111)", borderRadius: `${2 * scale}px` }} />
-                    <div style={{ width: 8 * scale, height: size * 0.14, background: "linear-gradient(180deg, #1a1a1a, #111)", borderRadius: `${2 * scale}px` }} />
+                    <div style={{ width: 8 * scale, height: size * 0.14, background: "linear-gradient(180deg, #4c367a, #39275b)", borderRadius: `${2 * scale}px` }} />
+                    <div style={{ width: 8 * scale, height: size * 0.14, background: "linear-gradient(180deg, #4c367a, #39275b)", borderRadius: `${2 * scale}px` }} />
                 </div>
             </div>
 
@@ -236,8 +232,8 @@ export default function RobotMascot({ state = "idle", className = "", size = 80 
           50% { opacity: 0.15; transform: translateX(-50%) scaleX(0.8); }
         }
         @keyframes antennaPulse {
-          0%, 100% { opacity: 1; box-shadow: 0 0 8px #00ff88, 0 0 16px rgba(0,255,136,0.5); }
-          50% { opacity: 0.6; box-shadow: 0 0 4px #00ff88, 0 0 8px rgba(0,255,136,0.3); }
+          0%, 100% { opacity: 1; box-shadow: 0 0 8px #E3BF42, 0 0 16px rgba(227,191,66,0.6); }
+          50% { opacity: 0.6; box-shadow: 0 0 4px #E3BF42, 0 0 8px rgba(227,191,66,0.4); }
         }
         @keyframes armWave {
           0%, 100% { transform: rotate(0deg); }

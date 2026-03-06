@@ -42,13 +42,13 @@ const RobotTooltip = ({
         >
             {/* Glass card tooltip */}
             <div
-                className="rounded-2xl border border-white/10 bg-black/90 backdrop-blur-xl shadow-2xl p-0 overflow-hidden"
-                style={{ boxShadow: "0 0 40px rgba(0,255,136,0.1), 0 20px 60px rgba(0,0,0,0.5)" }}
+                className="rounded-2xl border border-white/20 bg-[#2d1f4b]/95 backdrop-blur-xl shadow-2xl p-0 overflow-hidden"
+                style={{ boxShadow: "0 0 40px rgba(227,191,66,0.15), 0 20px 60px rgba(0,0,0,0.5)" }}
             >
                 {/* Progress bar */}
                 <div className="h-1 bg-white/5">
                     <div
-                        className="h-full bg-gradient-to-r from-[#00ff88] to-[#00cc66] transition-all duration-500 ease-out"
+                        className="h-full bg-gradient-to-r from-[#E3BF42] to-[#d7c896] transition-all duration-500 ease-out"
                         style={{ width: `${progress}%` }}
                     />
                 </div>
@@ -59,7 +59,7 @@ const RobotTooltip = ({
                         <RobotMascot state="talking" size={50} />
                         <div className="flex-1">
                             <div className="flex items-center justify-between mb-1">
-                                <span className="text-[10px] font-mono uppercase tracking-wider text-[#00ff88]">
+                                <span className="text-[10px] font-mono uppercase tracking-wider text-[#E3BF42]">
                                     Atlas Tour · Step {index + 1}/{size}
                                 </span>
                                 <button
@@ -101,7 +101,7 @@ const RobotTooltip = ({
                             )}
                             <button
                                 {...primaryProps}
-                                className="flex items-center gap-1 px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#00ff88] text-black hover:bg-[#00e07a] transition-all shadow-md shadow-[#00ff88]/20"
+                                className="flex items-center gap-1 px-4 py-1.5 rounded-lg text-xs font-semibold bg-[#E3BF42] text-[#39275b] hover:bg-[#d7c896] transition-all shadow-md shadow-[#E3BF42]/20"
                             >
                                 {isLastStep ? "Finish! 🎉" : "Next"}
                                 {!isLastStep && <ChevronRight className="w-3 h-3" />}
@@ -213,10 +213,32 @@ export default function TutorialOverlay({ run, onClose }: TutorialOverlayProps) 
                     arrowColor: "transparent",
                     overlayColor: "rgba(0, 0, 0, 0.85)",
                 },
+                buttonBack: {
+                    color: "#E3BF42",
+                    backgroundColor: "transparent",
+                    padding: "4px 8px",
+                    fontWeight: 600,
+                    fontSize: "12px",
+                },
+                buttonNext: {
+                    backgroundColor: "#E3BF42",
+                    color: "#39275b",
+                    padding: "6px 12px",
+                    borderRadius: "6px",
+                    fontWeight: 600,
+                    fontSize: "12px",
+                },
+                buttonSkip: {
+                    color: "#E3BF42",
+                    backgroundColor: "transparent",
+                    padding: "4px 8px",
+                    fontWeight: 600,
+                    fontSize: "12px",
+                },
                 overlay: {},
                 spotlight: {
                     borderRadius: 12,
-                    boxShadow: "0 0 0 4px rgba(0,255,136,0.3), 0 0 30px rgba(0,255,136,0.15)",
+                    boxShadow: "0 0 0 4px rgba(227,191,66,0.3), 0 0 30px rgba(227,191,66,0.15)",
                 },
             }}
         />
