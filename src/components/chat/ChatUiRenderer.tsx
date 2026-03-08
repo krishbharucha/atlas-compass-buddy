@@ -1,9 +1,7 @@
-import {
-  DegreeProgressRing,
-  CourseResultsTable,
-  FinancialSummaryCard,
-  AdvisorSlotPicker,
-} from "@/components/chat";
+import { DegreeProgressRing } from "./DegreeProgressRing";
+import { CourseResultsTable } from "./CourseResultsTable";
+import { FinancialSummaryCard } from "./FinancialSummaryCard";
+import { AdvisorSlotPicker } from "./AdvisorSlotPicker";
 
 export interface UiTrigger {
   component: string;
@@ -27,13 +25,13 @@ export const ChatUiRenderer = ({ triggers, onAction }: ChatUiRendererProps) => {
       {triggers.map((t, idx) => {
         switch (t.component) {
           case "DegreeProgressRing":
-            return <DegreeProgressRing key={idx} {...t.data} />;
+            return <DegreeProgressRing key={idx} {...(t.data as any)} />;
 
           case "CourseResultsTable":
             return (
               <CourseResultsTable
                 key={idx}
-                {...t.data}
+                {...(t.data as any)}
                 onEnroll={(code: string) =>
                   onAction?.("enroll", { courseCode: code })
                 }
@@ -41,13 +39,13 @@ export const ChatUiRenderer = ({ triggers, onAction }: ChatUiRendererProps) => {
             );
 
           case "FinancialSummaryCard":
-            return <FinancialSummaryCard key={idx} {...t.data} />;
+            return <FinancialSummaryCard key={idx} {...(t.data as any)} />;
 
           case "AdvisorSlotPicker":
             return (
               <AdvisorSlotPicker
                 key={idx}
-                {...t.data}
+                {...(t.data as any)}
                 onBook={(slotId: number) =>
                   onAction?.("book_slot", { slotId })
                 }

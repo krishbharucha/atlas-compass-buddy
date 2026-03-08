@@ -5,7 +5,33 @@ Welcome to **Atlas**, an enterprise-grade Student Success Agent designed to unif
 ---
 
 ## 🚀 The Agentic AI Architecture
+
+<p align="center">
+  <img src="public/uw_campus_hero.png" alt="UW Campus Hero" width="800">
+</p>
+
 Atlas has evolved from a standard hardcoded REST API into a **True Agentic AI Architecture**. At its core sits Google's Gemini 2.5-flash Large Language Model, acting as the central orchestration "brain." Rather than relying on simple text responses, the LLM is equipped with specialized Python tools that allow it to autonomously fetch data from or mutate data within our system of record (**Salesforce**).
+
+### 🏗 Architecture Overview
+
+```mermaid
+graph TD
+    %% Frontend
+    UI[React Frontend / Vite] -->|1. User Prompt Request| API[Django REST API]
+    API --> |2. Route Message| Agent[Gemini 2.5-Flash Agent]
+
+    %% Agent Core
+    subgraph Autonomous Agent Loop
+        Agent <--> |3. Tool Calling & Execution| Tools[Python Agent Tools]
+        Tools <--> |Query/Mutate| SF[(Salesforce Developer Edition)]
+        Tools --> |Log UI Actions| DB[(Local SQLite Database)]
+        Tools <--> |Semantic Search| RAG[RAG Campus Knowledge Base]
+    end
+
+    %% Response Synthesis
+    Agent --> |4. Synthesize Text & JSON UI Commands| API
+    API --> |5. Return Payload| UI
+```
 
 ### How the Agent Loop Works:
 1. **Frontend Request**: The React application sends a user prompt (e.g., "Check my holds and open a ticket for my dorm") to the Django API.
@@ -33,6 +59,90 @@ Atlas has evolved from a standard hardcoded REST API into a **True Agentic AI Ar
 - **System of Record**: Salesforce Developer Edition
 - **API Client**: `simple-salesforce`
 - **Generative AI**: Google Gemini API (`google-generativeai`)
+
+---
+
+## 📸 Comprehensive Application Previews
+
+*Below is a complete visual walkthrough of the Atlas Student Portal, encompassing the core navigation pillars, the tutorial experience, and the generative Agent's dynamic UI capabilities.*
+
+### 1. The Landing & Dashboard Experience
+<p align="center">
+  <img src="public/landing_page_1772943459908.png" alt="Atlas Landing Area" width="800">
+  <br>
+  <i>The entry point to the Atlas ecosystem, featuring a beautiful UW-themed design.</i>
+</p>
+
+<p align="center">
+  <img src="public/dashboard_tab.png" alt="Main Dashboard" width="800">
+  <br>
+  <i>The Dashboard: A centralized hub for the student's holistic university life.</i>
+</p>
+
+<p align="center">
+  <img src="public/tutorial_overlay_1772944013630.png" alt="Interactive Tutorial Overlay" width="800">
+  <br>
+  <i>An interactive, guided tour overlay demonstrating key platform features.</i>
+</p>
+
+### 2. The Five Pillars of Support
+
+Atlas categorizes support into distinct, purpose-built pillars. Each page aggregates relevant data from the Salesforce backend:
+
+| Academic | Financial |
+|:---:|:---:|
+| <img src="public/academic_tab.png" width="400"> | <img src="public/financial_tab.png" width="400"> |
+
+| Career & Jobs | Wellness |
+|:---:|:---:|
+| <img src="public/jobs_tab.png" width="400"> | <img src="public/wellness_tab.png" width="400"> |
+
+<p align="center">
+  **My Plan & Profile Management**<br>
+  <img src="public/plan_tab.png" width="390"> <img src="public/profile_tab.png" width="390">
+</p>
+
+---
+
+### 3. Agentic Chat Flows & Native UI Rendering
+
+The true power of Atlas lies in its Agentic Engine. The Gemini LLM parses intent, calls Python tools, and instructs the React frontend to natively render UI components directly into the chat flow.
+
+#### The Agent Interface & Action Log
+The right-hand panel visualizes the "Brain" at work. As the Agent executes tools, it logs Actions (with Agentforce metadata) indicating exactly what system it touched.
+<p align="center">
+  <img src="public/full_chat_workflow_1772943505087.png" alt="Chat UI Snapshot" width="800">
+</p>
+
+#### Visual Degree Audit
+When a student asks, *"How close am I to graduating?"*, the Agent runs an audit against their transcript and renders an interactive Progress Ring component.
+<p align="center">
+  <img src="public/degree_audit_ui_1772944059427.png" alt="Degree Audit Snapshot" width="800">
+</p>
+
+#### Actionable Course Registration
+When requested, the Agent searches the MuleSoft catalog API. It returns an interactive course results table directly in the chat, allowing the student to execute course enrollment without leaving the conversation.
+<p align="center">
+  <img src="public/course_registration_ui_1772944082330.png" alt="Course Search Snapshot" width="800">
+</p>
+
+#### Financial Aid Breakdown
+The Agent calculates the breakdown of grants, work-study balances, and pending documents, rendering a rich semantic Financial Card instead of an exhaustive wall of text.
+<p align="center">
+  <img src="public/financial_aid_card_1772943496357.png" alt="Financial Aid Summary" width="800">
+</p>
+
+#### Crisis Detection & Case Escalation
+If a student expresses distress, the Agent detects the crisis, immediately pages the on-call counselor via Salesforce Service Cloud, and flags the UI with a distinct red Emergency Support mode.
+<p align="center">
+  <img src="public/support_case_ui_1772944101768.png" alt="Support Case Escalation" width="800">
+</p>
+
+#### Automated Career Planning
+When a student asks for internship help, the Agent parses their academic record, identifies skill gaps, queries the alumni network, and generates a personalized 8-week multi-step career plan.
+<p align="center">
+  <img src="public/career_plan_ui_1772944120987.png" alt="Career Plan Generation" width="800">
+</p>
 
 ---
 
