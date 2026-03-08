@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Send, Zap, CheckCircle2, Clock, Loader2, AlertTriangle, ChevronRight, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { scenarios, pillarConfig, type Scenario, type ActionItem, type ChatMessage } from "@/data/atlasScenarios";
+import { ChatUiRenderer, type UiTrigger } from "@/components/chat/ChatUiRenderer";
 
 /* ─── Action Log types ─── */
 interface ActionLogItem {
@@ -175,6 +176,7 @@ interface LiveMessage {
   role: "user" | "atlas";
   text: string;
   action?: { label: string; path: string };
+  uiTriggers?: UiTrigger[];
 }
 
 /* ─── Quick prompts ─── */
@@ -274,6 +276,7 @@ const AtlasChat = () => {
             role: "atlas",
             text: data.text,
             action: data.action,
+            uiTriggers: data.ui_triggers,
           },
         ]);
 
@@ -447,6 +450,15 @@ const AtlasChat = () => {
                           {msg.action.label} <ArrowRight className="w-3 h-3" />
                         </button>
                       )}
+                      {msg.uiTriggers && msg.uiTriggers.length > 0 && (
+                        <ChatUiRenderer
+                          triggers={msg.uiTriggers}
+                          onAction={(action, payload) => {
+                            console.log("Chat UI action:", action, payload);
+                            // Future: dispatch follow-up messages to the agent
+                          }}
+                        />
+                      )}
                     </div>
                   </div>
                 ))}
@@ -541,6 +553,11 @@ const AtlasChat = () => {
                           </div>
                         )}
                         <span style={{ whiteSpace: "pre-line" }}>{msg.content}</span>
+                        {msg.uiTriggers && msg.uiTriggers.length > 0 && (
+                          <div className="mt-3">
+                            <ChatUiRenderer triggers={msg.uiTriggers} />
+                          </div>
+                        )}
                       </div>
                     </div>
                   );

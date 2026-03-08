@@ -19,6 +19,7 @@ Atlas is a **True Agentic AI** student-success platform for universities. A Reac
 | `atlas_backend/api/serializers.py` | DRF serializers — both use `fields = '__all__'` |
 | `atlas_backend/api/management/commands/seed_sf_data.py` | Clears DB, creates 16 students (incl. demo `jordan123`) + 30 SF Cases via Faker |
 | `atlas-compass-buddy/src/pages/AtlasChat.tsx` | Main chat UI — manages live chat + demo-scenario modes, renders action log panel |
+| `atlas-compass-buddy/src/components/chat/` | Phase 3 rich UI widgets: `DegreeProgressRing`, `CourseResultsTable`, `FinancialSummaryCard`, `AdvisorSlotPicker`, `ChatUiRenderer` |
 | `atlas-compass-buddy/src/data/atlasScenarios.ts` | Hardcoded demo scenarios with pillar-based actions for offline demos |
 
 ---
@@ -237,11 +238,11 @@ Pulls SF Contacts with `Title = 'Student'`, derives `netid` from email prefix, a
 
 ---
 
-### Phase 3 — Structured UI Payloads
+### Phase 3 — Structured UI Payloads ✅
 
 **Goal**: Let the agent trigger rich frontend components (charts, calendars, progress rings) inline in the chat, not just plain text.
 
-- [ ] Define a JSON payload convention. Example response shape from the backend:
+- [x] Define a JSON payload convention. Response shape from the backend:
   ```json
   {
     "text": "Here's your degree progress…",
@@ -251,14 +252,18 @@ Pulls SF Contacts with `Title = 'Student'`, derives `netid` from email prefix, a
     ]
   }
   ```
-- [ ] Update `views.py` `process_chat` to pass through `ui_triggers` from agent output.
-- [ ] In `agent.py`, update `execute_agent_chat` to optionally return a third element (triggers list), or embed structured JSON in the text that the view parses.
-- [ ] **Frontend**: Create reusable chart components in `src/components/chat/`:
-  - `DegreeProgressRing.tsx` — circular progress using recharts or a custom SVG.
-  - `CourseScheduleCard.tsx` — weekly calendar grid.
-  - `FinancialBreakdownChart.tsx` — stacked bar chart using recharts.
-- [ ] In `AtlasChat.tsx`, update the assistant message renderer to detect `ui_triggers` in the response and mount the corresponding React component inline in the chat bubble.
-- [ ] Add demo scenario entries that include `ui_triggers` so the Demo mode also showcases rich rendering.
+- [x] Updated `views.py` `process_chat` to unpack 3-tuple from `execute_agent_chat` and pass `ui_triggers` in response.
+- [x] In `agent.py`, added `_emit_ui_trigger(component, data)` helper with thread-local storage. `execute_agent_chat` returns `(text, actions, ui_triggers)`. Four tools emit triggers: `run_degree_audit` → DegreeProgressRing, `search_courses` → CourseResultsTable, `query_financial_aid` → FinancialSummaryCard, `check_advisor_availability` → AdvisorSlotPicker.
+- [x] **Frontend**: Created reusable rich components in `src/components/chat/`:
+  - `DegreeProgressRing.tsx` — circular SVG progress ring with credits, GPA, graduation note.
+  - `CourseResultsTable.tsx` — interactive course table with enroll buttons, seat counts.
+  - `FinancialSummaryCard.tsx` — award breakdown with amounts, status pills, balance.
+  - `AdvisorSlotPicker.tsx` — advisor slot list with book buttons, office & time display.
+  - `ChatUiRenderer.tsx` — dispatcher that maps `ui_triggers[].component` → React component.
+  - `index.ts` — barrel export.
+- [x] In `AtlasChat.tsx`, updated `LiveMessage` type with `uiTriggers?`, `sendMessage()` captures `data.ui_triggers`, message renderer calls `<ChatUiRenderer>` after the text bubble.
+- [x] Updated `ChatMessage` type in `atlasScenarios.ts` to include `uiTriggers?: UiTriggerData[]`.
+- [x] Added 4 demo scenarios: Visual Degree Audit, Visual Course Search, Visual Aid Summary, Visual Advisor Booking — all with embedded `uiTriggers` that render rich components in Demo mode.
 
 ---
 

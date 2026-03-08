@@ -1,9 +1,15 @@
 export type MessageRole = "user" | "atlas" | "atlas-crisis" | "atlas-success" | "confirmation";
 
+export interface UiTriggerData {
+  component: string;
+  data: Record<string, any>;
+}
+
 export interface ChatMessage {
   role: MessageRole;
   content: string;
   confirmationOptions?: { primary: string; secondary: string; detail: string };
+  uiTriggers?: UiTriggerData[];
 }
 
 export interface ActionItem {
@@ -776,6 +782,177 @@ export const scenarios: Scenario[] = [
       { id: "CSR-001", pillar: "academic", title: "Knowledge Base Searched", description: "Retrieved CS degree requirements — 4 passages from cs_major_requirements.txt", status: "Complete", agentforceNote: "RAG · ChromaDB vector search" },
       { id: "CSR-002", pillar: "academic", title: "Transcript Cross-Referenced", description: "Compared 19 completed courses against 180-credit CS requirement", status: "Complete", agentforceNote: "Data Cloud · Degree audit engine" },
       { id: "CSR-003", pillar: "academic", title: "At-Risk Flag", description: "MATH 208 at C- — below 2.0 threshold for math requirement", status: "Complete", agentforceNote: "Einstein AI · Academic risk detection" },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════
+  // PHASE 3 — RICH UI RENDERING DEMOS
+  // ═══════════════════════════════════════════════════
+  {
+    id: "rich-degree-audit",
+    pillar: "academic",
+    pillarLabel: "Academic",
+    title: "Visual Degree Audit",
+    trigger: "Run my degree audit with a visual progress ring",
+    messages: [
+      {
+        role: "user",
+        content: "Run my degree audit — how close am I to graduating?",
+      },
+      {
+        role: "atlas",
+        content:
+          "Here's your degree progress at a glance, Jordan. You're 68% through your BS Computer Science:",
+        uiTriggers: [
+          {
+            component: "DegreeProgressRing",
+            data: {
+              completed: 82,
+              total: 120,
+              gpa: 3.47,
+              remaining: 38,
+              studentName: "Jordan Rivera",
+              major: "BS Computer Science",
+              gradNote: "On track for Spring 2027 graduation if you take 15 cr/quarter.",
+            },
+          },
+        ],
+      },
+      {
+        role: "atlas",
+        content:
+          "⚠️ One flag — your MATH 208 grade (C-) is below the 2.0 threshold for the math requirement. I'd recommend retaking it or substituting MATH 307.",
+      },
+    ],
+    actions: [
+      { id: "RDA-001", pillar: "academic", title: "Degree Audit Executed", description: "Ran full audit — 82/120 credits completed, GPA 3.47", status: "Complete", agentforceNote: "Data Cloud · Degree audit engine" },
+      { id: "RDA-002", pillar: "academic", title: "Progress Ring Rendered", description: "Rich DegreeProgressRing widget displayed in chat", status: "Complete", agentforceNote: "Phase 3 · UI Triggers" },
+      { id: "RDA-003", pillar: "academic", title: "At-Risk Course Flagged", description: "MATH 208 at C- — below math req 2.0 minimum", status: "Complete", agentforceNote: "Einstein AI · Academic risk detection" },
+    ],
+  },
+  {
+    id: "rich-course-search",
+    pillar: "academic",
+    pillarLabel: "Academic",
+    title: "Visual Course Search",
+    trigger: "Search for courses with an interactive results table",
+    messages: [
+      {
+        role: "user",
+        content: "Find me some data structures or algorithms classes for next quarter.",
+      },
+      {
+        role: "atlas",
+        content:
+          "I found several matching courses. Here's a live table — you can enroll directly from here:",
+        uiTriggers: [
+          {
+            component: "CourseResultsTable",
+            data: {
+              query: "data structures algorithms",
+              courses: [
+                { code: "CSE 332", title: "Data Structures & Parallelism", credits: 4, schedule: "MWF 10:30-11:20", location: "CSE2 G10", seatsAvailable: 12, isFull: false },
+                { code: "CSE 331", title: "Software Design & Implementation", credits: 4, schedule: "TTh 1:00-2:20", location: "KNE 130", seatsAvailable: 3, isFull: false },
+                { code: "CSE 421", title: "Introduction to Algorithms", credits: 3, schedule: "MWF 1:30-2:20", location: "CSE2 G20", seatsAvailable: 0, isFull: true },
+                { code: "CSE 312", title: "Foundations of Computing II", credits: 4, schedule: "TTh 10:00-11:20", location: "LOW 216", seatsAvailable: 8, isFull: false },
+              ],
+            },
+          },
+        ],
+      },
+      {
+        role: "atlas",
+        content:
+          "CSE 332 has good availability and fits a morning schedule. CSE 421 is full but I can add you to the waitlist. Want me to enroll you in any of these?",
+      },
+    ],
+    actions: [
+      { id: "RCS-001", pillar: "academic", title: "Course Search", description: "Searched for 'data structures algorithms' — 4 matches", status: "Complete", agentforceNote: "Data Cloud · Course catalog API" },
+      { id: "RCS-002", pillar: "academic", title: "Results Table Rendered", description: "Interactive CourseResultsTable with enroll buttons shown in chat", status: "Complete", agentforceNote: "Phase 3 · UI Triggers" },
+    ],
+  },
+  {
+    id: "rich-financial-summary",
+    pillar: "financial",
+    pillarLabel: "Financial Aid",
+    title: "Visual Aid Summary",
+    trigger: "Show my financial aid summary with a rich card",
+    messages: [
+      {
+        role: "user",
+        content: "Can you show me a summary of my financial aid for this year?",
+      },
+      {
+        role: "atlas",
+        content:
+          "Here's your 2025–26 financial aid breakdown, Jordan:",
+        uiTriggers: [
+          {
+            component: "FinancialSummaryCard",
+            data: {
+              awards: [
+                { name: "Federal Pell Grant", amount: 3500, status: "Disbursed" },
+                { name: "University Need Grant", amount: 5000, status: "Disbursed" },
+                { name: "Federal Work-Study", amount: 2250, status: "Pending" },
+              ],
+              totalAwarded: 10750,
+              tuitionDue: 12588,
+              balance: 1838,
+              disbursementDate: "January 6, 2026",
+            },
+          },
+        ],
+      },
+      {
+        role: "atlas",
+        content:
+          "You have a remaining balance of $1,838. Your Work-Study award ($2,250) hasn't been applied yet — once it disburses, you'll be in the clear. I can also search for supplemental scholarships if you'd like.",
+      },
+    ],
+    actions: [
+      { id: "RFS-001", pillar: "financial", title: "Financial Data Retrieved", description: "Pulled Salesforce financial aid awards for 2025-26", status: "Complete", agentforceNote: "Salesforce · Financial Aid object" },
+      { id: "RFS-002", pillar: "financial", title: "Summary Card Rendered", description: "Rich FinancialSummaryCard displayed with award breakdown", status: "Complete", agentforceNote: "Phase 3 · UI Triggers" },
+    ],
+  },
+  {
+    id: "rich-advisor-slots",
+    pillar: "academic",
+    pillarLabel: "Academic",
+    title: "Visual Advisor Booking",
+    trigger: "Check advisor availability with interactive slot picker",
+    messages: [
+      {
+        role: "user",
+        content: "I need to meet with a CS advisor about my degree plan. Who's available?",
+      },
+      {
+        role: "atlas",
+        content:
+          "Here are the available slots for CS advising. You can book directly:",
+        uiTriggers: [
+          {
+            component: "AdvisorSlotPicker",
+            data: {
+              department: "Computer Science",
+              slots: [
+                { slotId: 101, advisorName: "Dr. Sarah Chen", department: "Computer Science", office: "CSE 410", datetime: "2025-01-27T10:00:00", displayTime: "Mon Jan 27, 10:00 AM" },
+                { slotId: 102, advisorName: "Dr. Sarah Chen", department: "Computer Science", office: "CSE 410", datetime: "2025-01-27T14:00:00", displayTime: "Mon Jan 27, 2:00 PM" },
+                { slotId: 103, advisorName: "Prof. Mike Torres", department: "Computer Science", office: "CSE 326", datetime: "2025-01-28T11:00:00", displayTime: "Tue Jan 28, 11:00 AM" },
+                { slotId: 104, advisorName: "Prof. Mike Torres", department: "Computer Science", office: "CSE 326", datetime: "2025-01-29T09:00:00", displayTime: "Wed Jan 29, 9:00 AM" },
+              ],
+            },
+          },
+        ],
+      },
+      {
+        role: "atlas",
+        content:
+          "Dr. Chen specializes in upper-division planning and Prof. Torres handles major applications. Both are great choices for degree planning.",
+      },
+    ],
+    actions: [
+      { id: "RAS-001", pillar: "academic", title: "Advisor Availability Checked", description: "Found 4 open slots across 2 CS advisors", status: "Complete", agentforceNote: "Data Cloud · AdvisorSlot API" },
+      { id: "RAS-002", pillar: "academic", title: "Slot Picker Rendered", description: "Interactive AdvisorSlotPicker with book buttons shown in chat", status: "Complete", agentforceNote: "Phase 3 · UI Triggers" },
     ],
   },
 ];
