@@ -1,0 +1,90 @@
+University of Washington — Computer Science Major Requirements
+===============================================================
+
+ADMISSION TO THE CSE MAJOR
+----------------------------
+The Computer Science & Engineering (CSE) major is a capacity-constrained program. Students apply for direct admission as freshmen or through the competitive application process:
+
+- Direct Admission: Offered to a limited number of incoming freshmen based on holistic review (GPA, essays, extracurriculars). About 80 students admitted directly each year.
+- Competitive Admission (most common): Students apply after completing prerequisite courses. Two application cycles per year:
+  - Autumn cycle: Apply by April 1. Decisions by May 15.
+  - Spring cycle: Apply by November 1. Decisions by December 15.
+
+Prerequisites for application:
+1. CSE 142: Computer Programming I (minimum 3.2)
+2. CSE 143: Computer Programming II (minimum 3.2)
+3. MATH 124: Calculus I (minimum 2.5)
+4. MATH 125: Calculus II (minimum 2.5)
+5. Minimum cumulative GPA of 3.0.
+
+Admission is competitive. Typical admitted student GPA in prerequisites: 3.6–3.9.
+
+DEGREE REQUIREMENTS (BS in Computer Science)
+----------------------------------------------
+Total credits required: 180 quarter credits.
+
+**Core CS Courses (52 credits):**
+- CSE 311: Foundations of Computing I (4cr)
+- CSE 312: Foundations of Computing II (4cr)
+- CSE 331: Software Design & Implementation (4cr)
+- CSE 332: Data Structures & Parallelism (4cr)
+- CSE 333: Systems Programming (4cr)
+- CSE 341: Programming Languages (4cr)
+- CSE 351: Hardware/Software Interface (4cr)
+- CSE 369: Introduction to Digital Design (3cr)
+- CSE 401: Introduction to Compiler Construction (4cr)
+- CSE 421: Introduction to Algorithms (4cr)
+- CSE 451: Introduction to Operating Systems (4cr)
+- CSE 452: Introduction to Distributed Systems (4cr)
+- CSE Senior Capstone: CSE 403 (Software Engineering Capstone, 5cr)
+
+**Math & Science Foundation (38 credits):**
+- MATH 124, 125, 126: Calculus sequence (15cr)
+- MATH 208: Matrix Algebra with Applications (3cr) — minimum grade C (2.0)
+- STAT 311 or CSE 312 equivalent for probability requirement (4cr)
+- PHYS 121, 122, 123: Physics sequence (15cr)
+- One approved lab science elective (1cr from PHYS labs or CHEM labs)
+
+**General Education & Electives (60 credits):**
+- Arts & Humanities (VLPA): 15 credits from approved list.
+- Social Sciences (I&S): 15 credits from approved list.
+- Natural Sciences (NW): Fulfilled by physics sequence above.
+- Additional breadth: 30 credits of free electives.
+
+**Writing (15 credits):**
+- English Composition (C courses): ENGL 111, 121, or 131 (5cr).
+- Writing-intensive (W courses): Two W-courses, at least one in CSE (e.g., CSE 390W: Technical Writing in CS, or another approved W course). Total 10cr of W courses.
+
+**Diversity Requirement (5 credits):**
+- One 5-credit course from the approved Diversity list (e.g., AES 150, AMER 230, GWSS 200).
+
+**Technical Electives (10 credits):**
+- Two additional CSE courses numbered 300+, or approved courses from EE, INFO, or MATH.
+
+SPECIALIZATION TRACKS (Optional)
+----------------------------------
+Students may declare a specialization (not required for graduation):
+1. **Artificial Intelligence**: CSE 446, CSE 447, CSE 473, CSE 490 (ML)
+2. **Systems & Networking**: CSE 452, CSE 461, CSE 462
+3. **Human-Computer Interaction**: CSE 440, CSE 441
+4. **Data Science**: CSE 414, CSE 446, STAT 390
+5. **Security & Privacy**: CSE 484, CSE 490 (Security)
+
+Each specialization requires 3–4 designated courses. Students declare through the CSE advising office.
+
+ACADEMIC STANDING IN THE MAJOR
+--------------------------------
+Once admitted, students must maintain:
+- Cumulative GPA of 2.0 or above.
+- A grade of 2.0 or above in each required CSE course. Courses passed below 2.0 must be retaken.
+- Satisfactory progress: Complete at least 36 credits per academic year to stay on track for 4-year graduation.
+
+Students who fall below these standards receive a warning from the CSE advising office. Two consecutive quarters below standard may result in removal from the major.
+
+CSE ADVISING
+-------------
+CSE undergraduate advisors are available in the Paul Allen Center for Computer Science & Engineering:
+- Dr. Sarah Patel — General CSE advising, specialization counseling. Office: ACE 542.
+- Dr. Michael Torres — Transfer students, double-major planning. Office: ACE 310.
+- Walk-in hours: Tuesday and Thursday 1:00–3:00 PM.
+- Appointments: Book through Atlas or email cse-advising@uw.edu.
