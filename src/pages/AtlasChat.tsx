@@ -245,43 +245,72 @@ const AtlasChat = () => {
     if (first) setSelectedScenario(first);
   };
 
-  const sendMessage = (text: string) => {
+  const sendMessage = async (text: string) => {
     if (!text.trim()) return;
     setMessages((prev) => [...prev, { role: "user", text }]);
     setInput("");
     setTyping(true);
 
-    const { responses, actions, action } = getContextualResponse(text);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+      const response = await fetch(`${apiUrl}/api/actions/process_chat/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: text, netid: "jordan123" }),
+      });
 
-    // Add actions to the Action Log progressively
-    let actionDelay = 800;
-    actions.forEach((act, i) => {
-      setTimeout(() => {
-        setActionLog((prev) => {
-          if (prev.find((a) => a.id === act.id)) return prev;
-          return [...prev, act];
-        });
-      }, actionDelay);
-      actionDelay += 600;
-    });
+      if (!response.ok) throw new Error("Backend request failed");
 
-    // Deliver responses with delays
-    let delay = 1200;
-    responses.forEach((response, i) => {
+      const data = await response.json();
+
+      // Delay response slightly for natural feel
       setTimeout(() => {
-        if (i === responses.length - 1) setTyping(false);
+        setTyping(false);
         setMessages((prev) => [
           ...prev,
           {
             role: "atlas",
-            text: response,
-            action: i === responses.length - 1 ? action : undefined,
+            text: data.text,
+            action: data.action,
           },
         ]);
-        if (i < responses.length - 1) setTyping(true);
-      }, delay);
-      delay += 1800 + Math.random() * 800;
-    });
+
+        // Add actions to the Action Log progressively
+        if (data.actions && data.actions.length > 0) {
+          data.actions.forEach((act: any, i: number) => {
+            setTimeout(() => {
+              setActionLog((prev) => {
+                const newAction: ActionLogItem = {
+                  id: `SF-${Math.floor(Math.random() * 1000)}`,
+                  title: act.type === "info" ? "Data Retrieval" :
+                    act.type === "warning" ? "Hold Detected" : "System Action",
+                  description: act.description,
+                  status: act.status === "completed" ? "Complete" :
+                    act.status === "pending" ? "In Progress" : "Awaiting",
+                  agentforceNote: act.agentforceNote,
+                };
+                return [...prev, newAction];
+              });
+            }, i * 600 + 400);
+          });
+        }
+      }, 1000);
+
+    } catch (error) {
+      console.error("Error calling backend:", error);
+      setTimeout(() => {
+        setTyping(false);
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "atlas",
+            text: "I'm having trouble connecting to my backend right now. Please ensure the Django server is running.",
+          },
+        ]);
+      }, 1000);
+    }
   };
 
   const completedCount = actionLog.filter((a) => a.status === "Complete" || a.status === "Ready").length;
