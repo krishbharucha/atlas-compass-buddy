@@ -120,7 +120,7 @@ const Index = () => {
                 <span className="text-sm font-medium text-[#39275b]/80 font-mono-accent">University of Washington · Agentic AI</span>
               </div>
               <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-[#39275b] tracking-tight leading-[1.1] mb-5">
-                Atlas &mdash;<br /> Your UW Student Success Assistant
+                Atlas;<br /> Your UW Student Success Assistant
               </h1>
               <p className="text-base sm:text-lg text-[#39275b]/80 font-medium leading-relaxed mb-4 max-w-lg">
                 One conversation. Every campus service connected.
