@@ -217,26 +217,23 @@ Pulls SF Contacts with `Title = 'Student'`, derives `netid` from email prefix, a
 
 ---
 
-### Phase 2 — RAG Integration (Knowledge Base)
+### Phase 2 — RAG Integration (Knowledge Base) ✅ COMPLETE
 
 **Goal**: Give the agent campus policy knowledge so it can cite real rules instead of hallucinating.
 
-- [ ] Create directory `atlas_backend/knowledge/` for PDF sources and vector DB storage.
-- [ ] Add `chromadb` (or `faiss-cpu` + `langchain`) to `requirements.txt`.
-- [ ] Write `atlas_backend/knowledge/ingest.py` — a script that:
-  1. Reads PDFs from `knowledge/documents/` (Housing rules, Academic Integrity, Financial Aid deadlines).
-  2. Splits them into chunks (~500 tokens).
-  3. Embeds chunks via Gemini embeddings or a local model.
+- [x] Create directory `atlas_backend/knowledge/` for document sources and vector DB storage.
+- [x] Add `chromadb==1.5.2` to `requirements.txt`.
+- [x] Write `atlas_backend/knowledge/ingest.py` — a script that:
+  1. Reads `.txt`/`.md` files from `knowledge/documents/`.
+  2. Splits them into chunks (~500 tokens with 80-token overlap).
+  3. Embeds chunks via `gemini-embedding-001` model.
   4. Stores in a persistent ChromaDB collection at `knowledge/vectordb/`.
-- [ ] Create a Django management command `python manage.py ingest_knowledge` that calls the ingest script.
-- [ ] In `api/agent.py`, add:
-  ```python
-  def search_knowledge_base(query: str) -> str:
-      """Searches the campus policy knowledge base and returns relevant passages."""
-  ```
-  This tool queries ChromaDB, retrieves top-k passages, and returns them as a formatted string.
-- [ ] Append to `AGENT_TOOLS`.
-- [ ] Update `execute_agent_chat` system instruction to tell Gemini: "When the student asks about campus policies, use `search_knowledge_base` before answering."
+- [x] Create 5 campus policy documents: academic policies, financial aid, housing, health & wellness, important dates, CS major requirements.
+- [x] Create Django management command `python manage.py ingest_knowledge` that calls the ingest script and tracks documents in `KnowledgeDocument` model.
+- [x] In `api/agent.py`, added `search_knowledge_base(query: str) -> str` tool that queries ChromaDB top-4 passages with Gemini query embeddings.
+- [x] Appended to `AGENT_TOOLS`.
+- [x] Updated `execute_agent_chat` system instruction to use `search_knowledge_base` for policy questions with source citation.
+- [x] Added 4 RAG-powered demo scenarios to frontend: Add/Drop Deadlines, Financial Aid SAP, Housing Contract, CS Major Requirements.
 
 ---
 

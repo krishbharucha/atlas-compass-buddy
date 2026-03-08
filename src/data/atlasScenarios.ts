@@ -618,6 +618,166 @@ export const scenarios: Scenario[] = [
       { id: "DA-005", pillar: "academic", title: "Gap-Filling Courses Found", description: "MATH 307, ENGL 182, AMER 230 — all available Spring 2026", status: "Ready", agentforceNote: "Data Cloud · Course recommendation engine" },
     ],
   },
+
+  // ═══════════════════════════════════════════════════
+  // PHASE 2: RAG — CAMPUS POLICY Q&A
+  // ═══════════════════════════════════════════════════
+  {
+    id: "policy-add-drop",
+    pillar: "academic",
+    pillarLabel: "Academic",
+    title: "Add/Drop Deadlines",
+    trigger: "When is the last day to drop a class?",
+    messages: [
+      {
+        role: "user",
+        content: "When is the last day I can drop a class this quarter without it showing on my transcript?",
+      },
+      {
+        role: "atlas",
+        content:
+          "Great question, Jordan. Let me check the official UW academic calendar and drop/add policies for you.",
+      },
+      {
+        role: "atlas",
+        content:
+          "Here's what I found from the UW Academic Policies:\n\n" +
+          "For **Winter Quarter 2026**:\n" +
+          "• **Drop without a \"W\"**: Through **February 13, 2026** — no record on your transcript.\n" +
+          "• **Drop with a \"W\"**: February 14 – **February 20, 2026** — a Withdrawal mark appears but doesn't affect your GPA.\n" +
+          "• **After February 20**: You'd need to petition the Registrar, and it's only approved for extraordinary circumstances like a medical emergency.\n\n" +
+          "Since today is within the window, you can still drop without any record. Want me to help you review your schedule to decide which course to drop?",
+      },
+    ],
+    actions: [
+      { id: "PO-001", pillar: "academic", title: "Knowledge Base Searched", description: "Queried campus policy DB for add/drop deadlines — 4 relevant passages retrieved", status: "Complete", agentforceNote: "RAG · ChromaDB vector search" },
+      { id: "PO-002", pillar: "academic", title: "Policy Cited", description: "Source: UW Academic Policies — Add/Drop Deadlines section", status: "Complete", agentforceNote: "RAG · Source attribution" },
+    ],
+  },
+
+  {
+    id: "policy-financial-aid-sap",
+    pillar: "financial",
+    pillarLabel: "Financial Aid",
+    title: "Financial Aid Requirements",
+    trigger: "Will I lose my financial aid?",
+    messages: [
+      {
+        role: "user",
+        content: "I'm worried about losing my financial aid. What do I need to maintain to keep it?",
+      },
+      {
+        role: "atlas",
+        content:
+          "That's an important question. Let me pull up the Satisfactory Academic Progress (SAP) requirements from the UW Financial Aid policies.",
+      },
+      {
+        role: "atlas",
+        content:
+          "To keep your financial aid, you must meet **three SAP requirements** reviewed every quarter:\n\n" +
+          "1. **GPA**: Maintain at least a **2.0 cumulative GPA**.\n" +
+          "2. **Credit Completion Rate**: Complete at least **67%** of all attempted credits (including Ws and Incompletes).\n" +
+          "3. **Maximum Timeframe**: Finish your degree within **270 attempted credits** (150% of the 180-credit requirement).\n\n" +
+          "Your current GPA is 3.47 and you've completed 82 credits — you're well within all three thresholds. " +
+          "If you ever dip below, you'd get one **warning quarter** before aid is suspended. You can also appeal with extenuating circumstances.\n\n" +
+          "*(Source: UW Financial Aid Policies)*",
+      },
+    ],
+    actions: [
+      { id: "FA-SAP-001", pillar: "financial", title: "Knowledge Base Searched", description: "Queried SAP requirements — matched Financial Aid Policies document", status: "Complete", agentforceNote: "RAG · ChromaDB vector search" },
+      { id: "FA-SAP-002", pillar: "financial", title: "Student Record Cross-Referenced", description: "GPA 3.47, 82 credits — all SAP thresholds met", status: "Complete", agentforceNote: "Data Cloud · Student record lookup" },
+    ],
+  },
+
+  {
+    id: "policy-housing-contract",
+    pillar: "admin",
+    pillarLabel: "Campus Admin",
+    title: "Housing Contract",
+    trigger: "Can I break my housing contract?",
+    messages: [
+      {
+        role: "user",
+        content: "I got an internship in San Francisco for Spring. Can I break my housing contract to move out?",
+      },
+      {
+        role: "atlas",
+        content:
+          "Congrats on the internship! Let me check the UW housing contract policies to see what your options are.",
+      },
+      {
+        role: "atlas",
+        content:
+          "According to the **UW Housing & Residential Life** policies, the housing contract runs for the full academic year (Autumn through Spring). Early termination is only permitted for:\n\n" +
+          "1. Graduation or academic dismissal\n" +
+          "2. Marriage or domestic partnership\n" +
+          "3. Medical reasons (with documentation)\n" +
+          "4. **Approved study abroad program**\n\n" +
+          "An internship isn't listed as an approved reason, so breaking the contract would make you **liable for the remaining quarter's room charges** and you'd **forfeit your $300 deposit**.\n\n" +
+          "However, I'd recommend:\n" +
+          "• Check if your internship qualifies as a **co-op program** through your department — some co-ops count as study abroad equivalents.\n" +
+          "• Contact the Housing office directly to discuss your situation — they sometimes make exceptions.\n" +
+          "• If you're in Lander or Maple Hall, you might be able to find someone to **sublease** through the housing exchange board.\n\n" +
+          "Want me to file a support case with the Housing office for you?",
+      },
+      {
+        role: "confirmation",
+        content: "Contact Housing Office",
+        confirmationOptions: {
+          primary: "File Housing Support Case",
+          secondary: "Just Show Me the Policy",
+          detail: "Create a support case requesting early contract termination for Spring internship",
+        },
+      },
+    ],
+    actions: [
+      { id: "HC-001", pillar: "admin", title: "Knowledge Base Searched", description: "Queried housing contract termination policy — 3 passages retrieved", status: "Complete", agentforceNote: "RAG · ChromaDB vector search" },
+      { id: "HC-002", pillar: "admin", title: "Policy Analyzed", description: "Internship not in approved termination list — alternatives identified", status: "Complete", agentforceNote: "Einstein AI · Policy reasoning" },
+      { id: "HC-003", pillar: "admin", title: "Support Case Ready", description: "Pending student confirmation to file with UW Housing office", status: "Ready", agentforceNote: "Service Cloud · Case creation" },
+    ],
+  },
+
+  {
+    id: "policy-cs-requirements",
+    pillar: "academic",
+    pillarLabel: "Academic",
+    title: "CS Major Requirements",
+    trigger: "What classes do I need to graduate with a CS degree?",
+    messages: [
+      {
+        role: "user",
+        content: "Can you give me a breakdown of what I still need to complete for my CS degree?",
+      },
+      {
+        role: "atlas",
+        content:
+          "Let me pull up the CS major requirements and cross-reference them with your transcript.",
+      },
+      {
+        role: "atlas",
+        content:
+          "Here's the **BS Computer Science** breakdown from the UW CSE department, mapped against your completed coursework:\n\n" +
+          "**Core CS Courses (52cr required):**\n" +
+          "✅ CSE 142, CSE 143, CSE 332, CSE 351 — completed\n" +
+          "❌ CSE 311, 312, 331, 333, 341, 369, 401, 421, 451, 452, 403 — still needed\n\n" +
+          "**Math & Science (38cr required):**\n" +
+          "✅ MATH 124, 125, 126, MATH 208 (⚠️ C-, needs ≥2.0), STAT 311, PHYS 121, 122 — completed\n" +
+          "❌ PHYS 123, lab elective — still needed\n\n" +
+          "**Writing (15cr required):**\n" +
+          "✅ ENGL 131 — completed\n" +
+          "❌ 2 W-courses (10cr) — consider CSE 390W\n\n" +
+          "**Diversity (5cr required):**\n" +
+          "❌ Not yet completed — AMER 230 or GWSS 200 recommended\n\n" +
+          "Key note: Your MATH 208 grade of C- is **below the 2.0 minimum** for the math requirement. You'll need to retake it or substitute MATH 307.\n\n" +
+          "*(Sources: CS Major Requirements, Academic Policies)*",
+      },
+    ],
+    actions: [
+      { id: "CSR-001", pillar: "academic", title: "Knowledge Base Searched", description: "Retrieved CS degree requirements — 4 passages from cs_major_requirements.txt", status: "Complete", agentforceNote: "RAG · ChromaDB vector search" },
+      { id: "CSR-002", pillar: "academic", title: "Transcript Cross-Referenced", description: "Compared 19 completed courses against 180-credit CS requirement", status: "Complete", agentforceNote: "Data Cloud · Degree audit engine" },
+      { id: "CSR-003", pillar: "academic", title: "At-Risk Flag", description: "MATH 208 at C- — below 2.0 threshold for math requirement", status: "Complete", agentforceNote: "Einstein AI · Academic risk detection" },
+    ],
+  },
 ];
 
 export const pillarConfig = {
