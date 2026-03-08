@@ -472,6 +472,152 @@ export const scenarios: Scenario[] = [
       { id: "D7", pillar: "admin", title: "Appointment Booked", description: "Today 3:00 PM — Student Legal Services, HUB Room 306. ~10 minutes", status: "Complete", agentforceNote: "Flow Orchestration · Appointment scheduler" },
     ],
   },
+
+  // ═══════════════════════════════════════════════════
+  // PHASE 1: COURSE REGISTRATION
+  // ═══════════════════════════════════════════════════
+  {
+    id: "acad-course-register",
+    pillar: "academic",
+    pillarLabel: "Academic",
+    title: "Course Registration",
+    trigger: "Need to register for Spring courses",
+    messages: [
+      {
+        role: "user",
+        content: "I need to register for Spring quarter. Can you help me find a CSE course that still has seats?",
+      },
+      {
+        role: "atlas",
+        content:
+          "Absolutely, Jordan. Let me search the Spring 2026 CSE catalog and check seat availability in real-time.",
+      },
+      {
+        role: "atlas",
+        content:
+          "I found several options. CSE 142 (Computer Programming I) has 13 seats open — MWF 10:30-11:20 in Kane Hall. CSE 143 has only 2 seats left. CSE 332 has 5 seats open TTh 10:00-11:20. CSE 351 is completely full — I can waitlist you if needed.",
+      },
+      {
+        role: "confirmation",
+        content: "Enroll in Course",
+        confirmationOptions: {
+          primary: "Enroll in CSE 332",
+          secondary: "Waitlist CSE 351",
+          detail: "CSE 332: Data Structures & Parallelism (4cr) — TTh 10:00-11:20, CSE2 G10",
+        },
+      },
+      {
+        role: "atlas-success",
+        content:
+          "Done! You're now enrolled in CSE 332: Data Structures & Parallelism for Spring 2026. Your schedule has been updated. You'll meet TTh 10:00-11:20 in CSE2 G10. Want me to search for more courses or check how this fits your degree requirements?",
+      },
+    ],
+    actions: [
+      { id: "CR-001", pillar: "academic", title: "Course Catalog Search", description: "Searched CSE courses for Spring 2026 — 4 results with availability", status: "Complete", agentforceNote: "Data Cloud · Course catalog query" },
+      { id: "CR-002", pillar: "academic", title: "Seat Availability Check", description: "CSE 142: 13 open | CSE 143: 2 open | CSE 332: 5 open | CSE 351: FULL", status: "Complete", agentforceNote: "MuleSoft · Registration system API" },
+      { id: "CR-003", pillar: "academic", title: "Enrolled: CSE 332", description: "Successfully enrolled in Data Structures & Parallelism (4cr) — TTh 10:00-11:20", status: "Complete", agentforceNote: "Flow Orchestration · Enrollment pipeline" },
+      { id: "CR-004", pillar: "academic", title: "Schedule Updated", description: "Spring 2026 schedule synced with new enrollment", status: "Complete", agentforceNote: "MuleSoft · Calendar sync" },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════
+  // PHASE 1: ADVISOR BOOKING
+  // ═══════════════════════════════════════════════════
+  {
+    id: "acad-advisor-booking",
+    pillar: "academic",
+    pillarLabel: "Academic",
+    title: "Advisor Appointment",
+    trigger: "Need to meet with my CS advisor",
+    messages: [
+      {
+        role: "user",
+        content: "I need to meet with a Computer Science advisor about changing my specialization. Can you book something?",
+      },
+      {
+        role: "atlas",
+        content:
+          "Of course, Jordan. Let me check available CS advisor slots for you right now.",
+      },
+      {
+        role: "atlas",
+        content:
+          "I found several open slots:\n\n• Dr. Sarah Patel — Tomorrow at 10:00 AM (Paul Allen Center 542)\n• Dr. Sarah Patel — Tomorrow at 2:00 PM\n• Dr. Michael Torres — Wednesday at 10:00 AM (Paul Allen Center 310)\n• Dr. Michael Torres — Wednesday at 2:00 PM\n\nDr. Patel specializes in undergraduate advising. Would you like me to book with her?",
+      },
+      {
+        role: "confirmation",
+        content: "Book Advisor Appointment",
+        confirmationOptions: {
+          primary: "Book Dr. Patel — Tomorrow 10 AM",
+          secondary: "See More Times",
+          detail: "Dr. Sarah Patel — Paul Allen Center 542, ~30 min",
+        },
+      },
+      {
+        role: "atlas-success",
+        content:
+          "Booked! You'll meet Dr. Sarah Patel tomorrow at 10:00 AM in Paul Allen Center 542. I'd recommend bringing your degree audit and a list of specialization tracks you're interested in. Want me to run your degree audit now so you have it ready?",
+      },
+    ],
+    actions: [
+      { id: "AB-001", pillar: "academic", title: "Advisor Availability Checked", description: "4 open CS advisor slots found over the next 3 days", status: "Complete", agentforceNote: "MuleSoft · Advisor calendar API" },
+      { id: "AB-002", pillar: "academic", title: "Appointment Booked", description: "Dr. Sarah Patel — Tomorrow 10:00 AM, Paul Allen Center 542", status: "Complete", agentforceNote: "Flow Orchestration · Appointment scheduler" },
+      { id: "AB-003", pillar: "academic", title: "Prep Reminder Set", description: "Reminder to bring degree audit + specialization preferences", status: "Ready", agentforceNote: "Marketing Cloud · SMS reminder" },
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════
+  // PHASE 1: DEGREE AUDIT
+  // ═══════════════════════════════════════════════════
+  {
+    id: "acad-degree-audit",
+    pillar: "academic",
+    pillarLabel: "Academic",
+    title: "Degree Audit",
+    trigger: "How close am I to graduating?",
+    messages: [
+      {
+        role: "user",
+        content: "How many credits do I have left to graduate? Am I on track?",
+      },
+      {
+        role: "atlas",
+        content:
+          "Great question, Jordan. Let me pull your complete transcript and run a degree audit against the Computer Science requirements.",
+      },
+      {
+        role: "atlas",
+        content:
+          "Here's your degree audit:\n\n• **Credits completed**: 87 of 180\n• **Calculated GPA**: 3.41\n• **Credits remaining**: 93\n• **Estimated timeline**: ~6 quarters remaining (on track for Spring 2028)\n\nI noticed MATH 208 is at C- — that's below the 2.0 minimum for your math requirement. I've already flagged tutoring options for you. Your strongest area is Core CS where you're averaging a 3.7.",
+      },
+      {
+        role: "atlas",
+        content:
+          "Key recommendations:\n1. **Retake MATH 208** or take MATH 307 next quarter to strengthen your math foundation\n2. You still need 15 credits of Writing (W courses) — consider ENGL 281 or CSE 390W\n3. You're 5 credits short on your Diversity requirement\n\nWant me to search for courses that fill these gaps for Spring?",
+      },
+      {
+        role: "confirmation",
+        content: "Find Gap-Filling Courses",
+        confirmationOptions: {
+          primary: "Search Spring Courses for Gaps",
+          secondary: "Schedule Advisor Meeting",
+          detail: "Search for W-credit, Diversity, and Math courses for Spring 2026",
+        },
+      },
+      {
+        role: "atlas-success",
+        content:
+          "I've identified 3 courses that would fill your gaps: MATH 307 (Diff Eq, 3cr), ENGL 182 (Craft of Verse — W credit, 3cr, seats available), and AMER 230 (Diversity, 5cr). I can enroll you in any of these right now.",
+      },
+    ],
+    actions: [
+      { id: "DA-001", pillar: "academic", title: "Transcript Analyzed", description: "19 courses on record — 87 credits across 6 quarters", status: "Complete", agentforceNote: "Data Cloud · Transcript aggregation" },
+      { id: "DA-002", pillar: "academic", title: "Degree Audit Complete", description: "87/180 credits · GPA 3.41 · 93 credits remaining · ~6 quarters to graduation", status: "Complete", agentforceNote: "CRM Analytics · Degree progress engine" },
+      { id: "DA-003", pillar: "academic", title: "At-Risk Course Flagged", description: "MATH 208 at C- — below 2.0 minimum for math requirement", status: "Complete", agentforceNote: "Einstein AI · Academic risk detection" },
+      { id: "DA-004", pillar: "academic", title: "Gap Analysis", description: "Missing: 15 W-credits, 5 Diversity credits, Math foundation at risk", status: "Complete", agentforceNote: "CRM Analytics · Requirement gap analysis" },
+      { id: "DA-005", pillar: "academic", title: "Gap-Filling Courses Found", description: "MATH 307, ENGL 182, AMER 230 — all available Spring 2026", status: "Ready", agentforceNote: "Data Cloud · Course recommendation engine" },
+    ],
+  },
 ];
 
 export const pillarConfig = {
