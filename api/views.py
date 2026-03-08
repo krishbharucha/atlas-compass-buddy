@@ -67,11 +67,12 @@ class AtlasActionViewSet(viewsets.ModelViewSet):
         from .agent import execute_agent_chat
         
         try:
-            agent_text, new_actions = execute_agent_chat(user_message, student)
+            agent_text, new_actions, ui_triggers = execute_agent_chat(user_message, student)
             
             response_data = {
                 "text": agent_text,
-                "actions": [AtlasActionSerializer(action).data for action in new_actions]
+                "actions": [AtlasActionSerializer(action).data for action in new_actions],
+                "ui_triggers": ui_triggers,
             }
             return Response(response_data, status=status.HTTP_200_OK)
         except Exception as e:

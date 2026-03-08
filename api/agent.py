@@ -1,11 +1,30 @@
 import google.generativeai as genai
 import os
+import threading
 from django.utils import timezone
 from .models import (
     Student, AtlasAction, Course, Enrollment,
     Advisor, AdvisorSlot, DegreeRequirement, StudentCourseHistory,
 )
 from .sf_client import get_sf_connection
+
+# Thread-local storage for ui_triggers so tools can append structured payloads
+# during a single request without global state conflicts.
+_thread_local = threading.local()
+
+def _get_ui_triggers() -> list:
+    """Get the current request's ui_triggers list."""
+    if not hasattr(_thread_local, 'ui_triggers'):
+        _thread_local.ui_triggers = []
+    return _thread_local.ui_triggers
+
+def _reset_ui_triggers():
+    """Clear ui_triggers at the start of each request."""
+    _thread_local.ui_triggers = []
+
+def _emit_ui_trigger(component: str, data: dict):
+    """Called by tool functions to emit a structured UI trigger."""
+    _get_ui_triggers().append({"component": component, "data": data})
 
 # Will be called dynamically per request to ensure env is loaded
 def configure_gemini():
@@ -53,6 +72,18 @@ def query_financial_aid(netid: str) -> str:
         )
     except:
         pass
+
+    # Phase 3: Emit structured UI trigger for financial summary
+    _emit_ui_trigger("FinancialSummaryCard", {
+        "awards": [
+            {"name": "Merit Scholarship", "amount": 7500, "status": "Awarded"},
+            {"name": "Pell Grant", "amount": 3250, "status": "Pending Verification"},
+        ],
+        "totalAwarded": 10750,
+        "tuitionDue": 3386,
+        "balance": 10750 - 3386,
+        "disbursementDate": "March 20, 2026",
+    })
         
     return f"Student {netid} was awarded $7,500 Merit Scholarship and $3,250 Pell Grant. Disbursement is pending verification."
 
@@ -101,10 +132,26 @@ def search_courses(query: str) -> str:
         return f"No courses found matching '{query}'."
 
     results = []
+    course_rows = []
     for c in courses:
         seats = c.seats_available
         status_str = f"{seats} seats open" if seats > 0 else "FULL — waitlist only"
         results.append(f"• {c.code}: {c.title} ({c.credits}cr) — {c.schedule} @ {c.location} [{status_str}]")
+        course_rows.append({
+            "code": c.code,
+            "title": c.title,
+            "credits": c.credits,
+            "schedule": c.schedule,
+            "location": c.location,
+            "seatsAvailable": seats,
+            "isFull": c.is_full,
+        })
+
+    # Phase 3: Emit structured UI trigger for a course results table
+    _emit_ui_trigger("CourseResultsTable", {
+        "query": query,
+        "courses": course_rows,
+    })
 
     return f"Found {len(results)} course(s) matching '{query}':\n" + "\n".join(results)
 
@@ -166,10 +213,25 @@ def check_advisor_availability(department: str) -> str:
         return f"No available advisor slots found for the {department} department."
 
     results = []
+    slot_rows = []
     for s in slots:
         results.append(
             f"• Slot #{s.id}: {s.advisor.name} — {s.datetime:%A %b %d at %I:%M %p} (Office: {s.advisor.office})"
         )
+        slot_rows.append({
+            "slotId": s.id,
+            "advisorName": s.advisor.name,
+            "department": s.advisor.department,
+            "office": s.advisor.office,
+            "datetime": s.datetime.isoformat(),
+            "displayTime": f"{s.datetime:%A %b %d at %I:%M %p}",
+        })
+
+    # Phase 3: Emit structured UI trigger for advisor slots
+    _emit_ui_trigger("AdvisorSlotPicker", {
+        "department": department,
+        "slots": slot_rows,
+    })
 
     return f"Available {department} advisor slots:\n" + "\n".join(results)
 
@@ -260,6 +322,17 @@ def run_degree_audit(netid: str) -> str:
         agentforce_note="Gemini Tool: run_degree_audit"
     )
 
+    # Phase 3: Emit structured UI trigger for a rich progress ring
+    _emit_ui_trigger("DegreeProgressRing", {
+        "completed": total_credits,
+        "total": total_required,
+        "gpa": calculated_gpa,
+        "remaining": credits_remaining,
+        "studentName": f"{student.first_name} {student.last_name}",
+        "major": student.major or "Undeclared",
+        "gradNote": grad_note,
+    })
+
     summary = (
         f"Degree Audit for {student.first_name} {student.last_name} ({student.major}):\n"
         f"• Credits completed: {total_credits} / {total_required}\n"
@@ -329,10 +402,13 @@ AGENT_TOOLS = [
 def execute_agent_chat(message: str, student: Student):
     """
     Sends the user message to the Gemini agent, allowing it to call tools, 
-    and returns both the text response and any new actions taken.
+    and returns the text response, any new actions, and structured UI triggers.
     """
     if not configure_gemini():
-        return "GEMINI_API_KEY is missing from the environment.", []
+        return "GEMINI_API_KEY is missing from the environment.", [], []
+
+    # Reset UI triggers for this request
+    _reset_ui_triggers()
 
     # Get the timestamp before the conversation to find new actions later
     start_time = timezone.now()
@@ -374,4 +450,7 @@ def execute_agent_chat(message: str, student: Student):
         created_at__gte=start_time
     )
 
-    return text, list(new_actions)
+    # Collect UI triggers emitted by tools during this request
+    ui_triggers = list(_get_ui_triggers())
+
+    return text, list(new_actions), ui_triggers
