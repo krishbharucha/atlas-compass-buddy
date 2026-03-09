@@ -95,9 +95,8 @@ class AtlasActionViewSet(viewsets.ModelViewSet):
             # Note: We return the default student immediately so Gemini doesn't crash on this request.
 
         # Dynamic Agent Execution Loop (Gemini)
-        from .agent import execute_agent_chat
-        
         try:
+            from .agent import execute_agent_chat
             agent_text, new_actions, ui_triggers = execute_agent_chat(user_message, student)
             
             response_data = {
@@ -107,4 +106,7 @@ class AtlasActionViewSet(viewsets.ModelViewSet):
             }
             return Response(response_data, status=status.HTTP_200_OK)
         except Exception as e:
+            import traceback
+            error_trace = traceback.format_exc()
+            print(f"Agent Crash: {error_trace}")
             return Response({"error": f"Agent execution failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
