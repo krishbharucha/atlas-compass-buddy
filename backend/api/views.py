@@ -55,47 +55,47 @@ class AtlasActionViewSet(viewsets.ModelViewSet):
         """
         Processes a chat message and generates actions, syncing with Salesforce.
         """
-        user_message = request.data.get('message', '').lower()
-        netid = request.data.get('netid', 'jordan123') # Default for demo
-        
         try:
-            student = Student.objects.get(netid=netid)
-        except Student.DoesNotExist:
-            print("Student not found locally. Ephemeral DB might have reset. Auto-seeding...")
-            import threading
-            from django.core.management import call_command
-            from .models import Student
-            from .sf_client import get_sf_connection
+            user_message = request.data.get('message', '').lower()
+            netid = request.data.get('netid', 'jordan123') # Default for demo
             
-            # Create the demo student locally immediately so the chat can proceed
-            student, _ = Student.objects.get_or_create(
-                netid='jordan123',
-                defaults={
-                    'first_name': 'Jordan',
-                    'last_name': 'Student',
-                    'email': 'jordan123@uw.edu',
-                    'major': 'Computer Science',
-                    'gpa': 3.5,
-                    'sf_id': 'sf_demo_fallback', # Temporary
-                }
-            )
+            try:
+                student = Student.objects.get(netid=netid)
+            except Student.DoesNotExist:
+                print("Student not found locally. Ephemeral DB might have reset. Auto-seeding...")
+                import threading
+                from django.core.management import call_command
+                from .models import Student
+                from .sf_client import get_sf_connection
+                
+                # Create the demo student locally immediately so the chat can proceed
+                student, _ = Student.objects.get_or_create(
+                    netid='jordan123',
+                    defaults={
+                        'first_name': 'Jordan',
+                        'last_name': 'Student',
+                        'email': 'jordan123@uw.edu',
+                        'major': 'Computer Science',
+                        'gpa': 3.5,
+                        'sf_id': 'sf_demo_fallback', # Temporary
+                    }
+                )
 
-            # Define background task to run the heavy Salesforce sync without blocking HTTP
-            def background_seed():
-                try:
-                    call_command('seed_sf_data')
-                except Exception as e:
-                    print(f"Background seed failed: {e}")
+                # Define background task to run the heavy Salesforce sync without blocking HTTP
+                def background_seed():
+                    try:
+                        call_command('seed_sf_data')
+                    except Exception as e:
+                        print(f"Background seed failed: {e}")
 
-            # Start background thread
-            thread = threading.Thread(target=background_seed)
-            thread.daemon = True
-            thread.start()
-            
-            # Note: We return the default student immediately so Gemini doesn't crash on this request.
+                # Start background thread
+                thread = threading.Thread(target=background_seed)
+                thread.daemon = True
+                thread.start()
+                
+                # Note: We return the default student immediately so Gemini doesn't crash on this request.
 
-        # Dynamic Agent Execution Loop (Gemini)
-        try:
+            # Dynamic Agent Execution Loop (Gemini)
             from .agent import execute_agent_chat
             agent_text, new_actions, ui_triggers = execute_agent_chat(user_message, student)
             
@@ -108,5 +108,5 @@ class AtlasActionViewSet(viewsets.ModelViewSet):
         except Exception as e:
             import traceback
             error_trace = traceback.format_exc()
-            print(f"Agent Crash: {error_trace}")
-            return Response({"error": f"Agent execution failed: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            print(f"Global View Crash: {error_trace}")
+            return Response({"error": f"Internal Error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
