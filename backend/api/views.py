@@ -61,7 +61,13 @@ class AtlasActionViewSet(viewsets.ModelViewSet):
         try:
             student = Student.objects.get(netid=netid)
         except Student.DoesNotExist:
-            return Response({"error": "Student not found. Please sync first."}, status=status.HTTP_404_NOT_FOUND)
+            print("Student not found locally. Ephemeral DB might have reset. Auto-seeding...")
+            from django.core.management import call_command
+            try:
+                call_command('seed_sf_data')
+                student = Student.objects.get(netid=netid)
+            except Exception as e:
+                return Response({"error": f"Student not found and auto-sync failed: {str(e)}. Please check your Salesforce credentials in Render."}, status=status.HTTP_404_NOT_FOUND)
 
         # Dynamic Agent Execution Loop (Gemini)
         from .agent import execute_agent_chat
