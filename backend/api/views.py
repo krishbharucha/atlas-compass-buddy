@@ -65,7 +65,6 @@ class AtlasActionViewSet(viewsets.ModelViewSet):
                 print("Student not found locally. Ephemeral DB might have reset. Auto-seeding...")
                 import threading
                 from django.core.management import call_command
-                from .models import Student
                 from .sf_client import get_sf_connection
                 
                 # Create the demo student locally immediately so the chat can proceed
